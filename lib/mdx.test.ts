@@ -85,7 +85,7 @@ describe("getContentBySlug", () => {
     expect(project).not.toBeNull();
     expect(project!.frontmatter.category).toBe("Professional");
     expect(project!.frontmatter.associatedExperience).toBe("exp-rpotential");
-    expect(project!.frontmatter.techStack).toContain("React");
+    expect(project!.frontmatter.techStack).toContain("React 19");
   });
 });
 
@@ -187,7 +187,7 @@ describe("getSkillsForExperience", () => {
   it("returns aggregated techStack from associated projects", () => {
     const skills = getSkillsForExperience("exp-rpotential");
     expect(skills.length).toBeGreaterThan(0);
-    expect(skills).toContain("React");
+    expect(skills).toContain("React 19");
   });
 
   it("returns deduplicated and sorted skills", () => {
