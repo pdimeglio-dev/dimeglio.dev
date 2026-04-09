@@ -1,0 +1,48 @@
+# Project: dimeglio.dev — Pablo Di Meglio's Developer Portfolio & Blog
+
+## Package Manager
+- **Always use npm** — never yarn, pnpm, or bun.
+
+## Environment Files
+- All `.env*` files must be in `.gitignore` (already configured).
+
+## Tech Stack
+- **Framework:** Next.js 16 (App Router) with TypeScript
+- **Styling:** Tailwind CSS v4 + shadcn/ui (base-nova style)
+- **Content:** MDX via next-mdx-remote/rsc + gray-matter + rehype-pretty-code
+- **Animation:** Framer Motion
+- **Icons:** Lucide React
+- **Theming:** next-themes (forced dark mode)
+- **Testing:** Vitest + React Testing Library
+
+## Next.js 16 Breaking Changes (IMPORTANT)
+- `params` prop is now a **Promise** — must be awaited: `const { slug } = await params`
+- `searchParams` prop is also a **Promise** — must be awaited
+- Use `PageProps<'/path/[slug]'>` and `LayoutProps<'/path'>` global type helpers (no import needed)
+- Tailwind v4 uses `@import 'tailwindcss'` instead of `@tailwind` directives
+- Tailwind v4 uses `@theme inline {}` for custom theme values
+- shadcn/ui uses `@custom-variant dark (&:is(.dark *))` for dark mode
+
+## Coding Conventions
+- Use functional components with TypeScript
+- Prefer Server Components; use `'use client'` only when needed
+- File naming: kebab-case for files, PascalCase for components
+- Path alias: `@/*` maps to project root
+
+## Design System
+- Aesthetic: "Apple meets Gen AI startup"
+- Dark mode only (forced via next-themes)
+- True black background (#000000)
+- Pure white primary text
+- Dark slate borders (border-slate-800)
+- Geist font family (sans + mono)
+
+## Project Structure
+```
+/app           — Next.js App Router pages and layouts
+/components    — React components (UI in /components/ui via shadcn)
+/lib           — Utilities, helpers, data
+/content       — MDX content (blog, experience, projects)
+/docs          — Architecture docs and decision records
+/public        — Static assets
+```
