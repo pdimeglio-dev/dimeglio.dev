@@ -10,8 +10,8 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import type { ReactNode } from "react";
 import { ProjectCard } from "@/components/project-card";
-import { MDXContent } from "@/components/mdx-content";
 import type { MDXContent as MDXContentType, ProjectFrontmatter } from "@/lib/mdx";
 
 type Category = "All" | "Professional" | "Personal";
@@ -20,6 +20,8 @@ const categories: Category[] = ["All", "Professional", "Personal"];
 
 interface ProjectsGridProps {
   projects: MDXContentType<ProjectFrontmatter>[];
+  /** Pre-rendered MDX content keyed by slug (rendered on the server) */
+  renderedContent: Record<string, ReactNode>;
 }
 
 /**
@@ -29,7 +31,7 @@ interface ProjectsGridProps {
  * - Slide-out Sheet for project detail (parsed MDX)
  * - URL state sync via searchParams (?show=project-slug&category=...)
  */
-export function ProjectsGrid({ projects }: ProjectsGridProps) {
+export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -161,7 +163,7 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
               </div>
 
               <div className="mt-6">
-                <MDXContent source={activeProject.content} />
+                {renderedContent[activeProject.slug]}
               </div>
             </>
           )}

@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { getProjects } from "@/lib/mdx";
+import { MDXContent } from "@/components/mdx-content";
 import { ProjectsGrid } from "@/components/projects-grid";
 
 export const metadata: Metadata = {
@@ -10,14 +12,23 @@ export const metadata: Metadata = {
 
 /**
  * Projects page — displays a filterable grid of project cards.
- * Data is fetched server-side and passed to the client-side ProjectsGrid
- * which handles filtering, Sheet detail, and URL state sync.
  *
- * Wrapped in Suspense because ProjectsGrid uses useSearchParams
- * (required for dynamic rendering with client-side search params).
+ * MDX content is pre-rendered here (Server Component) and passed as
+ * ReactNode props to the client-side ProjectsGrid. This avoids the
+ * "async Client Component" error from using MDXRemote in a client context.
+ *
+ * The RSC protocol supports passing ReactNode as props to client components.
  */
 export default function ProjectsPage() {
   const projects = getProjects();
+
+  // Pre-render MDX content on the server for each project
+  const renderedContent: Record<string, ReactNode> = {};
+  for (const project of projects) {
+    renderedContent[project.slug] = (
+      <MDXContent source={project.content} />
+    );
+  }
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-24">
@@ -28,7 +39,10 @@ export default function ProjectsPage() {
 
       <div className="mt-12">
         <Suspense fallback={<ProjectsGridSkeleton />}>
-          <ProjectsGrid projects={projects} />
+          <ProjectsGrid
+            projects={projects}
+            renderedContent={renderedContent}
+          />
         </Suspense>
       </div>
     </main>
