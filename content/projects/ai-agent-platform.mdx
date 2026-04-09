@@ -1,0 +1,36 @@
+---
+title: "AI Agent Platform"
+description: "A platform for building, deploying, and monitoring autonomous AI agents."
+category: "Professional"
+tags: ["ai", "agents", "langchain", "python", "typescript"]
+image: "/projects/ai-agent-platform.png"
+github: "https://github.com"
+live: "https://example.com"
+featured: true
+order: 1
+---
+
+# AI Agent Platform
+
+A comprehensive platform for building, deploying, and monitoring autonomous AI agents in production environments.
+
+## Architecture
+
+The platform uses a multi-agent orchestration pattern:
+
+```typescript
+const orchestrator = new AgentOrchestrator({
+  agents: [researchAgent, writerAgent, reviewerAgent],
+  strategy: "sequential",
+  fallback: "human-in-the-loop",
+});
+
+const result = await orchestrator.execute(task);
+```
+
+## Key Features
+
+- **Visual Agent Builder** — Drag-and-drop interface for composing agent workflows
+- **Real-time Monitoring** — Live dashboards for agent performance and token usage
+- **Guardrails Engine** — Built-in safety checks and content filtering
+- **Multi-model Support** — GPT-4, Claude, Gemini, and open-source models
