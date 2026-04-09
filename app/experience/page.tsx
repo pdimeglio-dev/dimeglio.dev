@@ -99,15 +99,13 @@ export default function ExperiencePage() {
       </section>
 
       {/* ----------------------------------------------------------------- */}
-      {/* Education & Certifications                                         */}
+      {/* Education                                                          */}
       {/* ----------------------------------------------------------------- */}
-      {(education.length > 0 || certifications.length > 0) && (
+      {education.length > 0 && (
         <section className="mt-24">
-          <h2 className="text-2xl font-bold tracking-tighter">
-            Education &amp; Certifications
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tighter">Education</h2>
           <p className="mt-2 text-muted-foreground">
-            Formal education and professional credentials.
+            University degrees and formal education.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -125,6 +123,23 @@ export default function ExperiencePage() {
                 description={edu.content.trim()}
               />
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Certifications                                                     */}
+      {/* ----------------------------------------------------------------- */}
+      {certifications.length > 0 && (
+        <section className="mt-16">
+          <h2 className="text-2xl font-bold tracking-tighter">
+            Certifications
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Professional credentials and specialized training.
+          </p>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
             {certifications.map((cert) => (
               <CredentialCard
                 key={cert.slug}
