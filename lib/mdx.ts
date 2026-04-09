@@ -17,22 +17,27 @@ export interface BlogFrontmatter {
 export interface ExperienceFrontmatter {
   title: string;
   company: string;
-  location: string;
+  location?: string;
   startDate: string;
   endDate: string;
-  order: number;
+  order?: number;
+  /** Only present on edu-* and cert-* entries. Job skills are computed from projects. */
+  skills?: string[];
 }
 
 export interface ProjectFrontmatter {
   title: string;
-  description: string;
+  description?: string;
   category: "Professional" | "Personal";
-  tags: string[];
+  tags?: string[];
+  techStack?: string[];
+  associatedExperience?: string;
   image?: string;
   github?: string;
   live?: string;
-  featured: boolean;
-  order: number;
+  liveLink?: string;
+  featured?: boolean;
+  order?: number;
 }
 
 export interface MDXContent<T> {
@@ -160,4 +165,20 @@ export function getProjects() {
 
 export function getProject(slug: string) {
   return getContentBySlug<ProjectFrontmatter>(CONTENT_PATHS.projects, slug);
+}
+
+/**
+ * Get aggregated skills for an experience entry by collecting
+ * techStack from all Professional projects associated with it.
+ * Returns a deduplicated, sorted array of skill strings.
+ */
+export function getSkillsForExperience(expSlug: string): string[] {
+  const projects = getProjects();
+  const associatedProjects = projects.filter(
+    (p) => p.frontmatter.associatedExperience === expSlug,
+  );
+  const allSkills = associatedProjects.flatMap(
+    (p) => p.frontmatter.techStack || [],
+  );
+  return [...new Set(allSkills)].sort();
 }

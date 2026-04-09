@@ -213,18 +213,59 @@ if (jobsWithDates.length < 2) {
 }
 
 // ---------------------------------------------------------------------------
-// 4. Skill Checks
+// 4. Skill Checks (new model: projects are the source of truth)
 // ---------------------------------------------------------------------------
 
 header("4. Skill Checks");
 
-for (const exp of experiences) {
-  const skills = exp.frontmatter.skills;
-  if (!skills || !Array.isArray(skills) || skills.length === 0) {
-    error(`${exp.slug} — Missing or empty skills array.`);
+// 4a. Every project must have a non-empty techStack[]
+const subheader = (msg) =>
+  console.log(`\n  ${DIM}${msg}${RESET}`);
+
+subheader("Projects — techStack[]");
+for (const proj of projects) {
+  const ts = proj.frontmatter.techStack;
+  if (!ts || !Array.isArray(ts) || ts.length === 0) {
+    error(`${proj.slug} — Missing or empty techStack array.`);
     errors++;
   } else {
-    pass(`${exp.slug} — ${skills.length} skill(s)`);
+    pass(`${proj.slug} — ${ts.length} tech(s): ${ts.join(", ")}`);
+  }
+}
+
+// 4b. edu-* and cert-* must have their own skills[] (predefined)
+subheader("Education & Certifications — skills[]");
+const eduCerts = experiences.filter(
+  (e) => e.slug.startsWith("edu-") || e.slug.startsWith("cert-"),
+);
+for (const entry of eduCerts) {
+  const skills = entry.frontmatter.skills;
+  if (!skills || !Array.isArray(skills) || skills.length === 0) {
+    error(`${entry.slug} — Missing or empty skills array.`);
+    errors++;
+  } else {
+    pass(`${entry.slug} — ${skills.length} skill(s)`);
+  }
+}
+
+// 4c. exp-* jobs: verify aggregated skills from projects are non-empty
+subheader("Jobs — aggregated skills from projects' techStack");
+for (const job of jobs) {
+  const mapped = projsByExp.get(job.slug) || [];
+  const aggregated = new Set();
+  for (const projSlug of mapped) {
+    const proj = projects.find((p) => p.slug === projSlug);
+    if (proj && proj.frontmatter.techStack) {
+      proj.frontmatter.techStack.forEach((s) => aggregated.add(s));
+    }
+  }
+  if (aggregated.size === 0) {
+    warn(
+      `${job.slug} (${job.frontmatter.title || "?"}) — Aggregated skills are empty (no projects or projects have no techStack).`,
+    );
+    warnings++;
+  } else {
+    pass(`${job.slug} — ${aggregated.size} aggregated skill(s): ${[...aggregated].sort().join(", ")}`);
   }
 }
 
