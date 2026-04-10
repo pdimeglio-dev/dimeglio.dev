@@ -49,7 +49,7 @@ export function ProjectCard({ slug, frontmatter, onClick }: ProjectCardProps) {
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {frontmatter.tags.slice(0, 4).map((tag) => (
+        {(frontmatter.techStack || frontmatter.tags || []).slice(0, 4).map((tag) => (
           <span
             key={tag}
             className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground"

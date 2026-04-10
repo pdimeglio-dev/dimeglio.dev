@@ -8,6 +8,7 @@ import {
   getExperiences,
   getProjects,
   getProject,
+  getSkillsForExperience,
   CONTENT_PATHS,
   type BlogFrontmatter,
   type ExperienceFrontmatter,
@@ -27,15 +28,17 @@ describe("getSlugs", () => {
 
   it("returns experience slugs", () => {
     const slugs = getSlugs(CONTENT_PATHS.experience);
-    expect(slugs).toContain("staff-engineer");
-    expect(slugs).toContain("senior-engineer");
+    expect(slugs).toContain("exp-rpotential");
+    expect(slugs).toContain("exp-disney-parks");
+    expect(slugs).toContain("edu-info-systems");
+    expect(slugs).toContain("cert-gcp");
   });
 
   it("returns project slugs", () => {
     const slugs = getSlugs(CONTENT_PATHS.projects);
-    expect(slugs).toContain("ai-agent-platform");
-    expect(slugs).toContain("developer-portfolio");
-    expect(slugs).toContain("open-source-cli");
+    expect(slugs).toContain("proj-genui-engine");
+    expect(slugs).toContain("proj-google-shopping");
+    expect(slugs).toContain("proj-paddle-games");
   });
 
   it("returns empty array for non-existent path", () => {
@@ -76,13 +79,13 @@ describe("getContentBySlug", () => {
   it("parses project frontmatter correctly", () => {
     const project = getContentBySlug<ProjectFrontmatter>(
       CONTENT_PATHS.projects,
-      "ai-agent-platform",
+      "proj-genui-engine",
     );
 
     expect(project).not.toBeNull();
     expect(project!.frontmatter.category).toBe("Professional");
-    expect(project!.frontmatter.featured).toBe(true);
-    expect(project!.frontmatter.tags).toContain("ai");
+    expect(project!.frontmatter.associatedExperience).toBe("exp-rpotential");
+    expect(project!.frontmatter.techStack).toContain("React 19");
   });
 });
 
@@ -103,17 +106,17 @@ describe("getAllContent", () => {
     expect(posts[0].frontmatter.date >= posts[1].frontmatter.date).toBe(true);
   });
 
-  it("returns experiences sorted by order (asc)", () => {
+  it("returns experiences including all types", () => {
     const experiences = getAllContent<ExperienceFrontmatter>(
       CONTENT_PATHS.experience,
-      "order",
-      "asc",
     );
 
-    expect(experiences.length).toBeGreaterThanOrEqual(2);
-    expect(experiences[0].frontmatter.order).toBeLessThanOrEqual(
-      experiences[1].frontmatter.order,
-    );
+    expect(experiences.length).toBeGreaterThanOrEqual(10);
+    const slugs = experiences.map((e) => e.slug);
+    // Should include jobs, education, and certs
+    expect(slugs.some((s) => s.startsWith("exp-"))).toBe(true);
+    expect(slugs.some((s) => s.startsWith("edu-"))).toBe(true);
+    expect(slugs.some((s) => s.startsWith("cert-"))).toBe(true);
   });
 });
 
@@ -148,10 +151,9 @@ describe("getBlogPost", () => {
 });
 
 describe("getExperiences", () => {
-  it("returns experiences sorted by order ascending", () => {
+  it("returns all experience entries", () => {
     const experiences = getExperiences();
-    expect(experiences.length).toBeGreaterThanOrEqual(2);
-    expect(experiences[0].frontmatter.order).toBe(1);
+    expect(experiences.length).toBeGreaterThanOrEqual(10);
   });
 });
 
@@ -171,8 +173,34 @@ describe("getProjects", () => {
 
 describe("getProject", () => {
   it("returns a specific project by slug", () => {
-    const project = getProject("ai-agent-platform");
+    const project = getProject("proj-genui-engine");
     expect(project).not.toBeNull();
-    expect(project!.frontmatter.title).toBe("AI Agent Platform");
+    expect(project!.frontmatter.title).toBe("GenUI Engine & SDUI React Library");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getSkillsForExperience (aggregation from projects)
+// ---------------------------------------------------------------------------
+
+describe("getSkillsForExperience", () => {
+  it("returns aggregated techStack from associated projects", () => {
+    const skills = getSkillsForExperience("exp-rpotential");
+    expect(skills.length).toBeGreaterThan(0);
+    expect(skills).toContain("React 19");
+  });
+
+  it("returns deduplicated and sorted skills", () => {
+    const skills = getSkillsForExperience("exp-rpotential");
+    // Check sorted
+    const sorted = [...skills].sort();
+    expect(skills).toEqual(sorted);
+    // Check no duplicates
+    expect(new Set(skills).size).toBe(skills.length);
+  });
+
+  it("returns empty array for experience with no associated projects", () => {
+    const skills = getSkillsForExperience("non-existent-slug");
+    expect(skills).toEqual([]);
   });
 });

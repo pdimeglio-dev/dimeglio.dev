@@ -152,7 +152,7 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
               </SheetHeader>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                {activeProject.frontmatter.tags.map((tag) => (
+                {(activeProject.frontmatter.techStack || activeProject.frontmatter.tags || []).map((tag) => (
                   <span
                     key={tag}
                     className="rounded-full border border-slate-800 px-3 py-1 text-xs text-muted-foreground"
