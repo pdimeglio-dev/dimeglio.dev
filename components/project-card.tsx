@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink, GitFork } from "lucide-react";
+import { ExternalLink, GitFork, Camera, Globe } from "lucide-react";
 import type { ProjectFrontmatter } from "@/lib/mdx";
 
 interface ProjectCardProps {
@@ -10,12 +10,22 @@ interface ProjectCardProps {
   onClick: () => void;
 }
 
+/** Map of known link labels → Lucide icons */
+const linkIcons: Record<string, typeof GitFork> = {
+  github: GitFork,
+  instagram: Camera,
+  website: Globe,
+};
+
 /**
- * Project card — displays project title, description, tags, and category.
+ * Project card — displays project title, company, description, tags, and links.
  * Clickable to open the project detail Sheet.
  * Uses Framer Motion layout animations for smooth filter transitions.
  */
 export function ProjectCard({ slug, frontmatter, onClick }: ProjectCardProps) {
+  const links = frontmatter.links ?? {};
+  const linkEntries = Object.entries(links);
+
   return (
     <motion.div
       layout
@@ -40,7 +50,14 @@ export function ProjectCard({ slug, frontmatter, onClick }: ProjectCardProps) {
         {frontmatter.category}
       </span>
 
-      <h3 className="mt-4 text-lg font-semibold tracking-tight transition-colors group-hover:text-white">
+      {/* Company eyebrow */}
+      {frontmatter.company && (
+        <span className="mt-3 block text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80 mb-1">
+          {frontmatter.company}
+        </span>
+      )}
+
+      <h3 className={`${frontmatter.company ? '' : 'mt-2'} text-lg font-semibold tracking-tight transition-colors group-hover:text-white`}>
         {frontmatter.title}
       </h3>
 
@@ -60,14 +77,19 @@ export function ProjectCard({ slug, frontmatter, onClick }: ProjectCardProps) {
       </div>
 
       {/* Links */}
-      <div className="mt-4 flex items-center gap-3">
-        {frontmatter.github && (
-          <GitFork className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-white" />
-        )}
-        {frontmatter.live && (
-          <ExternalLink className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-white" />
-        )}
-      </div>
+      {linkEntries.length > 0 && (
+        <div className="mt-4 flex items-center gap-3">
+          {linkEntries.map(([label]) => {
+            const Icon = linkIcons[label] ?? ExternalLink;
+            return (
+              <Icon
+                key={label}
+                className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-white"
+              />
+            );
+          })}
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { GraduationCap, Award } from "lucide-react";
-import { getExperiences, getSkillsForExperience } from "@/lib/mdx";
+import { getExperiences, getSkillsForExperience, getProjectsForExperience } from "@/lib/mdx";
 import { ExperienceTimeline } from "@/components/experience-timeline";
 
 export const metadata: Metadata = {
@@ -42,6 +42,7 @@ export default function ExperiencePage() {
     endDate: job.frontmatter.endDate,
     content: job.content.trim(),
     skills: getSkillsForExperience(job.slug),
+    relatedProjects: getProjectsForExperience(job.slug),
   }));
 
   return (

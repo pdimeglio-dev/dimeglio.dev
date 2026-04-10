@@ -23,19 +23,22 @@ export interface ExperienceFrontmatter {
   order?: number;
   /** Only present on edu-* and cert-* entries. Job skills are computed from projects. */
   skills?: string[];
+  /** Optional explicit list of related project slugs (overrides auto-computed). */
+  relatedProjects?: string[];
 }
 
 export interface ProjectFrontmatter {
   title: string;
   description?: string;
   category: "Professional" | "Personal";
+  company?: string;
   tags?: string[];
   techStack?: string[];
   associatedExperience?: string;
   image?: string;
-  github?: string;
-  live?: string;
-  liveLink?: string;
+  images?: string[];
+  /** Keyed by label (e.g. "github", "website", "instagram") → URL */
+  links?: Record<string, string>;
   featured?: boolean;
   order?: number;
 }
@@ -181,6 +184,24 @@ export function getSkillsForExperience(expSlug: string): string[] {
     (p) => p.frontmatter.techStack || [],
   );
   return [...new Set(allSkills)].sort();
+}
+
+/**
+ * Get project slugs, titles, and descriptions associated with an experience entry.
+ * Uses the reverse relationship from projects' `associatedExperience` field.
+ * Description falls back to the MDX body content (trimmed).
+ */
+export function getProjectsForExperience(
+  expSlug: string,
+): { slug: string; title: string; description: string }[] {
+  const projects = getProjects();
+  return projects
+    .filter((p) => p.frontmatter.associatedExperience === expSlug)
+    .map((p) => ({
+      slug: p.slug,
+      title: p.frontmatter.title,
+      description: p.frontmatter.description || p.content.trim(),
+    }));
 }
 
 /**

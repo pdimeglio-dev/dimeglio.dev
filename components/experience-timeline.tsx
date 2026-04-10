@@ -1,6 +1,14 @@
 "use client";
 
+import Link from "next/link";
+import { ChevronRight, FolderOpen } from "lucide-react";
 import { Timeline } from "@/components/ui/timeline";
+
+interface RelatedProject {
+  slug: string;
+  title: string;
+  description: string;
+}
 
 interface JobData {
   slug: string;
@@ -10,6 +18,7 @@ interface JobData {
   endDate: string;
   content: string;
   skills: string[];
+  relatedProjects: RelatedProject[];
 }
 
 function formatYear(raw: string): string {
@@ -51,6 +60,34 @@ export function ExperienceTimeline({ jobs }: { jobs: JobData[] }) {
                 {skill}
               </span>
             ))}
+          </div>
+        )}
+
+        {job.relatedProjects.length > 0 && (
+          <div className="mt-10">
+            <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <FolderOpen className="h-3.5 w-3.5" />
+              <span>Related Projects</span>
+            </div>
+            <div className="mt-3 flex flex-col gap-3">
+              {job.relatedProjects.map((project) => (
+                <Link
+                  key={project.slug}
+                  href={`/projects?projectId=${project.slug}`}
+                  className="group/card flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition-all hover:border-slate-600 hover:bg-slate-800/50"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-zinc-200 transition-colors group-hover/card:text-white">
+                      {project.title}
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-zinc-500 line-clamp-2">
+                      {project.description}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover/card:text-zinc-400" />
+                </Link>
+              ))}
+            </div>
           </div>
         )}
       </div>
