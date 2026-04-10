@@ -1,7 +1,7 @@
 # Architecture Overview — dimeglio.dev
 
 ## Project Purpose
-Personal developer portfolio and blog for Pablo Di Meglio (Staff Engineer · AI Architect).
+Personal developer portfolio and blog for Pablo Di Meglio (Senior Full Stack Engineer · AI Architect).
 
 ## Tech Stack
 
@@ -59,6 +59,33 @@ dimeglio.dev/
 - MDX content lives in `/content/` (not in `/app/`) for clean separation
 - Server Components by default; `'use client'` only when needed
 - `params` and `searchParams` are Promises in Next.js 16 — must be awaited
+
+## Home Page Components
+
+### Logo Strip (`components/home/logo-ticker.tsx`)
+
+Displays company logos linking to their experience timeline entries.
+
+**To add/edit a logo:**
+1. Place the SVG in `/public/logos/` (ensure it's pre-cropped — no internal padding, `viewBox` only, no `width`/`height` attributes)
+2. Edit the `logos` array in `components/home/logo-ticker.tsx`:
+   ```ts
+   { src: "/logos/company.svg", alt: "Company", href: "/experience#slug" }
+   ```
+3. The `href` uses `/experience#<slug>` where `<slug>` matches the MDX filename in `content/experience/` (without `.mdx`)
+
+**Available experience slugs:**
+`exp-google-cloud-studio`, `exp-google-agile-modeling`, `exp-google-shopping`, `exp-disney-studios`, `exp-disney-parks`, `exp-wells-fargo`, `exp-mission-lane`, `exp-pccw-global`, `exp-rpotential`
+
+**SVG guidelines:**
+- Use `viewBox` only — remove explicit `width`/`height` attributes
+- Crop the viewBox tightly around the logo content (no padding)
+- Use white (`#FFFFFF`) fills for visibility on dark backgrounds
+- Remove colored background shapes (cards, rectangles) — keep only the wordmark/icon
+
+### Skills Marquee (`components/home/skills-marquee.tsx`)
+
+Auto-generated infinite scrolling strip of tech skills. Pulls from all projects' `techStack` arrays via `getAllUniqueSkills()` in `lib/mdx.ts`. No manual maintenance needed — adding skills to any project's frontmatter automatically updates the marquee.
 
 ## Content Architecture
 - Blog posts, experience entries, and projects are all MDX files

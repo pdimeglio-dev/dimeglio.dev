@@ -1,31 +1,31 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Code2, Brain, Layers, Sparkles } from "lucide-react";
+import { Code2, Brain, Layers, Users } from "lucide-react";
 
 const bentoItems = [
   {
     title: "Full Stack Engineering",
-    description: "Building end-to-end systems with TypeScript, React, and Node.js.",
+    description: "Architecting end-to-end systems with Angular, React, TypeScript, Node.js, Java, and Kotlin, deployed across highly scalable cloud environments.",
     icon: Code2,
     className: "md:col-span-2",
   },
   {
     title: "AI Architecture",
-    description: "Designing intelligent systems with LLMs, RAG pipelines, and multi-agent patterns.",
+    description: "Designing intelligent systems powered by LLMs, RAG pipelines, and multi-agent orchestration.",
     icon: Brain,
     className: "md:col-span-1",
   },
   {
     title: "System Design",
-    description: "Scalable architectures handling millions of requests.",
+    description: "Designing resilient, high-availability microservices and distributed architectures capable of handling massive enterprise scale.",
     icon: Layers,
     className: "md:col-span-1",
   },
   {
-    title: "Open Source",
-    description: "Contributing to tools that make developers more productive.",
-    icon: Sparkles,
+    title: "Engineering Leadership",
+    description: "Leading cross-functional, distributed engineering teams across the US and LATAM, bridging technical execution with strategic vision.",
+    icon: Users,
     className: "md:col-span-2",
   },
 ];
@@ -49,7 +49,7 @@ const itemVariants = {
  */
 export function BentoGrid() {
   return (
-    <section className="mx-auto max-w-6xl px-6 pb-24">
+    <section className="mx-auto max-w-6xl px-6">
       <motion.div
         className="grid grid-cols-1 gap-4 md:grid-cols-3"
         variants={containerVariants}
@@ -64,10 +64,10 @@ export function BentoGrid() {
             className={`group rounded-2xl border border-slate-800 bg-card p-6 transition-colors hover:border-slate-700 ${item.className}`}
           >
             <item.icon className="mb-4 h-8 w-8 text-muted-foreground transition-colors group-hover:text-white" />
-            <h3 className="text-lg font-semibold tracking-tight">
+            <h3 className="text-xl font-semibold tracking-tight">
               {item.title}
             </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-base leading-relaxed text-zinc-300">
               {item.description}
             </p>
           </motion.div>

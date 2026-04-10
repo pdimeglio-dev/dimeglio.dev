@@ -139,33 +139,33 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
 
       {/* Project detail Sheet */}
       <Sheet open={!!activeProject} onOpenChange={(open) => !open && handleSheetClose()}>
-        <SheetContent className="overflow-y-auto border-slate-800 bg-black sm:max-w-xl">
+        <SheetContent className="w-full overflow-y-auto border-slate-800 bg-black data-[side=right]:w-full data-[side=right]:sm:max-w-full">
           {activeProject && (
-            <>
-              <SheetHeader>
-                <SheetTitle className="text-2xl font-bold tracking-tight">
+            <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 p-8 md:p-12">
+              <SheetHeader className="p-0">
+                <SheetTitle className="text-2xl font-bold tracking-tight md:text-3xl">
                   {activeProject.frontmatter.title}
                 </SheetTitle>
-                <SheetDescription>
+                <SheetDescription className="text-base text-zinc-300 leading-relaxed">
                   {activeProject.frontmatter.description}
                 </SheetDescription>
               </SheetHeader>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 {(activeProject.frontmatter.techStack || activeProject.frontmatter.tags || []).map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-slate-800 px-3 py-1 text-xs text-muted-foreground"
+                    className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-1 text-xs font-medium text-zinc-300"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
 
-              <div className="mt-6">
+              <div className="prose prose-invert prose-zinc max-w-none">
                 {renderedContent[activeProject.slug]}
               </div>
-            </>
+            </div>
           )}
         </SheetContent>
       </Sheet>

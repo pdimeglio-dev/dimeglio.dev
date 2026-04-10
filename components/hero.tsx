@@ -25,10 +25,10 @@ export function Hero() {
         <h1 className="max-w-4xl text-6xl font-bold tracking-tighter sm:text-7xl lg:text-8xl">
           Pablo Di Meglio
         </h1>
-        <p className="mt-4 text-xl text-muted-foreground sm:text-2xl">
-          Staff Engineer · AI Architect
+        <p className="mt-4 text-xl text-zinc-300 sm:text-2xl">
+          Senior Full Stack Engineer · AI Architect
         </p>
-        <p className="mt-6 max-w-xl mx-auto text-base text-muted-foreground/70">
+        <p className="mt-6 max-w-xl mx-auto text-lg text-zinc-400 leading-relaxed">
           Building software that thinks.
         </p>
       </motion.div>
