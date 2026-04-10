@@ -37,7 +37,9 @@ export interface ProjectFrontmatter {
   associatedExperience?: string;
   image?: string;
   images?: string[];
-  /** Keyed by label (e.g. "github", "website", "instagram") → URL */
+  /** YouTube or other embeddable video URL */
+  video?: string;
+  /** Keyed by label (e.g. "github", "website", "instagram", "linkedin") → URL */
   links?: Record<string, string>;
   featured?: boolean;
   order?: number;
