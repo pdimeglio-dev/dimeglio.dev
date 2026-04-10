@@ -26,6 +26,7 @@ function formatDateRange(start: string, end: string): string {
 
 export function ExperienceTimeline({ jobs }: { jobs: JobData[] }) {
   const data = jobs.map((job) => ({
+    id: job.slug,
     title: formatDateRange(job.startDate, job.endDate),
     content: (
       <div>

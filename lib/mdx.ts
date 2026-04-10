@@ -182,3 +182,18 @@ export function getSkillsForExperience(expSlug: string): string[] {
   );
   return [...new Set(allSkills)].sort();
 }
+
+/**
+ * Get all unique skills across every project's techStack.
+ * Returns an alphabetically sorted array of `{ name }` objects
+ * (formatted for Aceternity's InfiniteMovingCards).
+ */
+export function getAllUniqueSkills(): { name: string }[] {
+  const projects = getProjects();
+  const allSkills = projects.flatMap(
+    (p) => p.frontmatter.techStack || [],
+  );
+  return [...new Set(allSkills)]
+    .sort((a, b) => a.localeCompare(b))
+    .map((skill) => ({ name: skill }));
+}
