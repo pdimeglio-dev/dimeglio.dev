@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Pablo Di Meglio — Staff Engineer · AI Architect",
+    default: "Pablo Di Meglio — Senior Full Stack Engineer · AI Architect",
     template: "%s | Pablo Di Meglio",
   },
   description:
-    "Personal portfolio and blog of Pablo Di Meglio — Staff Engineer and AI Architect. Building software that thinks.",
+    "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Architect. Building software that thinks.",
 };
 
 export default function RootLayout({

@@ -64,10 +64,10 @@ export function BentoGrid() {
             className={`group rounded-2xl border border-slate-800 bg-card p-6 transition-colors hover:border-slate-700 ${item.className}`}
           >
             <item.icon className="mb-4 h-8 w-8 text-muted-foreground transition-colors group-hover:text-white" />
-            <h3 className="text-lg font-semibold tracking-tight">
+            <h3 className="text-xl font-semibold tracking-tight">
               {item.title}
             </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-base leading-relaxed text-zinc-300">
               {item.description}
             </p>
           </motion.div>

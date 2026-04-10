@@ -1,7 +1,7 @@
 # Architecture Overview — dimeglio.dev
 
 ## Project Purpose
-Personal developer portfolio and blog for Pablo Di Meglio (Staff Engineer · AI Architect).
+Personal developer portfolio and blog for Pablo Di Meglio (Senior Full Stack Engineer · AI Architect).
 
 ## Tech Stack
 

@@ -33,11 +33,11 @@ export function ExperienceTimeline({ jobs }: { jobs: JobData[] }) {
         <p className="text-lg font-bold text-white md:text-2xl">
           {job.company}
         </p>
-        <p className="mt-1 text-sm font-medium text-neutral-400 md:text-base">
+        <p className="mt-1 text-base font-medium text-zinc-300 md:text-lg">
           {job.title}
         </p>
 
-        <p className="mt-4 text-sm leading-relaxed text-neutral-400 whitespace-pre-line">
+        <p className="mt-4 text-base leading-relaxed text-zinc-400 whitespace-pre-line">
           {job.content}
         </p>
 

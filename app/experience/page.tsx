@@ -49,7 +49,7 @@ export default function ExperiencePage() {
       <h1 className="text-4xl font-bold tracking-tighter md:text-5xl">
         Experience
       </h1>
-      <p className="mt-4 text-muted-foreground">
+      <p className="mt-4 text-lg text-zinc-300 leading-relaxed">
         Where I&apos;ve been and what I&apos;ve built.
       </p>
 
@@ -66,7 +66,7 @@ export default function ExperiencePage() {
       {education.length > 0 && (
         <section className="mt-24">
           <h2 className="text-2xl font-bold tracking-tighter">Education</h2>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-base text-zinc-300 leading-relaxed">
             University degrees and formal education.
           </p>
 
@@ -97,7 +97,7 @@ export default function ExperiencePage() {
           <h2 className="text-2xl font-bold tracking-tighter">
             Certifications
           </h2>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-base text-zinc-300 leading-relaxed">
             Professional credentials and specialized training.
           </p>
 
@@ -155,14 +155,14 @@ function CredentialCard({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold leading-tight">{title}</h3>
-          <p className="mt-0.5 text-xs text-muted-foreground">{institution}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground/60">{dates}</p>
+          <h3 className="text-base font-semibold leading-tight">{title}</h3>
+          <p className="mt-0.5 text-sm text-zinc-400">{institution}</p>
+          <p className="mt-0.5 text-sm text-zinc-500">{dates}</p>
         </div>
       </div>
 
       {description && (
-        <p className="mt-3 text-xs leading-relaxed text-muted-foreground/80">
+        <p className="mt-3 text-sm leading-relaxed text-zinc-400">
           {description}
         </p>
       )}
@@ -172,7 +172,7 @@ function CredentialCard({
           {skills.map((skill) => (
             <span
               key={skill}
-              className="rounded-full bg-secondary px-2 py-0.5 text-[10px] text-muted-foreground"
+              className="rounded-full bg-secondary px-2 py-0.5 text-xs text-zinc-400"
             >
               {skill}
             </span>
