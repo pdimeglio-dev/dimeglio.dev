@@ -244,18 +244,24 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
 
               {/* Images gallery */}
               {activeProject.frontmatter.images && activeProject.frontmatter.images.length > 0 && (
-                <div className="flex flex-col gap-6">
-                  {activeProject.frontmatter.images.map((imageName) => (
-                    <div key={imageName} className="overflow-hidden rounded-xl border border-slate-800">
-                      <Image
-                        src={`/projects/${activeProject.slug}/${imageName}`}
-                        alt={`${activeProject.frontmatter.title} — ${imageName}`}
-                        width={1200}
-                        height={675}
-                        className="h-auto w-full object-cover"
-                      />
-                    </div>
-                  ))}
+                <div className="mt-4 flex flex-col gap-5">
+                  <div className="flex items-center gap-3">
+                    <Camera className="h-4 w-4 text-zinc-500" />
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-zinc-500">Screenshots</h3>
+                  </div>
+                  <div className={`grid gap-4 ${activeProject.frontmatter.images.length >= 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+                    {activeProject.frontmatter.images.map((imageName) => (
+                      <div key={imageName} className="overflow-hidden rounded-3xl border border-slate-800 bg-zinc-950 shadow-lg shadow-black/20">
+                        <Image
+                          src={`/projects/${activeProject.slug}/${imageName}`}
+                          alt={`${activeProject.frontmatter.title} — ${imageName}`}
+                          width={600}
+                          height={1200}
+                          className="h-auto w-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
