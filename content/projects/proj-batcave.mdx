@@ -1,8 +1,47 @@
 ---
 title: "Project Batcave"
+description: "A sovereign multi-agent AI ecosystem running on a $0/month GCP VM with full voice-to-voice capabilities via Telegram. Batman-themed agents with distinct personalities, voices, and domain expertise — because everyone else is building Jarvis."
 category: "Personal"
 associatedExperience: ""
-techStack: ["Node.js", "Multi-Agent AI", "MCP", "Claude API", "Gemini API", "OpenAI API", "Telegram Integration", "GCP VM"]
+techStack: ["Node.js", "Claude API", "OpenAI Whisper", "ElevenLabs TTS", "Telegraf", "Telegram Bot API", "GCP VM", "PM2", "Multi-Agent Architecture"]
+images: []
+links:
+  github: "https://github.com/pdimeglio-dev/project-batcave"
+order: 2
 ---
 
-Architecting a multi-agent AI ecosystem using intent-based routing to dispatch tasks to specialized sub-agents. Migrated from Python to Node.js. Integrates with Telegram via a burner number and runs isolated on a GCP VM. Work in progress.
+Inspired by the open-source AI assistant trend — but unwilling to install a black box — I built my own sovereign AI ecosystem from scratch. The result is Project Batcave: a multi-agent system running on a GCP Always Free Tier VM, accessible exclusively through Telegram via a dedicated burner number.
+
+Most people are building Jarvis. I went with a different superhero universe.
+
+### The Voice Loop
+
+Alfred Pennyworth is the primary agent — a sophisticated AI butler with full voice-to-voice capabilities. When I send a voice message on Telegram, it flows through a complete audio pipeline: speech-to-text via Whisper, reasoning via Claude, then text-to-speech via ElevenLabs using a British accent voice profile. Alfred responds with a voice message that sounds like a proper English butler.
+
+A graceful degradation protocol ensures Alfred never goes silent — if the voice pipeline fails for any reason, he falls back to text responses automatically.
+
+### Multi-Agent Orchestration
+
+The system is designed as an extensible multi-agent architecture where each agent owns a specific domain, has their own voice identity, and operates within clear boundaries:
+
+* **Alfred** — The host and orchestrator. Handles general requests, manages agent routing, and serves as the default conversational partner.
+* **Gordon** — Nutrition forensics specialist. Tracks meals, estimates calories from food photos via vision AI, detects dietary patterns, and correlates food intake with exercise data. (The name is also a deterrent — "don't get gordo.")
+* **Ra's** — Fitness and workout tracking agent. Will monitor training sessions, track progress, and cross-reference with nutrition data. (Planned)
+
+Agents communicate through a bidirectional handoff pattern — Alfred can transfer control to a specialist when the conversation shifts to their domain, and specialists can hand back to Alfred when the topic changes. Each agent maintains their own persona and voice throughout the interaction.
+
+### Security-First, Sovereign Design
+
+* **$0/month infrastructure** — GCP Always Free Tier VM running Ubuntu, carefully configured to stay within the free quota
+* **Single-user authentication** — one master, one butler. No multi-tenant complexity.
+* **Zero external HTTP dependencies** — all API calls use Node.js native fetch. Removed third-party HTTP libraries as a supply chain hygiene decision.
+* **Dedicated communication channel** — burner phone number via Tello, configured exclusively for the Telegram bot
+* **Full data sovereignty** — I own the infrastructure, the data, and every conversation
+
+### Key Achievements
+
+* **Voice-to-Voice AI Loop:** Complete speech pipeline — Whisper STT → Claude reasoning → ElevenLabs TTS with character-specific voice profiles.
+* **Multi-Agent Architecture:** Agent registry pattern with bidirectional handoffs, shared conversation context, and domain-specific expertise boundaries.
+* **Sovereign Infrastructure:** Self-hosted on GCP free tier with zero-cost operation, dedicated burner number, and no third-party dependencies for HTTP.
+* **Graceful Degradation:** "Plan B" protocol ensures the system never crashes or goes silent — voice failures fall back to text automatically.
+* **Active Development:** Building in public — multi-agent orchestration, vision-based nutrition tracking, and long-term memory are in the pipeline.

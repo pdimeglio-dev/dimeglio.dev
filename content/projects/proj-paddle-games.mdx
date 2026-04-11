@@ -1,12 +1,54 @@
 ---
 title: "The Paddle Games"
+description: "Full-stack leaderboard platform for Bay Area paddle sports — kayaking, SUP, canoeing, and surfing — with Strava integration, a data-driven gamification engine, and geo-spatial challenges. Currently serving 100+ active paddlers."
 category: "Personal"
 associatedExperience: ""
-techStack: ["React", "Vite", "Tailwind CSS", "shadcn/ui", "Node.js", "GCP Cloud Functions", "Firestore", "GCP Pub/Sub", "Strava Integration", "OAuth", "Webhooks", "Vercel"]
+techStack: ["React 19", "TanStack Router", "TanStack Query", "TypeScript", "Vite", "shadcn/ui", "Framer Motion", "Tailwind CSS", "Node.js", "Express", "GCP Cloud Functions", "Firestore", "GCP Pub/Sub", "Strava API", "OAuth", "Webhooks", "Turf.js", "Mapbox Polyline", "Vercel"]
+images: []
 links:
   github: "https://github.com/pdimeglio-dev/paddle-games"
   instagram: "https://instagram.com/the.paddle.games"
   website: "https://www.thepaddlegames.com"
+order: 1
 ---
 
-Designed, developed, and launched a complete full-stack web application for the paddle sports community, currently serving 100+ active users. Frontend deployed on Vercel, backend powered by GCP Cloud Functions connected via Pub/Sub, with Strava integration using OAuth and webhooks.
+The Paddle Games is a community-driven leaderboard platform for Bay Area paddle sports enthusiasts. It connects with Strava to automatically track kayaking, stand-up paddleboarding, canoeing, and surfing activities — ranking paddlers on weekly, monthly, and all-time leaderboards powered by a fully data-driven gamification engine.
+
+Designed, developed, and launched as a solo full-stack build — from product vision to production deployment — currently serving 100+ active users with a growing community on Instagram.
+
+### Event-Driven Microservices Architecture
+
+The backend is a serverless, event-driven system on Google Cloud Platform with 6 independent microservices communicating asynchronously via Pub/Sub:
+
+* **Auth Service** — Strava OAuth flow, JWT issuance, and token lifecycle management
+* **Strava Integration Service** — Webhook ingestion, activity enrichment, and geographic filtering
+* **Points Calculator Service** — Data-driven scoring rules engine
+* **Challenges Service** — Badge evaluation with a pluggable evaluator pattern
+* **Leaderboard Service** — Read-optimized materialized views for rankings
+* **Profile Service** — Stateless API aggregator for the frontend
+
+Each service subscribes only to the events it cares about, enabling independent scaling, deployment, and evolution.
+
+### 100% Data-Driven Gamification
+
+The entire points and challenges system is defined as data — no code changes are needed to add new scoring rules, challenges, or badges. Everything is stored in Firestore and evaluated at runtime:
+
+* **Scoring Rules Engine:** A flexible, condition-based rules engine supports per-unit scoring (e.g., points per kilometer) and fixed-point bonuses. Rules can target any combination of activity attributes — distance, duration, sport type, time of day, day of week — enabling creative reward mechanics like early morning bonuses or long-distance achievements.
+
+* **Pluggable Challenge Evaluators:** A generic evaluator pattern supports multiple challenge types — from simple milestones and single-activity achievements to location-based challenges and multi-step scavenger hunts. New evaluator types can be added without modifying the core evaluation loop.
+
+### Geo-Spatial Challenge System
+
+The platform is evolving into a location-based challenge engine powered by GPS data from Strava activities:
+
+* **Polyline Decoding & Analysis:** Strava activity polylines are decoded and analyzed against a library of spatial assets — points, lines, and polygons representing local landmarks and waterway waypoints.
+* **Landmark & Route Detection:** The system detects when a paddler passes within a configurable radius of defined locations, enabling discovery challenges and guided waterfront tours.
+* **Progressive Roadmap:** The spatial system is designed in phases — from landmark discovery, to route completion and sector coverage, to habit-building streaks, and eventually timed racing with start/finish gates.
+
+### Key Achievements
+
+* **Solo Full-Stack Product:** End-to-end ownership — product design, 6-service microservices backend, React 19 frontend, GCP infrastructure, Strava integration, and community building.
+* **Data-Driven Architecture:** Scoring rules, challenge definitions, badge configurations, and spatial assets are all stored as data — making the entire gamification layer extensible without code changes.
+* **Real-Time Event Pipeline:** Strava webhooks trigger an asynchronous pipeline through activity processing, points calculation, challenge evaluation, and leaderboard updates.
+* **Geo-Spatial Intelligence:** GPS polyline analysis, landmark proximity detection, sequenced waypoint validation, and a multi-phase roadmap toward route tracking and competitive timing.
+* **Production Community:** 100+ active users, automated activity ingestion, Instagram community, and a freemium business model with local sponsorship strategy.
