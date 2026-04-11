@@ -15,6 +15,7 @@ import type { ReactNode } from "react";
 import { ProjectCard } from "@/components/project-card";
 import { ImagesSlider } from "@/components/ui/images-slider";
 import type { MDXContent as MDXContentType, ProjectFrontmatter } from "@/lib/mdx";
+import { assetUrl } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 
 type Category = "All" | "Professional" | "Personal";
@@ -246,7 +247,7 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
                     <div className="overflow-hidden rounded-2xl border border-slate-800 bg-zinc-950">
                       <ImagesSlider
                         images={displayImages.map(
-                          (img) => `/projects/${activeProject.slug}/${img}`
+                          (img) => assetUrl(`/projects/${activeProject.slug}/${img}`)
                         )}
                         overlay={false}
                         autoplay

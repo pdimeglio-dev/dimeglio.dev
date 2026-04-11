@@ -134,3 +134,40 @@ The `ImagesSlider` component (`components/ui/images-slider.tsx`) provides:
 - **Framer Motion transitions** — Scale + rotate entrance, vertical slide exit
 - **Image preloading** — All images loaded before first render
 - **`object-contain`** — Images never crop, always fully visible
+
+---
+
+## CDN / External Storage (Future Migration)
+
+Images currently serve from `/public/` via Next.js. When the repo grows too large, migrate to a GCS bucket or CDN with a **one-line env change**:
+
+### Environment Variable
+
+```env
+# .env.example
+NEXT_PUBLIC_CDN_URL=
+```
+
+| Value | Behavior |
+|-------|----------|
+| `""` (empty / unset) | Images serve from `/public/` (default) |
+| `"https://storage.googleapis.com/dimeglio-assets"` | Images load from GCS bucket |
+| `"https://assets.dimeglio.dev"` | Images load from custom CDN domain |
+
+### Utility
+
+```ts
+import { assetUrl } from "@/lib/utils";
+
+assetUrl("/projects/proj-paddle-games/dashboard.png")
+// → "/projects/proj-paddle-games/dashboard.png"           (local)
+// → "https://assets.dimeglio.dev/projects/proj-paddle-games/dashboard.png"  (CDN)
+```
+
+### Migration Steps
+
+1. Create a GCS bucket (public read) or CDN origin
+2. Upload contents of `public/projects/` to the bucket
+3. Set `NEXT_PUBLIC_CDN_URL` in Vercel environment variables
+4. Optionally: remove images from `public/projects/` and `.gitignore` the directory
+5. Deploy — done, no code changes needed
