@@ -27,6 +27,14 @@ const linkIcons: Record<string, typeof GitFork> = {
   website: Globe,
 };
 
+/** Extract YouTube video ID from various URL formats */
+function getYouTubeId(url: string): string | null {
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([^?&]+)/,
+  );
+  return match?.[1] ?? null;
+}
+
 interface ProjectsGridProps {
   projects: MDXContentType<ProjectFrontmatter>[];
   /** Pre-rendered MDX content keyed by slug (rendered on the server) */
@@ -180,7 +188,7 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
 
               {/* Links */}
               {activeProject.frontmatter.links && Object.keys(activeProject.frontmatter.links).length > 0 && (
-                <div className="flex flex-col divide-y divide-slate-800/50">
+                <div className="flex flex-col divide-y divide-slate-800/50 overflow-hidden">
                   {Object.entries(activeProject.frontmatter.links).map(([label, url]) => {
                     const Icon = linkIcons[label] ?? ExternalLink;
                     const displayUrl = url
@@ -193,7 +201,7 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/link relative flex items-center gap-4 py-3 transition-all hover:bg-gradient-to-r hover:from-purple-500/10 hover:via-blue-500/5 hover:to-transparent hover:pl-4"
+                        className="group/link relative flex items-center gap-4 overflow-hidden py-3 transition-all hover:bg-gradient-to-r hover:from-purple-500/10 hover:via-blue-500/5 hover:to-transparent hover:pl-4"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="absolute left-0 top-0 h-full w-0.5 scale-y-0 bg-gradient-to-b from-purple-500 to-blue-500 transition-transform duration-200 group-hover/link:scale-y-100" />
@@ -211,27 +219,51 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
                 </div>
               )}
 
-              {/* Images gallery */}
-              {activeProject.frontmatter.images && activeProject.frontmatter.images.length > 0 && (
-                <div className="flex flex-col gap-6">
-                  {activeProject.frontmatter.images.map((imageName) => (
-                    <div key={imageName} className="overflow-hidden rounded-xl border border-slate-800">
-                      <Image
-                        src={`/projects/${activeProject.slug}/${imageName}`}
-                        alt={`${activeProject.frontmatter.title} — ${imageName}`}
-                        width={1200}
-                        height={675}
-                        className="h-auto w-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-
               {/* MDX content */}
               <div className="prose prose-invert prose-zinc max-w-none">
                 {renderedContent[activeProject.slug]}
               </div>
+
+              {/* Video embed */}
+              {activeProject.frontmatter.video && (() => {
+                const videoId = getYouTubeId(activeProject.frontmatter.video!);
+                return videoId ? (
+                  <div className="overflow-hidden rounded-xl border border-slate-800">
+                    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                      <iframe
+                        className="absolute inset-0 h-full w-full"
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        title={`${activeProject.frontmatter.title} — Video`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+
+              {/* Images gallery */}
+              {activeProject.frontmatter.images && activeProject.frontmatter.images.length > 0 && (
+                <div className="mt-4 flex flex-col gap-5">
+                  <div className="flex items-center gap-3">
+                    <Camera className="h-4 w-4 text-zinc-500" />
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-zinc-500">Screenshots</h3>
+                  </div>
+                  <div className={`grid gap-4 ${activeProject.frontmatter.images.length >= 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+                    {activeProject.frontmatter.images.map((imageName) => (
+                      <div key={imageName} className="overflow-hidden rounded-3xl border border-slate-800 bg-zinc-950 shadow-lg shadow-black/20">
+                        <Image
+                          src={`/projects/${activeProject.slug}/${imageName}`}
+                          alt={`${activeProject.frontmatter.title} — ${imageName}`}
+                          width={600}
+                          height={1200}
+                          className="h-auto w-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </SheetContent>

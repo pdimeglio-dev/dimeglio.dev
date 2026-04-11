@@ -9,16 +9,14 @@ import Link from "next/link";
  * When adding a new company, add its SVG to /public/logos/ and add an entry here.
  */
 const logos = [
-  // Headline logos first
-  { src: "/logos/google.svg", alt: "Google", href: "/experience#exp-google-cloud-studio" },
+  { src: "/logos/google.svg", alt: "Google", href: "/experience#exp-google-agile-modeling" },
   { src: "/logos/disney.svg", alt: "Disney", href: "/experience#exp-disney-studios" },
   { src: "/logos/globant.svg", alt: "Globant", href: "/experience" },
-  // Remaining companies
-  { src: "/logos/wells-fargo.svg", alt: "Wells Fargo", href: "/experience#exp-wells-fargo" },
-  { src: "/logos/mission-lane.svg", alt: "Mission Lane", href: "/experience#exp-mission-lane" },
-  { src: "/logos/pccw-global.svg", alt: "PCCW Global", href: "/experience#exp-pccw-global" },
   { src: "/logos/rpotential.svg", alt: "rPotential", href: "/experience#exp-rpotential" },
-  // { src: "/logos/argentina-gob-ar.svg", alt: "Argentina Gobierno", href: "/experience" },  // TODO: re-enable once experience entry is created
+  { src: "/logos/mission-lane.svg", alt: "Mission Lane", href: "/experience#exp-mission-lane" },
+  { src: "/logos/wells-fargo.svg", alt: "Wells Fargo", href: "/experience#exp-wells-fargo" },
+  { src: "/logos/pccw-global.svg", alt: "PCCW Global", href: "/experience#exp-pccw-global" },
+  { src: "/logos/argentina-gob-ar.svg", alt: "Argentina Gobierno", href: "/experience#exp-globant-educar" },
 ] as const;
 
 /**

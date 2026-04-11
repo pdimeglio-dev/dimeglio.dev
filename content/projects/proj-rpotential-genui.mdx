@@ -1,0 +1,22 @@
+---
+title: "Generative UI Engine"
+description: "An AI-first platform where LLMs dynamically compose and stream visual interfaces in real-time — no predefined layouts, no static pages."
+category: "Professional"
+company: "rPotential"
+associatedExperience: "exp-rpotential"
+techStack: ["React 19", "TypeScript", "Node.js", "Fastify", "Claude API", "Gemini API", "NDJSON Streaming", "GenUI", "Prompt Engineering", "Docker", "Azure"]
+links:
+  website: "https://rpotential.ai"
+order: 1
+---
+
+Traditional enterprise UIs are static — every screen, layout, and interaction must be designed and coded upfront. rPotential needed something fundamentally different: interfaces generated entirely by AI in real-time, adapting dynamically to each user's context and conversation.
+
+### Architecture
+
+The system operates as a multi-layer pipeline. The frontend communicates with an internal reasoning layer that interprets user intent and retrieves contextual data. That enriched context flows into an LLM Layout Planner running on a Fastify-based Backend for Frontend, where Large Language Models (Claude and Gemini) determine which visual components to render via tool-calling. Each tool maps directly to a UI component defined in the shared SDUI Component Library, and the selected components stream progressively to the browser via NDJSON for real-time rendering.
+
+### Key Achievements
+* **Zero Predefined Layouts:** Eliminated static page templates entirely — every interface is composed on-the-fly by the AI based on user intent and available data.
+* **Real-Time Conversational UI:** Shipped an AI-powered conversational experience with live data visualization and complex thread-based context management.
+* **Progressive Streaming:** Components render as they arrive via NDJSON, creating a fluid experience where users see content build in real-time rather than waiting for full page loads.

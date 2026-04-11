@@ -36,7 +36,7 @@ describe("getSlugs", () => {
 
   it("returns project slugs", () => {
     const slugs = getSlugs(CONTENT_PATHS.projects);
-    expect(slugs).toContain("proj-genui-engine");
+    expect(slugs).toContain("proj-rpotential-genui");
     expect(slugs).toContain("proj-google-shopping");
     expect(slugs).toContain("proj-paddle-games");
   });
@@ -79,7 +79,7 @@ describe("getContentBySlug", () => {
   it("parses project frontmatter correctly", () => {
     const project = getContentBySlug<ProjectFrontmatter>(
       CONTENT_PATHS.projects,
-      "proj-genui-engine",
+      "proj-rpotential-genui",
     );
 
     expect(project).not.toBeNull();
@@ -173,9 +173,9 @@ describe("getProjects", () => {
 
 describe("getProject", () => {
   it("returns a specific project by slug", () => {
-    const project = getProject("proj-genui-engine");
+    const project = getProject("proj-rpotential-genui");
     expect(project).not.toBeNull();
-    expect(project!.frontmatter.title).toBe("GenUI Engine & SDUI React Library");
+    expect(project!.frontmatter.title).toBe("Generative UI Engine");
   });
 });
 
