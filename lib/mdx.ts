@@ -37,6 +37,10 @@ export interface ProjectFrontmatter {
   associatedExperience?: string;
   image?: string;
   images?: string[];
+  /** Mobile-specific screenshots (shown on phone viewports instead of `images`) */
+  mobileImages?: string[];
+  /** Orientation of screenshot images — affects layout (default: "landscape") */
+  imageOrientation?: "portrait" | "landscape";
   /** YouTube or other embeddable video URL */
   video?: string;
   /** Keyed by label (e.g. "github", "website", "instagram", "linkedin") → URL */
