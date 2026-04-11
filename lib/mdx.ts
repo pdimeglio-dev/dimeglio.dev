@@ -161,11 +161,42 @@ export function getExperiences() {
 }
 
 export function getProjects() {
-  return getAllContent<ProjectFrontmatter>(
-    CONTENT_PATHS.projects,
-    "order",
-    "asc",
+  const projects = getAllContent<ProjectFrontmatter>(CONTENT_PATHS.projects);
+  const experiences = getAllContent<ExperienceFrontmatter>(
+    CONTENT_PATHS.experience,
   );
+
+  // Build a lookup: experience slug → startDate
+  const expDateMap = new Map<string, string>();
+  for (const exp of experiences) {
+    expDateMap.set(exp.slug, exp.frontmatter.startDate);
+  }
+
+  // Sort: newest experience date first.
+  // Personal projects (no associated experience) float to the top,
+  // ordered among themselves by their `order` field.
+  return projects.sort((a, b) => {
+    const aExp = a.frontmatter.associatedExperience;
+    const bExp = b.frontmatter.associatedExperience;
+    const aDate = aExp ? expDateMap.get(aExp) ?? "" : "";
+    const bDate = bExp ? expDateMap.get(bExp) ?? "" : "";
+    const aIsPersonal = !aExp;
+    const bIsPersonal = !bExp;
+
+    // Personal projects always first
+    if (aIsPersonal && !bIsPersonal) return -1;
+    if (!aIsPersonal && bIsPersonal) return 1;
+
+    // Both personal → sort by order asc
+    if (aIsPersonal && bIsPersonal) {
+      return (a.frontmatter.order ?? 99) - (b.frontmatter.order ?? 99);
+    }
+
+    // Both professional → sort by experience date desc (newest first),
+    // then by order asc within the same experience
+    if (aDate !== bDate) return bDate.localeCompare(aDate);
+    return (a.frontmatter.order ?? 99) - (b.frontmatter.order ?? 99);
+  });
 }
 
 export function getProject(slug: string) {
