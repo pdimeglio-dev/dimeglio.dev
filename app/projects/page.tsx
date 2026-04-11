@@ -51,13 +51,46 @@ export default function ProjectsPage() {
 
 function ProjectsGridSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-48 animate-pulse rounded-2xl border border-slate-800 bg-card"
-        />
-      ))}
+    <div className="flex flex-col items-center gap-12">
+      {/* Fake pill filter */}
+      <div className="flex items-center justify-center gap-1 rounded-full border border-slate-800 bg-card p-1">
+        {["All", "Professional", "Personal"].map((label) => (
+          <div
+            key={label}
+            className="rounded-full px-4 py-2 text-sm text-muted-foreground/30"
+          >
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Shimmer grid */}
+      <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="relative h-52 overflow-hidden rounded-2xl border border-slate-800 bg-card"
+          >
+            {/* Gradient shimmer sweep */}
+            <div
+              className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"
+              style={{ animationDelay: `${i * 150}ms` }}
+            />
+            {/* Skeleton content */}
+            <div className="flex h-full flex-col justify-end p-6">
+              <div className="mb-3 h-3 w-16 rounded-full bg-slate-800/60" />
+              <div className="mb-2 h-5 w-3/4 rounded-full bg-slate-800/60" />
+              <div className="h-3 w-full rounded-full bg-slate-800/40" />
+              <div className="mt-1 h-3 w-2/3 rounded-full bg-slate-800/40" />
+              <div className="mt-4 flex gap-2">
+                {Array.from({ length: 3 }).map((_, j) => (
+                  <div key={j} className="h-5 w-14 rounded-full bg-slate-800/40" />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
