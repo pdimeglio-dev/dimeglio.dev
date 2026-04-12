@@ -3,6 +3,7 @@ import { GraduationCap, Award } from "lucide-react";
 import { getExperiences, getSkillsForExperience, getProjectsForExperience } from "@/lib/mdx";
 import { ExperienceTimeline } from "@/components/experience-timeline";
 import { JsonLd, profilePageSchema } from "@/components/json-ld";
+import { ResumeDownloadLink } from "./resume-download-link";
 
 export const metadata: Metadata = {
   title: "Experience",
@@ -58,6 +59,8 @@ export default function ExperiencePage() {
       <p className="mt-4 text-lg text-zinc-300 leading-relaxed">
         Where I&apos;ve been and what I&apos;ve built.
       </p>
+
+      <ResumeDownloadLink />
 
       {/* ----------------------------------------------------------------- */}
       {/* Jobs Timeline — Aceternity animated scroll                         */}

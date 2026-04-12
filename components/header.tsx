@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Menu } from "lucide-react";
+import { Home, Menu, Download } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import {
   Sheet,
@@ -19,10 +19,12 @@ const navLinks = [
   { href: "/blog", label: "Blog" },
 ];
 
+const RESUME_URL = "/pablo-di-meglio-resume.pdf";
+
 /**
  * Sticky frosted-glass top navigation bar.
- * Desktop: inline nav links.
- * Mobile: hamburger → slide-out Sheet.
+ * Desktop: inline nav links + Download CV button.
+ * Mobile: hamburger → slide-out Sheet with nav + Download CV.
  */
 export function Header() {
   const pathname = usePathname();
@@ -46,34 +48,54 @@ export function Header() {
         </Link>
 
         {/* Desktop nav */}
-        <ul className="hidden items-center gap-1 md:flex">
-          {navLinks.map(({ href, label }) => {
-            const isActive =
-              href === "/" ? pathname === "/" : pathname.startsWith(href);
+        <div className="hidden items-center gap-1 md:flex">
+          <ul className="flex items-center gap-1">
+            {navLinks.map(({ href, label }) => {
+              const isActive =
+                href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className={cn(
-                    "rounded-md px-3 py-2 text-sm transition-colors",
-                    isActive
-                      ? "text-white"
-                      : "text-muted-foreground hover:text-white",
-                  )}
-                  onClick={() =>
-                    trackEvent({
-                      event: "nav_link_clicked",
-                      properties: { href, label, from_page: pathname },
-                    })
-                  }
-                >
-                  {label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className={cn(
+                      "rounded-md px-3 py-2 text-sm transition-colors",
+                      isActive
+                        ? "text-white"
+                        : "text-muted-foreground hover:text-white",
+                    )}
+                    onClick={() =>
+                      trackEvent({
+                        event: "nav_link_clicked",
+                        properties: { href, label, from_page: pathname },
+                      })
+                    }
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Download CV button */}
+          <a
+            href={RESUME_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            className="ml-4 inline-flex items-center gap-1.5 rounded-md border border-slate-700 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-slate-500 hover:text-white"
+            onClick={() =>
+              trackEvent({
+                event: "resume_downloaded",
+                properties: {},
+              })
+            }
+          >
+            <Download className="h-3.5 w-3.5" />
+            Resume
+          </a>
+        </div>
 
         {/* Mobile hamburger */}
         <button
@@ -118,6 +140,25 @@ export function Header() {
                   </Link>
                 );
               })}
+
+              {/* Mobile Download CV */}
+              <a
+                href={RESUME_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="mt-4 flex items-center gap-2 rounded-md border border-slate-700 px-4 py-3 text-base text-muted-foreground transition-colors hover:border-slate-500 hover:text-white"
+                onClick={() => {
+                  setMobileOpen(false);
+                  trackEvent({
+                    event: "resume_downloaded",
+                    properties: {},
+                  });
+                }}
+              >
+                <Download className="h-4 w-4" />
+                Download Resume
+              </a>
             </nav>
           </SheetContent>
         </Sheet>
