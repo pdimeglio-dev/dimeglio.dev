@@ -27,14 +27,19 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 10%", "end 50%"],
+    offset: ["start 20%", "end 80%"],
   });
 
-  const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
-  const opacityTransform = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
+  // Start with a small visible portion so the line appears immediately on scroll
+  const heightTransform = useTransform(
+    scrollYProgress,
+    [0, 0.02, 1],
+    [0, height * 0.05, height],
+  );
+  const opacityTransform = useTransform(scrollYProgress, [0, 0.02], [0, 1]);
 
   return (
-    <div className="w-full font-sans" ref={containerRef}>
+    <div className="relative w-full font-sans" ref={containerRef}>
       <div ref={ref} className="relative mx-auto max-w-7xl pb-20">
         {data.map((item, index) => (
           <div

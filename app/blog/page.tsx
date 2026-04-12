@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getBlogPosts } from "@/lib/mdx";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Thoughts on AI architecture, full-stack engineering, and building intelligent systems.",
+  description:
+    "Thoughts on AI architecture, full-stack engineering, and building intelligent systems.",
 };
 
 /**
@@ -25,43 +27,59 @@ export default function BlogPage() {
           <article key={post.slug}>
             <Link
               href={`/blog/${post.slug}`}
-              className="group block rounded-xl border border-slate-800 p-6 transition-colors hover:border-slate-700"
+              className="group block overflow-hidden rounded-xl border border-slate-800 transition-colors hover:border-slate-700"
             >
-              <time
-                dateTime={post.frontmatter.date}
-                className="text-sm text-muted-foreground"
-              >
-                {new Date(post.frontmatter.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
+              {post.frontmatter.coverImage && (
+                <div className="overflow-hidden">
+                  <Image
+                    src={post.frontmatter.coverImage}
+                    alt={post.frontmatter.title}
+                    width={800}
+                    height={420}
+                    className="w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                </div>
+              )}
 
-              <h2 className="mt-2 text-xl font-semibold tracking-tight transition-colors group-hover:text-white">
-                {post.frontmatter.title}
-              </h2>
+              <div className="p-6">
+                <time
+                  dateTime={post.frontmatter.date}
+                  className="text-sm text-muted-foreground"
+                >
+                  {new Date(post.frontmatter.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
 
-              <p className="mt-2 text-sm text-muted-foreground">
-                {post.frontmatter.description}
-              </p>
+                <h2 className="mt-2 text-xl font-semibold tracking-tight transition-colors group-hover:text-white">
+                  {post.frontmatter.title}
+                </h2>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {post.frontmatter.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-slate-800 px-3 py-1 text-xs text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {post.frontmatter.description}
+                </p>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {post.frontmatter.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-slate-800 px-3 py-1 text-xs text-muted-foreground"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             </Link>
           </article>
         ))}
 
         {posts.length === 0 && (
-          <p className="text-muted-foreground">No posts yet. Check back soon!</p>
+          <p className="text-muted-foreground">
+            No posts yet. Check back soon!
+          </p>
         )}
       </div>
     </main>

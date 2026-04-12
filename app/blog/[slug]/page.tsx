@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { getBlogPost, getBlogPosts } from "@/lib/mdx";
 import { MDXContent } from "@/components/mdx-content";
 
@@ -38,7 +39,7 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
   }
 
   return (
-    <article className="mx-auto max-w-3xl px-6 py-24">
+    <article className="mx-auto max-w-3xl px-6 py-24 overflow-x-hidden">
       <header className="mb-12">
         <time
           dateTime={post.frontmatter.date}
@@ -66,6 +67,19 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
             </span>
           ))}
         </div>
+
+        {post.frontmatter.coverImage && (
+          <div className="mt-8 overflow-hidden rounded-xl border border-slate-800">
+            <Image
+              src={post.frontmatter.coverImage}
+              alt={post.frontmatter.title}
+              width={1200}
+              height={630}
+              className="w-full object-cover"
+              priority
+            />
+          </div>
+        )}
       </header>
 
       <MDXContent source={post.content} />

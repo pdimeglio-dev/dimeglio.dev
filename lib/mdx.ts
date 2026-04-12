@@ -12,6 +12,8 @@ export interface BlogFrontmatter {
   date: string;
   tags: string[];
   published: boolean;
+  /** Hero/cover image displayed at top of post and in listing cards */
+  coverImage?: string;
 }
 
 export interface ExperienceFrontmatter {
