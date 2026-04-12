@@ -1,0 +1,242 @@
+---
+title: "The $3 SEO Audit: How AI Took My Site from 5.5 to 10/10"
+description: "A complete SEO overhaul of dimeglio.dev — audit, plan, and implementation — done entirely in a single AI conversation for under $3. Here's every fix, the before/after scores, and why this changes the economics of web development."
+date: "2026-04-12"
+lastModified: "2026-04-12"
+tags: ["seo", "ai", "nextjs", "web-performance", "devtools"]
+coverImage: "/blog/3-dollar-seo-audit-with-ai/cover.png"
+coverAlt: "Dark gradient visualization showing SEO metrics rising from 5.5 to 10, with JSON-LD schema code and sitemap XML fragments floating in the background"
+published: false
+---
+
+# The $3 SEO Audit: How AI Took My Site from 5.5 to 10/10
+
+I just built [dimeglio.dev](/blog/building-dimeglio-dev-with-ai) in 3 days with AI. The site looked great, the code was clean, the content was curated. But I had a nagging feeling: *how's the SEO?*
+
+So I asked my AI coding assistant to do a full SEO analysis. What happened next took about 15 minutes and cost less than $3 in API tokens — and the results were... humbling.
+
+## The Audit: A Honest Look in the Mirror
+
+The first thing the AI did was systematically read every file that matters for SEO: the root layout, every page component, the `next.config.ts`, and searched for things like `sitemap`, `robots.txt`, `canonical`, `JSON-LD`, and `not-found` pages.
+
+Here's what it found:
+
+### What Was Working ✅
+
+- **Metadata foundation** — Title templates, descriptions, `metadataBase` ✓
+- **OpenGraph & Twitter cards** — Dynamic OG image via Edge runtime ✓
+- **Semantic HTML** — `<main>`, `<article>`, `<section>`, `<time dateTime>` ✓
+- **Optimized fonts & images** — `next/font`, `next/image` ✓
+- **Blog post metadata** — Dynamic per-post titles, descriptions, OG images ✓
+
+### What Was Missing ❌
+
+- **No `sitemap.xml`** — Search engines couldn't discover pages efficiently
+- **No `robots.txt`** — No crawl directives at all
+- **No JSON-LD structured data** — Zero rich snippets potential
+- **No canonical URLs** — Duplicate content risk
+- **No custom 404 page** — Generic Next.js error page
+- **No RSS feed** — Blog invisible to feed readers
+- **No footer** — Missing social links and secondary navigation
+- **No web manifest** — No PWA support
+- **No Apple touch icon** — Poor mobile bookmark experience
+- **`maximumScale: 1`** — Blocking pinch-to-zoom (accessibility violation!)
+- **No security headers** — Missing `X-Frame-Options`, `X-Content-Type-Options`
+
+### The Score
+
+| Category | Score |
+|---|---|
+| Metadata | 7/10 |
+| Discoverability | 3/10 |
+| Structured Data | **0/10** |
+| Social Sharing | 8/10 |
+| Accessibility | 6/10 |
+| Technical | 7/10 |
+| Content SEO | 7/10 |
+| **Overall** | **~5.5/10** |
+
+Ouch. I had focused so much on the visual design and content that I'd completely neglected the infrastructure that makes a site *findable*.
+
+## The Fix: 15 Minutes, 15 Files
+
+Here's the beautiful part. After the audit, I said: *"Can we fix all of this?"*
+
+The AI created a plan, I approved it, and then it went to work. In a single conversation — no context switching, no Googling, no Stack Overflow — it:
+
+### Created 8 New Files
+
+| File | Purpose |
+|---|---|
+| `app/sitemap.ts` | Dynamic XML sitemap — auto-discovers all routes + blog posts |
+| `app/robots.ts` | Crawl directives + sitemap reference |
+| `app/not-found.tsx` | Branded 404 page with "Go home" and "Read the blog" CTAs |
+| `app/feed.xml/route.ts` | RSS 2.0 feed from all published blog posts |
+| `app/manifest.ts` | Web app manifest with PWA metadata |
+| `app/apple-icon.tsx` | Dynamic 180×180 Apple touch icon |
+| `components/json-ld.tsx` | Reusable JSON-LD helper + 6 schema factories |
+| `components/footer.tsx` | Site-wide footer with nav, social links, copyright |
+
+### Modified 7 Existing Files
+
+| File | What Changed |
+|---|---|
+| `app/layout.tsx` | Added keywords, canonical URL, RSS link, WebSite JSON-LD, footer, skip-to-content link, removed `maximumScale: 1` |
+| `app/page.tsx` | Added home-specific metadata + Person JSON-LD schema |
+| `app/blog/page.tsx` | Added canonical + ItemList JSON-LD |
+| `app/blog/[slug]/page.tsx` | Added per-post canonical + Article JSON-LD |
+| `app/experience/page.tsx` | Added canonical + ProfilePage JSON-LD |
+| `app/projects/page.tsx` | Added canonical URL |
+| `next.config.ts` | Added 5 security headers |
+
+### The JSON-LD Structured Data
+
+This was the biggest gap — and the biggest win. The AI created a complete structured data system:
+
+```typescript
+// components/json-ld.tsx — Schema factories
+
+websiteSchema()     // → Every page (via layout)
+personSchema()      // → Home page
+articleSchema(post)  // → Each blog post
+blogListSchema(posts) // → Blog index
+profilePageSchema()  // → Experience page
+breadcrumbSchema()   // → Ready for future use
+```
+
+Each schema follows [schema.org](https://schema.org) standards and includes rich context. For example, the Person schema includes:
+
+```json
+{
+  "@type": "Person",
+  "name": "Pablo Di Meglio",
+  "jobTitle": "Senior Full Stack Engineer",
+  "sameAs": [
+    "https://www.linkedin.com/in/pablodimeglio/",
+    "https://github.com/pdimeglio-dev"
+  ],
+  "knowsAbout": ["TypeScript", "React", "AI Architecture", ...]
+}
+```
+
+This is what powers Google's Knowledge Panel, rich search results, and AI-powered search summaries.
+
+## The Results: Before → After
+
+| Category | Before | After | Δ |
+|---|---|---|---|
+| **Metadata** | 7/10 | **10/10** | +3 |
+| **Discoverability** | 3/10 | **10/10** | +7 |
+| **Structured Data** | 0/10 | **10/10** | +10 |
+| **Social Sharing** | 8/10 | **9/10** | +1 |
+| **Accessibility** | 6/10 | **10/10** | +4 |
+| **Technical** | 7/10 | **10/10** | +3 |
+| **Content SEO** | 7/10 | **9/10** | +2 |
+| **Overall** | **5.5/10** | **~9.7/10** | **+4.2** |
+
+Every single route verified: `/sitemap.xml` renders valid XML, `/robots.txt` points to the sitemap, the 404 page is branded and helpful, the RSS feed has all posts, and `npm run build` compiles with zero errors.
+
+## The Economics
+
+Let's talk about what this would typically cost:
+
+| Approach | Cost | Time |
+|---|---|---|
+| SEO consultant (audit only) | $500 – $2,000 | 1-2 weeks |
+| SEO consultant (audit + implementation) | $2,000 – $5,000 | 2-4 weeks |
+| Freelance developer (implementation) | $500 – $1,500 | 3-5 days |
+| **AI assistant (audit + implementation)** | **~$3** | **~15 minutes** |
+
+That's not a typo. The entire conversation — analysis, planning, implementation, debugging TypeScript errors, and visual verification — cost approximately $3 in API tokens.
+
+Obviously, the comparison isn't perfectly apples-to-apples. I'm an experienced engineer who could evaluate every suggestion the AI made. I knew what good SEO looks like and could validate the output. The AI didn't teach me SEO — it automated the tedious implementation.
+
+But that's exactly the point.
+
+## What This Means
+
+This isn't about SEO specifically. It's about a pattern:
+
+1. **Expert identifies a problem** ("my SEO needs work")
+2. **AI does the comprehensive audit** (reads every file, knows every best practice)
+3. **Expert validates the plan** (approves the approach, catches anything wrong)
+4. **AI executes the implementation** (creates files, writes code, fixes errors)
+5. **Expert verifies the result** (reviews the build, checks the rendered output)
+
+The human brings judgment. The AI brings exhaustiveness and speed. Together, the output is better than either could produce alone — and it happens in minutes instead of weeks.
+
+This is what "AI Native" actually means. Not replacing the engineer. Making the engineer's time infinitely more leveraged.
+
+## The Technical Details
+
+For the developers who want to replicate this on their own Next.js site, here are the key patterns:
+
+### Dynamic Sitemap (Next.js App Router)
+
+```typescript
+// app/sitemap.ts
+export default function sitemap(): MetadataRoute.Sitemap {
+  const posts = getBlogPosts();
+  return [
+    { url: "https://yoursite.com", priority: 1 },
+    ...posts.map((post) => ({
+      url: `https://yoursite.com/blog/${post.slug}`,
+      lastModified: new Date(post.frontmatter.date),
+    })),
+  ];
+}
+```
+
+### Reusable JSON-LD Component
+
+```typescript
+// components/json-ld.tsx
+export function JsonLd({ data }: { data: Record<string, any> }) {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+```
+
+### Security Headers
+
+```typescript
+// next.config.ts
+const nextConfig: NextConfig = {
+  async headers() {
+    return [{
+      source: "/(.*)",
+      headers: [
+        { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      ],
+    }];
+  },
+};
+```
+
+### Skip-to-Content (Accessibility)
+
+```tsx
+// In your root layout, before the header
+<a
+  href="#main-content"
+  className="sr-only focus:not-sr-only focus:fixed focus:z-[100] ..."
+>
+  Skip to content
+</a>
+```
+
+## The Meta Angle
+
+Just like the [first blog post](/blog/building-dimeglio-dev-with-ai), this is recursive: an AI-built portfolio, SEO-optimized by AI, where the optimization itself becomes blog content... for the AI-optimized blog.
+
+We're deep in the meta now. And it cost $3.
+
+---
+
+*Full source code on [GitHub](https://github.com/pdimeglio-dev/dimeglio.dev). The SEO changes are all in a single commit — check the diff to see exactly what was added.*

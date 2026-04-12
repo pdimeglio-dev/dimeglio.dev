@@ -14,6 +14,10 @@ export interface BlogFrontmatter {
   published: boolean;
   /** Hero/cover image displayed at top of post and in listing cards */
   coverImage?: string;
+  /** Alt text for the cover image (describes the visual content for screen readers & image SEO) */
+  coverAlt?: string;
+  /** ISO date when the post was last modified (for Article schema dateModified) */
+  lastModified?: string;
 }
 
 export interface ExperienceFrontmatter {

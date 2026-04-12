@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getBlogPosts } from "@/lib/mdx";
+import { JsonLd, blogListSchema } from "@/components/json-ld";
 
 export const metadata: Metadata = {
   title: "Blog",
   description:
     "Thoughts on AI architecture, full-stack engineering, and building intelligent systems.",
+  alternates: {
+    canonical: "https://dimeglio.dev/blog",
+  },
 };
 
 /**
@@ -15,8 +19,15 @@ export const metadata: Metadata = {
 export default function BlogPage() {
   const posts = getBlogPosts();
 
+  const postsForSchema = posts.map((p) => ({
+    title: p.frontmatter.title,
+    slug: p.slug,
+    description: p.frontmatter.description,
+  }));
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-24">
+      <JsonLd data={blogListSchema(postsForSchema)} />
       <h1 className="text-4xl font-bold tracking-tighter">Blog</h1>
       <p className="mt-4 text-muted-foreground">
         Thoughts on AI, engineering, and building things that matter.
@@ -33,7 +44,7 @@ export default function BlogPage() {
                 <div className="overflow-hidden">
                   <Image
                     src={post.frontmatter.coverImage}
-                    alt={post.frontmatter.title}
+                    alt={post.frontmatter.coverAlt || post.frontmatter.title}
                     width={800}
                     height={420}
                     className="w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"

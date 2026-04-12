@@ -86,6 +86,10 @@ export type AnalyticsEvent =
   | {
       event: "category_filter_changed";
       properties: { category: string; page: string };
+    }
+  | {
+      event: "social_link_clicked";
+      properties: { platform: string; href: string };
     };
 
 /**

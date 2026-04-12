@@ -4,6 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { JsonLd, websiteSchema } from "@/components/json-ld";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,7 +21,6 @@ const geistMono = Geist_Mono({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 export const metadata: Metadata = {
@@ -30,10 +31,31 @@ export const metadata: Metadata = {
   description:
     "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Native. Building software that thinks.",
   metadataBase: new URL("https://dimeglio.dev"),
+  keywords: [
+    "Pablo Di Meglio",
+    "full stack engineer",
+    "AI native",
+    "senior software engineer",
+    "portfolio",
+    "React",
+    "TypeScript",
+    "Next.js",
+    "Angular",
+    "Node.js",
+    "Google Cloud",
+    "AI architecture",
+    "system design",
+  ],
+  alternates: {
+    canonical: "https://dimeglio.dev",
+    types: {
+      "application/rss+xml": "https://dimeglio.dev/feed.xml",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Pablo Di Meglio",
+    siteName: "dimeglio.dev",
     title: "Pablo Di Meglio — Senior Full Stack Engineer · AI Native",
     description:
       "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Native. Building software that thinks.",
@@ -58,6 +80,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
+        {/* Skip-to-content link for keyboard/screen-reader users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-black"
+        >
+          Skip to content
+        </a>
+        <JsonLd data={websiteSchema()} />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -67,7 +97,8 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <PostHogProvider>
               <Header />
-              <div className="pt-16">{children}</div>
+              <div id="main-content" className="pt-16">{children}</div>
+              <Footer />
             </PostHogProvider>
           </Suspense>
         </ThemeProvider>
