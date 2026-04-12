@@ -8,6 +8,9 @@ import { ProjectsGrid } from "@/components/projects-grid";
 export const metadata: Metadata = {
   title: "Projects",
   description: "Professional and personal projects by Pablo Di Meglio.",
+  alternates: {
+    canonical: "https://dimeglio.dev/projects",
+  },
 };
 
 /**

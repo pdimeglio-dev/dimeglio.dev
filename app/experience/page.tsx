@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import { GraduationCap, Award } from "lucide-react";
 import { getExperiences, getSkillsForExperience, getProjectsForExperience } from "@/lib/mdx";
 import { ExperienceTimeline } from "@/components/experience-timeline";
+import { JsonLd, profilePageSchema } from "@/components/json-ld";
 
 export const metadata: Metadata = {
   title: "Experience",
   description:
     "Professional experience and career history of Pablo Di Meglio.",
+  alternates: {
+    canonical: "https://dimeglio.dev/experience",
+  },
 };
 
 /**
@@ -47,6 +51,7 @@ export default function ExperiencePage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-24">
+      <JsonLd data={profilePageSchema()} />
       <h1 className="text-4xl font-bold tracking-tighter md:text-5xl">
         Experience
       </h1>

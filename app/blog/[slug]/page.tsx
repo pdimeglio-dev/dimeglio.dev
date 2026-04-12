@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getBlogPost, getBlogPosts } from "@/lib/mdx";
 import { MDXContent } from "@/components/mdx-content";
 import { BlogPostTracker } from "@/components/blog-post-tracker";
+import { JsonLd, articleSchema } from "@/components/json-ld";
 
 /**
  * Generate static params for all published blog posts at build time.
@@ -26,6 +27,9 @@ export async function generateMetadata(props: PageProps<"/blog/[slug]">) {
   return {
     title,
     description,
+    alternates: {
+      canonical: `https://dimeglio.dev/blog/${slug}`,
+    },
     openGraph: {
       title,
       description,
@@ -57,6 +61,17 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-24 overflow-x-hidden">
+      <JsonLd
+        data={articleSchema({
+          title: post.frontmatter.title,
+          description: post.frontmatter.description,
+          date: post.frontmatter.date,
+          lastModified: post.frontmatter.lastModified,
+          slug,
+          tags: post.frontmatter.tags,
+          coverImage: post.frontmatter.coverImage,
+        })}
+      />
       <header className="mb-12">
         <time
           dateTime={post.frontmatter.date}
@@ -89,7 +104,7 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
           <div className="mt-8 overflow-hidden rounded-xl border border-slate-800">
             <Image
               src={post.frontmatter.coverImage}
-              alt={post.frontmatter.title}
+              alt={post.frontmatter.coverAlt || post.frontmatter.title}
               width={1200}
               height={630}
               className="w-full object-cover"
