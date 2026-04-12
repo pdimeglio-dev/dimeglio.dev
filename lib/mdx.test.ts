@@ -22,8 +22,8 @@ import {
 describe("getSlugs", () => {
   it("returns blog post slugs", () => {
     const slugs = getSlugs(CONTENT_PATHS.blog);
-    expect(slugs).toContain("hello-world");
-    expect(slugs).toContain("ai-architecture-patterns");
+    expect(slugs).toContain("building-dimeglio-dev-with-ai");
+    expect(slugs).toContain("3-dollar-seo-audit-with-ai");
   });
 
   it("returns experience slugs", () => {
@@ -55,17 +55,17 @@ describe("getContentBySlug", () => {
   it("returns parsed blog post with frontmatter", () => {
     const post = getContentBySlug<BlogFrontmatter>(
       CONTENT_PATHS.blog,
-      "hello-world",
+      "building-dimeglio-dev-with-ai",
     );
 
     expect(post).not.toBeNull();
-    expect(post!.slug).toBe("hello-world");
+    expect(post!.slug).toBe("building-dimeglio-dev-with-ai");
     expect(post!.frontmatter.title).toBe(
-      "Hello World: Building My Portfolio with Next.js 16",
+      "How I Built dimeglio.dev in 3 Days with AI",
     );
     expect(post!.frontmatter.published).toBe(true);
     expect(post!.frontmatter.tags).toContain("nextjs");
-    expect(post!.content).toContain("# Hello World");
+    expect(post!.content).toContain("# How I Built dimeglio.dev");
   });
 
   it("returns null for non-existent slug", () => {
@@ -85,7 +85,7 @@ describe("getContentBySlug", () => {
     expect(project).not.toBeNull();
     expect(project!.frontmatter.category).toBe("Professional");
     expect(project!.frontmatter.associatedExperience).toBe("exp-rpotential");
-    expect(project!.frontmatter.techStack).toContain("React 19");
+    expect(project!.frontmatter.techStack).toContain("React");
   });
 });
 
@@ -144,9 +144,9 @@ describe("getBlogPosts", () => {
 
 describe("getBlogPost", () => {
   it("returns a specific post by slug", () => {
-    const post = getBlogPost("hello-world");
+    const post = getBlogPost("building-dimeglio-dev-with-ai");
     expect(post).not.toBeNull();
-    expect(post!.frontmatter.title).toContain("Hello World");
+    expect(post!.frontmatter.title).toContain("dimeglio.dev");
   });
 });
 
@@ -187,7 +187,7 @@ describe("getSkillsForExperience", () => {
   it("returns aggregated techStack from associated projects", () => {
     const skills = getSkillsForExperience("exp-rpotential");
     expect(skills.length).toBeGreaterThan(0);
-    expect(skills).toContain("React 19");
+    expect(skills).toContain("React");
   });
 
   it("returns deduplicated and sorted skills", () => {

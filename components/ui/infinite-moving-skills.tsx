@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 
 /**
  * Aceternity-style infinite horizontal scroller for skill pills.
@@ -23,36 +23,35 @@ export function InfiniteMovingSkills({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLUListElement>(null);
-  const [start, setStart] = useState(false);
+
+  const initScroller = useCallback(() => {
+    if (!containerRef.current || !scrollerRef.current) return;
+
+    const scrollerContent = Array.from(scrollerRef.current.children);
+    scrollerContent.forEach((item) => {
+      const duplicatedItem = item.cloneNode(true);
+      scrollerRef.current?.appendChild(duplicatedItem);
+    });
+
+    // Set CSS custom properties for direction & speed
+    containerRef.current.style.setProperty(
+      "--animation-direction",
+      direction === "left" ? "forwards" : "reverse",
+    );
+
+    const durations = { fast: "20s", normal: "40s", slow: "80s" };
+    containerRef.current.style.setProperty(
+      "--animation-duration",
+      durations[speed],
+    );
+
+    // Enable animation via DOM class (avoids setState in effect)
+    scrollerRef.current.classList.add("animate-scroll");
+  }, [direction, speed]);
 
   useEffect(() => {
-    if (containerRef.current && scrollerRef.current) {
-      const scrollerContent = Array.from(scrollerRef.current.children);
-
-      scrollerContent.forEach((item) => {
-        const duplicatedItem = item.cloneNode(true);
-        if (scrollerRef.current) {
-          scrollerRef.current.appendChild(duplicatedItem);
-        }
-      });
-
-      // Set CSS custom properties for direction & speed
-      if (containerRef.current) {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          direction === "left" ? "forwards" : "reverse",
-        );
-
-        const durations = { fast: "20s", normal: "40s", slow: "80s" };
-        containerRef.current.style.setProperty(
-          "--animation-duration",
-          durations[speed],
-        );
-      }
-
-      setStart(true);
-    }
-  }, [direction, speed]);
+    initScroller();
+  }, [initScroller]);
 
   return (
     <div
@@ -66,7 +65,6 @@ export function InfiniteMovingSkills({
         ref={scrollerRef}
         className={cn(
           "flex w-max min-w-full shrink-0 flex-nowrap gap-3 py-4",
-          start && "animate-scroll",
           pauseOnHover && "hover:[animation-play-state:paused]",
         )}
       >
