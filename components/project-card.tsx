@@ -45,8 +45,15 @@ export function ProjectCard({ slug, frontmatter, onClick }: ProjectCardProps) {
         }
       }}
     >
-      {/* Category pill */}
-      <span className="inline-block rounded-full border border-slate-800 px-3 py-1 text-xs text-muted-foreground">
+      {/* Category indicator — colored dot + label, visually distinct from skill chips */}
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span
+          className={`h-2 w-2 rounded-full ${
+            frontmatter.category === "Professional"
+              ? "bg-purple-500"
+              : "bg-blue-400"
+          }`}
+        />
         {frontmatter.category}
       </span>
 
@@ -69,7 +76,7 @@ export function ProjectCard({ slug, frontmatter, onClick }: ProjectCardProps) {
         {(frontmatter.techStack || frontmatter.tags || []).slice(0, 4).map((tag) => (
           <span
             key={tag}
-            className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground"
+            className="rounded-full border border-slate-700 bg-slate-800/50 px-2.5 py-0.5 text-xs font-medium text-neutral-300"
           >
             {tag}
           </span>
