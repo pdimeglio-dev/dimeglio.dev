@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * Logo data: each entry maps a company logo to its experience timeline anchor.
@@ -22,6 +25,8 @@ const logos = [
 /**
  * "Where I've built" logo strip — displays company logos in a centered flex row.
  * Each logo links to the corresponding experience timeline anchor.
+ *
+ * Analytics: fires `logo_clicked` with logo name and target href.
  */
 export function LogoTicker() {
   return (
@@ -36,6 +41,12 @@ export function LogoTicker() {
             key={logo.alt}
             href={logo.href}
             className="flex-shrink-0"
+            onClick={() =>
+              trackEvent({
+                event: "logo_clicked",
+                properties: { logo: logo.alt, href: logo.href },
+              })
+            }
           >
             <Image
               src={logo.src}

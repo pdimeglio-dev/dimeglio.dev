@@ -13,6 +13,7 @@
 - **Animation:** Framer Motion
 - **Icons:** Lucide React
 - **Theming:** next-themes (forced dark mode)
+- **Analytics:** PostHog (posthog-js) — cookieless, typed events
 - **Testing:** Vitest + React Testing Library
 
 ## Next.js 16 Breaking Changes (IMPORTANT)
@@ -41,8 +42,28 @@
 ```
 /app           — Next.js App Router pages and layouts
 /components    — React components (UI in /components/ui via shadcn)
-/lib           — Utilities, helpers, data
+/lib           — Utilities, helpers, data (analytics.ts = event catalog)
 /content       — MDX content (blog, experience, projects)
 /docs          — Architecture docs and decision records
 /public        — Static assets
 ```
+
+## Analytics (IMPORTANT — Read Before Creating Components)
+
+This project uses **PostHog** for analytics. The event catalog lives in `lib/analytics.ts`
+and is documented in `docs/ANALYTICS.md`.
+
+### Rules for agents:
+1. **New page/route** → Page views are tracked automatically by `PostHogProvider`.
+   No action needed unless you want custom events.
+2. **New interactive component** (buttons, links, cards that users click) →
+   Add a `trackEvent()` call with an appropriate event from `lib/analytics.ts`.
+   If no matching event exists, **add a new variant** to the `AnalyticsEvent` union type first.
+3. **New blog post** → Analytics are automatic. The `BlogPostTracker` component in
+   `app/blog/[slug]/page.tsx` handles `blog_post_viewed` and scroll depth.
+4. **New project or experience entry** → Already tracked via existing grid/timeline components.
+5. **Event naming** → Use `snake_case`. Include relevant context as properties
+   (slug, title, company, etc.). See existing events for patterns.
+6. **Import** → `import { trackEvent } from "@/lib/analytics"` — works in client components only.
+   For Server Components, tracking is handled by the client wrapper or provider.
+7. **Never hardcode PostHog API keys** — always use `NEXT_PUBLIC_POSTHOG_KEY` env var.

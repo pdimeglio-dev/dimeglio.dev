@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { getBlogPost, getBlogPosts } from "@/lib/mdx";
 import { MDXContent } from "@/components/mdx-content";
+import { BlogPostTracker } from "@/components/blog-post-tracker";
 
 /**
  * Generate static params for all published blog posts at build time.
@@ -83,6 +84,13 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
       </header>
 
       <MDXContent source={post.content} />
+
+      {/* Analytics: tracks blog_post_viewed + scroll depth */}
+      <BlogPostTracker
+        slug={slug}
+        title={post.frontmatter.title}
+        tags={post.frontmatter.tags}
+      />
     </article>
   );
 }

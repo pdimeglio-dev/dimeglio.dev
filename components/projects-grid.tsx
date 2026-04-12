@@ -17,6 +17,7 @@ import { ImagesSlider } from "@/components/ui/images-slider";
 import type { MDXContent as MDXContentType, ProjectFrontmatter } from "@/lib/mdx";
 import { assetUrl } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { trackEvent } from "@/lib/analytics";
 
 type Category = "All" | "Professional" | "Personal";
 
@@ -93,6 +94,10 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
   );
 
   const handleCategoryChange = (category: Category) => {
+    trackEvent({
+      event: "category_filter_changed",
+      properties: { category, page: "projects" },
+    });
     updateParams({
       category: category === "All" ? null : category,
       projectId: null, // close sheet when changing category
@@ -100,6 +105,18 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
   };
 
   const handleProjectClick = (slug: string) => {
+    const project = projects.find((p) => p.slug === slug);
+    if (project) {
+      trackEvent({
+        event: "project_card_clicked",
+        properties: {
+          slug,
+          title: project.frontmatter.title,
+          company: project.frontmatter.company || "",
+          category: project.frontmatter.category || "",
+        },
+      });
+    }
     updateParams({ projectId: slug });
   };
 
@@ -205,7 +222,17 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group/link relative flex items-center gap-4 overflow-hidden py-3 transition-all hover:bg-gradient-to-r hover:from-purple-500/10 hover:via-blue-500/5 hover:to-transparent hover:pl-4"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          trackEvent({
+                            event: "project_link_clicked",
+                            properties: {
+                              slug: activeProject.slug,
+                              label,
+                              url,
+                            },
+                          });
+                        }}
                       >
                         <div className="absolute left-0 top-0 h-full w-0.5 scale-y-0 bg-gradient-to-b from-purple-500 to-blue-500 transition-transform duration-200 group-hover/link:scale-y-100" />
                         <Icon className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover/link:text-blue-400" />

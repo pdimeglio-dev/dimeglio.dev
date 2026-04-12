@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Menu } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import {
   Sheet,
   SheetContent,
@@ -34,6 +35,12 @@ export function Header() {
           href="/"
           className="transition-opacity hover:opacity-80"
           aria-label="Home"
+          onClick={() =>
+            trackEvent({
+              event: "nav_link_clicked",
+              properties: { href: "/", label: "Home (icon)", from_page: pathname },
+            })
+          }
         >
           <Home className="h-5 w-5" />
         </Link>
@@ -54,6 +61,12 @@ export function Header() {
                       ? "text-white"
                       : "text-muted-foreground hover:text-white",
                   )}
+                  onClick={() =>
+                    trackEvent({
+                      event: "nav_link_clicked",
+                      properties: { href, label, from_page: pathname },
+                    })
+                  }
                 >
                   {label}
                 </Link>
@@ -87,7 +100,13 @@ export function Header() {
                   <Link
                     key={href}
                     href={href}
-                    onClick={() => setMobileOpen(false)}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      trackEvent({
+                        event: "nav_link_clicked",
+                        properties: { href, label, from_page: pathname },
+                      });
+                    }}
                     className={cn(
                       "rounded-md px-4 py-3 text-base transition-colors",
                       isActive
