@@ -21,9 +21,25 @@ export async function generateMetadata(props: PageProps<"/blog/[slug]">) {
 
   if (!post) return { title: "Post Not Found" };
 
+  const { title, description, coverImage } = post.frontmatter;
+
   return {
-    title: post.frontmatter.title,
-    description: post.frontmatter.description,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      ...(coverImage && {
+        images: [{ url: coverImage, width: 1200, height: 630, alt: title }],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(coverImage && { images: [coverImage] }),
+    },
   };
 }
 
