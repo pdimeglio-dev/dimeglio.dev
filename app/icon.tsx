@@ -1,9 +1,8 @@
 import { ImageResponse } from "next/og";
 
 /**
- * Dynamic favicon / PWA icon — generates multiple sizes.
- * Next.js auto-generates /icon-192x192.png, /icon-512x512.png etc.
- * Uses the same "PD" monogram as the Apple touch icon.
+ * Dynamic favicon / PWA icon — "</>" closing tag symbol.
+ * Classic developer branding for dimeglio.dev.
  */
 
 export const size = { width: 512, height: 512 };
@@ -14,27 +13,50 @@ export default function Icon() {
     (
       <div
         style={{
-          background:
-            "linear-gradient(135deg, #000000 0%, #0a0a1a 50%, #0f172a 100%)",
+          background: "#000000",
           width: "100%",
           height: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "sans-serif",
           borderRadius: "96px",
         }}
       >
-        <div
-          style={{
-            fontSize: 240,
-            fontWeight: 800,
-            color: "#ffffff",
-            letterSpacing: "-0.04em",
-          }}
+        {/* SVG </> icon — clean geometric code brackets with slash */}
+        <svg
+          width="360"
+          height="360"
+          viewBox="0 0 360 360"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          PD
-        </div>
+          {/* < bracket */}
+          <path
+            d="M120 80 L30 180 L120 280"
+            stroke="white"
+            strokeWidth="32"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          {/* / slash */}
+          <path
+            d="M210 60 L150 300"
+            stroke="#6366f1"
+            strokeWidth="28"
+            strokeLinecap="round"
+            fill="none"
+          />
+          {/* > bracket */}
+          <path
+            d="M240 80 L330 180 L240 280"
+            stroke="white"
+            strokeWidth="32"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </svg>
       </div>
     ),
     { ...size },
