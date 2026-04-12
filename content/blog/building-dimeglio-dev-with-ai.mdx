@@ -11,21 +11,21 @@ published: true
 
 # How I Built dimeglio.dev in 3 Days with AI
 
-What used to take 2–3 weeks took 3 days. Not because the scope was smaller — 18 projects, 15 experience entries, 75 unique skills, responsive design, dark theme, Vercel deployment — but because the way I work has fundamentally changed.
+I've been meaning to build a proper portfolio for... honestly, years. The kind of project that sits on your todo list so long it becomes furniture. I finally did it, and the whole thing took 3 days.
 
-This isn't a story about AI replacing engineers. It's about what happens when a senior engineer with 14 years of experience uses AI as a force multiplier.
+Not a landing page. 18 projects, 15 experience entries, 75 unique skills, responsive design, dark theme, blog with MDX, deployed to Vercel. Three days.
+
+The short answer is AI. The longer answer is more interesting.
 
 {/* ![dimeglio.dev homepage](/blog/building-dimeglio-dev-with-ai/hero.png) */}
 
-## The AI Toolkit
+## Two AIs, Two Jobs
 
-Two models. Two jobs. One workflow.
+I used two different models and they did very different things.
 
-**Gemini Pro** was the brainstorming partner. Before writing a single line of code, I spent time with Gemini discussing architecture decisions, design direction, content strategy, and the overall vision. What's the right tech stack for a portfolio that needs to evolve into an AI-powered experience? How should I structure content to be both human-readable and machine-queryable? What's the "Apple meets Gen AI startup" aesthetic actually look like in practice?
+**Gemini Pro** was for thinking out loud. Before I wrote a line of code, I spent a few hours going back and forth with Gemini about architecture. What's the right stack for a portfolio that I want to eventually turn into an AI-powered experience? How should I structure content so it's both human-readable and machine-queryable later? I kept pushing on the aesthetic — I wanted something that felt like an Apple product page crossed with a Gen AI startup landing page. Gemini was good at bouncing ideas and poking holes in my assumptions.
 
-**Claude Opus 4.6** (via [Cline](https://github.com/cline/cline) in VS Code) was the execution engine. The brainstorming sessions with Gemini produced a detailed prompt — architecture decisions, design tokens, component hierarchy, content model — that became Claude's initial context. From there, Cline built the entire codebase through iterative pair programming.
-
-The workflow looked like this:
+**Claude Opus 4.6** (through [Cline](https://github.com/cline/cline) in VS Code) did the actual building. The brainstorming with Gemini produced a pretty detailed prompt — architecture decisions, design tokens, component hierarchy, content model — and that became Claude's starting context. From there it was iterative pair programming. I'd describe what I wanted, Claude would build it, I'd review, we'd go back and forth.
 
 ```mermaid
 graph LR
@@ -36,19 +36,19 @@ graph LR
   E -->|Iterate| D
   E -->|New questions| A
 ```
-*The AI-assisted development loop*
+*How the loop actually worked*
 
-The key insight: **Gemini was the architect, Claude was the builder, and I was the tech lead** reviewing every pull request and making the final calls.
+If I'm being honest about roles: Gemini was the person I talked to at the whiteboard, Claude was the person who actually typed, and I was the one saying "no, not like that" a lot.
 
 {/* ![Cline in VS Code](/blog/building-dimeglio-dev-with-ai/cline-vscode.png) */}
 
 ## The 3-Day Timeline
 
-Here's the actual commit history from the GitHub repository. 34 commits across 3 days:
+Here's the actual commit history. 34 commits across 3 days — I'm including the real SHAs because I think it tells the story better than I can.
 
 ### Day 1 — Foundation (April 9)
 
-14 commits. From `git init` to a fully functional multi-page portfolio.
+14 commits. From `git init` to a working multi-page portfolio.
 
 ```
 bdcedb5  feat: initial commit
@@ -67,11 +67,13 @@ be42a27  feat: projects page with filtered grid, slide-out sheet, and URL sync
 d870b61  Merge pull request #1 — feature/real-experience-timeline
 ```
 
-By end of Day 1, the site had: a dark-themed home page with hero and bento grid, a projects page with filtering and slide-out detail sheets, a full experience timeline, a blog with MDX rendering and syntax highlighting, and a content architecture with typed frontmatter.
+See that `fix:` on commit `22499b6`? That was a good 40 minutes of fighting with the typography plugin and MDX rendering. Server Components can't use `useEffect`, and the MDX renderer kept trying to be a Client Component. Claude and I went in circles on that one before landing on the right pattern — server fetches the data, client renders the interactive parts.
+
+By end of Day 1 the site had: a dark home page with hero and bento grid, projects with filtering and slide-out detail sheets, experience timeline, blog with syntax highlighting, and a content system with typed frontmatter. It was ugly in spots, but it worked.
 
 ### Day 2 — Content & Polish (April 10)
 
-14 commits. Filling in real data and polishing the UI.
+14 commits. This is where it got tedious.
 
 ```
 6081eb2  feat(home): add logo strip, skills marquee, and refine page layout
@@ -90,11 +92,13 @@ f07e286  Adding missing logos
 cf34ba4  Merge pull request #5 — feature/skeleton-loader
 ```
 
-Day 2 was about content density — populating every experience entry with accurate dates, roles, and achievements; adding project screenshots; creating SVG logos; and building UI enhancements like the logo ticker and skills marquee.
+Day 2 was mostly me sitting with old résumés, LinkedIn exports, and performance review docs, pulling out accurate dates, titles, and achievements for every single entry. AI couldn't help much here — it doesn't know what projects I worked on at Disney in 2019. I had to go dig all of that up myself.
+
+I also spent way too long getting SVG logos to look right. White fills, no padding, consistent viewBox sizing. It's the kind of pixel-fiddling that AI is bad at and I find weirdly satisfying.
 
 ### Day 3 — Ship It (April 11)
 
-6 commits. Media, mobile, and deployment.
+6 commits. Mobile fixes, media, deploy.
 
 ```
 16deda5  Added images and videos for some projects
@@ -105,21 +109,17 @@ ded5124  Fix mobile responsive header
 8dac282  Polish: rebrand, mobile fixes, skills audit, Vercel deploy
 ```
 
-Day 3 ended with `vercel --yes --prod` and **dimeglio.dev going live**. 🚀
+Day 3 ended with `vercel --yes --prod` and dimeglio.dev going live. 🚀
 
 {/* ![Git commit timeline](/blog/building-dimeglio-dev-with-ai/git-timeline.png) */}
 
-## The Real Work: Data Curation
+## The Hard Part Wasn't Code
 
-Here's the thing nobody tells you about AI-assisted development: **the code was the easy part.**
+Here's the thing. The code was the fast part. Claude knocked out components, pages, and configurations quickly. What actually took the most time — and the most mental energy — was the data.
 
-What actually consumed the most time — and the most mental energy — was going through years of old documentation, résumés, performance reviews, LinkedIn posts, and project notes to extract accurate, specific data points for each of the 18 projects and 15 experience entries.
+Going through years of old documentation, résumés, performance reviews, LinkedIn posts, and project notes to extract accurate, specific data points for 18 projects and 15 experience entries. Every title verified. Every date range checked. Every techStack array reviewed against what we actually used, not what the marketing deck said.
 
-Every title. Every date range. Every techStack array. Every key achievement. Verified against source material.
-
-This wasn't busywork. It was strategic.
-
-Every data point curated during this phase becomes a **fact the future RAG system can retrieve and cite with confidence**. Garbage in, garbage out applies doubly to AI systems. By investing in data quality during Phase 1, Phase 2's AI assistant will have a verified, structured knowledge base from day one — not a hallucination-prone summary of half-remembered bullet points.
+I did this carefully on purpose. Not just because I'm neurotic about accuracy (though I am), but because these MDX files are going to become the knowledge base for a RAG system in Phase 2. If the source data is sloppy, the AI assistant built on top of it will confidently repeat the sloppiness. I'd rather spend an extra day getting the facts right now.
 
 ## Architecture Decisions
 
@@ -159,35 +159,35 @@ graph TB
   I -.-> J
   J -.-> K
 ```
-*Content architecture: MDX files serve both the website and the future RAG system*
+*The same MDX files power the website now and will feed the RAG system later*
 
-This was a deliberate choice. MDX gives us:
+I went with MDX over a CMS or database for a few reasons:
 
-- **Structured frontmatter** — Every piece of content has typed metadata (dates, techStack arrays, categories, relationships) that's queryable and sortable
-- **Rich markup** — AI agents are exceptionally good at generating MDX. Blog posts with code blocks, diagrams, and custom components can be authored in seconds
-- **Relationship model** — Projects link to experiences via `associatedExperience` slugs, skills auto-aggregate from project techStacks, and the entire data model is self-documenting
-- **Future-proof for RAG** — The same MDX files that power the static site will become the embedding corpus for an AI assistant. Structured markdown with frontmatter is the ideal format for chunking, embedding, and retrieval
+- **Structured frontmatter** — Typed metadata (dates, techStack arrays, categories, relationships) that's queryable and sortable. It's basically a schema.
+- **AI-friendly format** — AI models are really good at generating MDX. Blog posts with code blocks, diagrams, and custom components can be authored quickly.
+- **Built-in relationships** — Projects link to experiences via `associatedExperience` slugs, skills auto-aggregate from project techStacks. The data model documents itself.
+- **RAG-ready** — Structured markdown with frontmatter is close to ideal for chunking, embedding, and retrieval. The same files that power the static site will become the embedding corpus later.
 
 ### Server Components → Client Components
 
-Next.js 16 defaults to Server Components — they run on the server, read files from disk, and ship zero JavaScript to the browser. But animations, scroll effects, and user interactions need the browser. The solution: **the server fetches and processes data, then passes it as props to interactive client components.**
+Next.js 16 defaults to Server Components — they run on the server, read files from disk, and ship zero JavaScript to the browser. But animations, scroll effects, and user interactions need the browser. So the pattern is: **server fetches data, client makes it move.**
 
 ```
 Server Component (page.tsx)     → reads MDX files via lib/mdx.ts
        ↓ serialized props
-Client Component (timeline.tsx) → renders with Framer Motion, hooks, scroll animations
+Client Component (timeline.tsx) → renders with Framer Motion, hooks, scroll stuff
 ```
 
-For example, `app/experience/page.tsx` calls `getExperiences()` which reads every MDX file from `/content/experience/`, parses frontmatter with gray-matter, and returns typed TypeScript objects. Those objects pass as props to `<ExperienceTimeline>` — a `"use client"` component that renders the animated timeline with scroll-triggered animations.
+`app/experience/page.tsx` calls `getExperiences()` which reads every MDX file from `/content/experience/`, parses frontmatter with gray-matter, and returns typed TypeScript objects. Those get passed as props to `<ExperienceTimeline>` — a `"use client"` component that does the animated timeline with scroll-triggered animations.
 
-The browser never sees `fs.readFileSync` or gray-matter — it only receives pre-processed JSON data. That's why the site loads fast: **zero runtime data fetching, all content baked in at build time.** Out of ~20 components, 14 are client components (for animations, filtering, carousels) and the rest are server components (for data fetching and static rendering).
+The browser never sees `fs.readFileSync` or gray-matter. It just gets JSON. That's why the site loads fast — no runtime data fetching, everything's baked in at build time. Out of ~20 components, 14 are client components (animations, filtering, carousels) and the rest are server components (data fetching, static rendering).
 
-### Why Not a CMS or Database?
+### Why Not a CMS?
 
-For a personal portfolio with ~50 content files, a CMS adds complexity without value. The MDX files **are** the database:
+For a personal portfolio with ~50 content files, a CMS is overhead I don't need. The MDX files *are* the database:
 
 ```typescript
-// lib/mdx.ts — The entire "backend"
+// lib/mdx.ts — This is the entire "backend"
 export function getExperiences(): Experience[] {
   return readMDXFiles<ExperienceFrontmatter>("content/experience")
     .filter((e) => e.frontmatter.type === "job")
@@ -198,11 +198,11 @@ export function getExperiences(): Experience[] {
 }
 ```
 
-No API calls. No database connections. No CMS subscriptions. Just TypeScript reading files from disk — and everything is statically generated at build time.
+No API calls. No database connections. No CMS subscriptions. TypeScript reads files from disk. Done.
 
-### The Content-as-Data Philosophy
+### Content-as-Data
 
-Every MDX file follows a strict schema. Here's what a project looks like:
+Every MDX file follows a strict schema. Here's a project:
 
 ```yaml
 ---
@@ -217,33 +217,21 @@ order: 1
 ---
 ```
 
-This frontmatter is data. The body is content. The combination is powerful — you get the queryability of a database with the expressiveness of markdown. And when Phase 2 arrives, each field becomes a filterable attribute in the RAG retrieval pipeline.
+Frontmatter is data. Body is content. You get the queryability of a database with the expressiveness of markdown. And when the RAG pipeline comes, each frontmatter field becomes a filterable attribute in retrieval.
 
-## Media Strategy
+## Media
 
-Currently, all project screenshots and blog images live in `/public/` — served directly by Vercel's CDN. This works perfectly for launch, but the plan is:
+Right now all screenshots and blog images live in `/public/` — served by Vercel's CDN. It works fine for launch. The plan is to move to GCP Cloud Storage with a CDN-fronted bucket eventually — better cache control, image optimization, and it decouples media from the deploy pipeline. The codebase already has a `CDN_PREFIX` env var ready for the switch.
 
-1. **Now:** Static assets in `/public/projects/` and `/public/blog/`
-2. **Soon:** Migration to **GCP Cloud Storage** with a CDN-fronted bucket
-3. **Why:** Better cache control, image optimization, and decoupling media from the deploy pipeline
+### Cover Images
 
-The codebase is already prepared — a `CDN_PREFIX` environment variable is ready for the switchover. One env change and all image URLs redirect to the bucket.
+The cover image for this post was generated by AI too. I wrote a script (`scripts/generate-cover-prompt.mjs`) that reads a blog post's frontmatter — title, description, tags, headings — and generates an optimized image prompt. That goes into Google's Imagen (via Nano Banana), out comes a cover that matches the site's dark aesthetic. Same color palette every time (black, slate, indigo, purple), same mood, every cover unique to its content.
 
-### AI-Generated Cover Images
+I'm not a designer. This workflow means I don't have to be.
 
-Even the cover image for this post was generated by AI. The workflow:
+## What's Next
 
-1. A custom script (`scripts/generate-cover-prompt.mjs`) reads the blog post's frontmatter — title, description, tags, and section headings — and assembles an optimized image generation prompt
-2. The prompt is fed into **Google's Imagen** (via Nano Banana), which generates a cover image matching the site's dark aesthetic
-3. The image drops into `/public/blog/<slug>/cover.png`, the frontmatter gets a `coverImage` field, and it's done
-
-The script ensures visual consistency across all posts — same color palette (black, slate, indigo, purple), same mood ("Apple meets AI startup"), same editorial quality. No design skills required, no stock photo subscriptions, and every cover is unique to its content.
-
-It's another example of the theme: **AI doesn't replace the creative direction — it accelerates the execution.**
-
-## What's Next: Phase 2
-
-This portfolio is Phase 1 — the content layer. Phase 2 adds native AI capabilities:
+This portfolio is Phase 1 — the content layer. Phase 2 adds AI capabilities:
 
 ```mermaid
 graph LR
@@ -267,20 +255,19 @@ graph LR
   F -.-> E
   E -.-> H
 ```
-*The roadmap: from static portfolio to AI-powered conversational experience*
 
-The hidden AI Orb button on the homepage? That's the entry point. When Phase 2 ships, visitors will be able to have a conversation with an AI that knows my entire career — every project, every technology, every achievement — backed by the curated MDX content we built in Phase 1.
+There's a hidden AI Orb button on the homepage. When Phase 2 ships, visitors will be able to chat with an AI that knows my entire career — every project, every technology, every role — backed by the MDX content from Phase 1.
 
-This is why every data point matters. This is why we spent more time curating content than writing code.
+That's why I was so careful about data quality. The AI assistant is only as good as the facts it can pull from.
 
-## The Meta-Observation
+## The Honest Takeaway
 
-The most fitting thing about this portfolio is that **the way it was built is proof of the thesis it presents.**
+I've been building software for 14 years. This is the fastest I've ever gone from idea to production, and the output is legitimately better than what I would have built alone in 2-3 weeks.
 
-The site claims I'm a Senior Full Stack Engineer who's AI Native. The site was built in 3 days by a senior full stack engineer using AI as a force multiplier. The architecture was designed with AI-first principles — structured content, embeddings-ready data, a RAG-compatible corpus.
+But I want to be clear about what "with AI" means here. I still made every architecture decision. I still reviewed every component. I still wrote all the content data by hand from source documents. The AI didn't have opinions about whether to use a CMS or MDX files — I did. It didn't know what projects I'd worked on at Google — I did.
 
-The portfolio doesn't just describe the work. It *is* the work.
+What AI did was eliminate the gap between "I know what I want" and "it exists." And for someone who's been doing this long enough to know exactly what they want, that gap shrinking changes everything.
 
 ---
 
-*Built with Next.js 16, Tailwind CSS v4, MDX, Framer Motion, and a lot of conversations with AI. Deployed on Vercel. Source code on [GitHub](https://github.com/pdimeglio-dev/dimeglio.dev).*
+*Built with Next.js 16, Tailwind CSS v4, MDX, Framer Motion, and a lot of back-and-forth with AI. Deployed on Vercel. Source on [GitHub](https://github.com/pdimeglio-dev/dimeglio.dev).*
