@@ -35,19 +35,32 @@ dimeglio.dev/
 │   └── projects/
 │       └── page.tsx        # Projects grid with Sheet detail
 ├── components/
-│   ├── ui/                 # shadcn/ui components
-│   └── ...                 # Custom components (header, hero, etc.)
+│   ├── ui/                 # shadcn/ui + Aceternity-adapted components
+│   ├── home/               # Homepage-specific components (logo ticker, skills marquee)
+│   └── ...                 # Custom components (header, hero, project-card, etc.)
 ├── content/
 │   ├── blog/               # Blog post MDX files
-│   ├── experience/         # Experience MDX files
-│   └── projects/           # Project MDX files
+│   ├── experience/         # Experience MDX (exp-*, cert-*, edu-*)
+│   └── projects/           # Project MDX (proj-*)
+├── hooks/
+│   └── use-is-mobile.ts    # Viewport detection hook
 ├── lib/
-│   ├── mdx.ts              # MDX reading/parsing utility
-│   └── utils.ts            # shadcn/ui utility (cn)
+│   ├── mdx.ts              # MDX reading/parsing/relationships
+│   ├── mdx.test.ts         # Vitest tests for content functions
+│   └── utils.ts            # Tailwind cn() utility
 ├── docs/
-│   ├── ARCHITECTURE.md     # This file
+│   ├── ARCHITECTURE.md     # This file — overview + tech stack
+│   ├── CONTENT-SYSTEM.md   # MDX content authoring guide
+│   ├── MEDIA-SYSTEM.md     # Screenshots, videos, viewport detection
+│   ├── COMPONENTS.md       # Component catalog
+│   ├── DATA-FLOW.md        # Data pipeline + relationships
+│   ├── SESSION_NOTES.md    # Dev session notes / TODO scratchpad
 │   └── decisions/          # Architecture Decision Records
-├── public/                 # Static assets
+├── public/
+│   ├── logos/              # Company SVG logos (white, viewBox-only)
+│   └── projects/           # Project screenshots (per-slug directories)
+├── scripts/
+│   └── validate-data.mjs   # Content validation script
 ├── .clinerules             # Cline AI context rules
 └── AGENTS.md               # Next.js agent rules
 ```
@@ -92,3 +105,15 @@ Auto-generated infinite scrolling strip of tech skills. Pulls from all projects'
 - Frontmatter parsed with `gray-matter`
 - Rendered with `next-mdx-remote/rsc` (Server Component compatible)
 - Code blocks highlighted with `rehype-pretty-code` using `github-dark` theme
+
+---
+
+## Further Documentation
+
+| Document | What it covers |
+|----------|---------------|
+| [CONTENT-SYSTEM.md](./CONTENT-SYSTEM.md) | MDX authoring guide, frontmatter types, naming conventions, cross-references |
+| [MEDIA-SYSTEM.md](./MEDIA-SYSTEM.md) | Screenshots, mobile images, video embeds, viewport-aware slider logic |
+| [COMPONENTS.md](./COMPONENTS.md) | Full component catalog — every component, props, Server vs Client |
+| [DATA-FLOW.md](./DATA-FLOW.md) | Data pipeline from MDX → lib → pages → UI, sorting logic, relationship model |
+| [decisions/](./decisions/) | Architecture Decision Records (ADRs) |

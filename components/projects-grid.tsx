@@ -2,9 +2,8 @@
 
 import { useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, ExternalLink, GitFork, Camera, Globe } from "lucide-react";
+import { ArrowUpRight, ExternalLink, GitFork, Camera, Globe, Video } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -14,7 +13,10 @@ import {
 } from "@/components/ui/sheet";
 import type { ReactNode } from "react";
 import { ProjectCard } from "@/components/project-card";
+import { ImagesSlider } from "@/components/ui/images-slider";
 import type { MDXContent as MDXContentType, ProjectFrontmatter } from "@/lib/mdx";
+import { assetUrl } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 type Category = "All" | "Professional" | "Personal";
 
@@ -51,6 +53,7 @@ interface ProjectsGridProps {
 export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isMobile = useIsMobile();
 
   const activeCategory = (searchParams.get("category") as Category) || "All";
   const showSlug = searchParams.get("projectId");
@@ -224,46 +227,66 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
                 {renderedContent[activeProject.slug]}
               </div>
 
+              {/* Screenshots — viewport & orientation aware */}
+              {activeProject.frontmatter.images && activeProject.frontmatter.images.length > 0 && (() => {
+                // Pick the right image set: mobile images on phone viewports (if available)
+                const useMobileSet = isMobile && activeProject.frontmatter.mobileImages && activeProject.frontmatter.mobileImages.length > 0;
+                const displayImages = useMobileSet
+                  ? activeProject.frontmatter.mobileImages!
+                  : activeProject.frontmatter.images;
+                // Portrait mode when: explicitly portrait OR using mobile image set
+                const isPortrait = useMobileSet || activeProject.frontmatter.imageOrientation === "portrait";
+
+                return (
+                  <div className="mt-8 flex flex-col gap-5">
+                    <div className="flex items-center gap-3">
+                      <Camera className="h-4 w-4 text-zinc-500" />
+                      <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-zinc-500">Screenshots</h3>
+                    </div>
+
+                    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-zinc-950">
+                      <ImagesSlider
+                        images={displayImages.map(
+                          (img) => assetUrl(`/projects/${activeProject.slug}/${img}`)
+                        )}
+                        overlay={false}
+                        autoplay
+                        className={
+                          isPortrait
+                            ? "h-[36rem] max-w-xs mx-auto md:h-[40rem]"
+                            : "h-[28rem] md:h-[36rem]"
+                        }
+                      >
+                        <div className="z-50" />
+                      </ImagesSlider>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Video embed */}
               {activeProject.frontmatter.video && (() => {
                 const videoId = getYouTubeId(activeProject.frontmatter.video!);
                 return videoId ? (
-                  <div className="overflow-hidden rounded-xl border border-slate-800">
-                    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                      <iframe
-                        className="absolute inset-0 h-full w-full"
-                        src={`https://www.youtube.com/embed/${videoId}`}
-                        title={`${activeProject.frontmatter.title} — Video`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                  <div className="mt-8 flex flex-col gap-5">
+                    <div className="flex items-center gap-3">
+                      <Video className="h-4 w-4 text-zinc-500" />
+                      <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-zinc-500">Demo</h3>
+                    </div>
+                    <div className="overflow-hidden rounded-xl border border-slate-800">
+                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                        <iframe
+                          className="absolute inset-0 h-full w-full"
+                          src={`https://www.youtube.com/embed/${videoId}`}
+                          title={`${activeProject.frontmatter.title} — Video`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
                     </div>
                   </div>
                 ) : null;
               })()}
-
-              {/* Images gallery */}
-              {activeProject.frontmatter.images && activeProject.frontmatter.images.length > 0 && (
-                <div className="mt-4 flex flex-col gap-5">
-                  <div className="flex items-center gap-3">
-                    <Camera className="h-4 w-4 text-zinc-500" />
-                    <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-zinc-500">Screenshots</h3>
-                  </div>
-                  <div className={`grid gap-4 ${activeProject.frontmatter.images.length >= 2 ? "grid-cols-2" : "grid-cols-1"}`}>
-                    {activeProject.frontmatter.images.map((imageName) => (
-                      <div key={imageName} className="overflow-hidden rounded-3xl border border-slate-800 bg-zinc-950 shadow-lg shadow-black/20">
-                        <Image
-                          src={`/projects/${activeProject.slug}/${imageName}`}
-                          alt={`${activeProject.frontmatter.title} — ${imageName}`}
-                          width={600}
-                          height={1200}
-                          className="h-auto w-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </SheetContent>
