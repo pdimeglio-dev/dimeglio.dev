@@ -1,5 +1,11 @@
 # Project: dimeglio.dev — Pablo Di Meglio's Developer Portfolio & Blog
 
+## Branding (IMPORTANT)
+- The site name is **dimeglio.dev** — always lowercase, always with the dot, never separated.
+- ❌ Never write: "Dimeglio Dev", "Dimeglio.Dev", "DiMeglio.dev", "dimeglio dev"
+- ✅ Always write: **dimeglio.dev**
+- The person's name is **Pablo Di Meglio** (capital P, D, M).
+
 ## Package Manager
 - **Always use npm** — never yarn, pnpm, or bun.
 

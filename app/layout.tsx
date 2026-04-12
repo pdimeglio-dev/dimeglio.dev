@@ -29,6 +29,21 @@ export const metadata: Metadata = {
   },
   description:
     "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Native. Building software that thinks.",
+  metadataBase: new URL("https://dimeglio.dev"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Pablo Di Meglio",
+    title: "Pablo Di Meglio — Senior Full Stack Engineer · AI Native",
+    description:
+      "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Native. Building software that thinks.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pablo Di Meglio — Senior Full Stack Engineer · AI Native",
+    description:
+      "Personal portfolio and blog. Building software that thinks.",
+  },
 };
 
 export default function RootLayout({
