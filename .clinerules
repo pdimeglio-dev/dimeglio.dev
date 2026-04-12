@@ -54,6 +54,42 @@
 /public        — Static assets
 ```
 
+## Blog Writing Voice (IMPORTANT — Read Before Writing Any Blog Content)
+
+Pablo's blog voice is **conversational, direct, and slightly self-deprecating**. It should read
+like a senior engineer talking to peers over coffee — not like a LinkedIn thought leader or a
+ChatGPT output.
+
+### Mandatory rules:
+
+1. **Open with something personal or specific** — a frustration, a real moment, a confession.
+   Never open with a thesis statement or "In this post, I'll show you..."
+2. **Show the mess** — what went wrong, what was annoying, what took too long. Real projects
+   have friction. If everything sounds smooth and perfect, it reads as fake.
+3. **No AI buzzwords** — ban these: "force multiplier", "game-changer", "paradigm shift",
+   "revolutionize", "empower", "leverage" (as a verb), "delve", "tapestry", "landscape",
+   "harness", "cutting-edge", "robust", "seamless". Just say what happened.
+4. **No profound conclusions** — don't wrap sections with mic-drop takeaways. If the point is
+   good, the reader will get it. Never write "This is what X actually means" or
+   "The portfolio doesn't just describe the work. It *is* the work."
+5. **No defensive AI framing** — never open with "This isn't about AI replacing engineers."
+   If you have to say it, the tone is already wrong.
+6. **No dramatic pauses** — ban "That's not a typo", "Here's the beautiful part", "Let that
+   sink in", "Here's the thing nobody tells you about X".
+7. **Use imperfect transitions** — "Anyway,", "So,", "The other thing was...",
+   "I also spent way too long on..." are fine. Not every paragraph needs a smooth segue.
+8. **First person, casual** — contractions ("I'd", "wasn't", "didn't"), sentence fragments
+   where they feel natural, occasional parenthetical asides (like this one).
+9. **Be specific over abstract** — "40 minutes fighting the typography plugin" beats
+   "encountered some challenges with rendering." Real details build trust.
+10. **End with something honest, not profound** — a practical takeaway, an open question,
+    or just what you'd do differently. No inspirational wrap-ups.
+
+### Voice check — does the draft sound like:
+- ✅ A dev blog post by a real person → ship it
+- ❌ A Medium article titled "How AI Is Transforming..." → rewrite it
+- ❌ A polished marketing case study → add friction and personality
+
 ## Analytics (IMPORTANT — Read Before Creating Components)
 
 This project uses **PostHog** for analytics. The event catalog lives in `lib/analytics.ts`
