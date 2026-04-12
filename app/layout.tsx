@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PostHogProvider } from "@/components/posthog-provider";
 import { Header } from "@/components/header";
 import "./globals.css";
 
@@ -47,8 +49,12 @@ export default function RootLayout({
           forcedTheme="dark"
           disableTransitionOnChange
         >
-          <Header />
-          <div className="pt-16">{children}</div>
+          <Suspense fallback={null}>
+            <PostHogProvider>
+              <Header />
+              <div className="pt-16">{children}</div>
+            </PostHogProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

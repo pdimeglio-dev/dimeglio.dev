@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronRight, FolderOpen } from "lucide-react";
 import { Timeline } from "@/components/ui/timeline";
+import { trackEvent } from "@/lib/analytics";
 
 interface RelatedProject {
   slug: string;
@@ -75,6 +76,16 @@ export function ExperienceTimeline({ jobs }: { jobs: JobData[] }) {
                   key={project.slug}
                   href={`/projects?projectId=${project.slug}`}
                   className="group/card flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition-all hover:border-slate-600 hover:bg-slate-800/50"
+                  onClick={() =>
+                    trackEvent({
+                      event: "experience_project_clicked",
+                      properties: {
+                        project_slug: project.slug,
+                        project_title: project.title,
+                        from_company: job.company,
+                      },
+                    })
+                  }
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-zinc-200 transition-colors group-hover/card:text-white">
