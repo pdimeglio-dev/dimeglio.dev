@@ -161,6 +161,57 @@
   animation: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
 }
 
+/* Prose table styles — dark theme with proper borders */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.prose thead {
+  border-bottom: 2px solid oklch(0.25 0.005 260);
+}
+
+.prose thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: oklch(1 0 0);
+  white-space: nowrap;
+}
+
+.prose tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid oklch(0.18 0.003 260);
+  color: oklch(0.75 0 0);
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.prose tbody tr:hover {
+  background-color: oklch(0.08 0 0);
+}
+
+/* Bold cells in tables (e.g. **Overall**) */
+.prose tbody td strong {
+  color: oklch(1 0 0);
+}
+
+/* Responsive table wrapper — added by MDX component override */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border: 1px solid oklch(0.25 0.005 260);
+  border-radius: 0.75rem;
+}
+
+.table-wrapper table {
+  margin: 0;
+}
+
 /* Shimmer skeleton loader animation */
 @keyframes shimmer {
   0% {

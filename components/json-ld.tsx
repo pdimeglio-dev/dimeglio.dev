@@ -50,7 +50,7 @@ export function personSchema() {
     description:
       "Senior Full Stack Engineer and AI Native with 14+ years of experience building scalable systems at Google, Disney, Wells Fargo, and more.",
     sameAs: [
-      "https://www.linkedin.com/in/pablodimeglio/",
+      "https://www.linkedin.com/in/dimegliopablo/",
       "https://github.com/pdimeglio-dev",
     ],
     knowsAbout: [

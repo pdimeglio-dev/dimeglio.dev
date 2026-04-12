@@ -14,6 +14,7 @@
  */
 
 import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 import rehypePrettyCode from "rehype-pretty-code";
 import type { MDXComponents } from "mdx/types";
 import { Mermaid } from "@/components/ui/mermaid";
@@ -47,6 +48,11 @@ function extractText(node: React.ReactNode): string {
  */
 const components: MDXComponents = {
   Mermaid,
+  table: (props) => (
+    <div className="table-wrapper">
+      <table {...props} />
+    </div>
+  ),
   pre: (props) => {
     // Intercept mermaid code blocks: ```mermaid ... ```
     const child = props.children as React.ReactElement<{
@@ -93,6 +99,7 @@ export function MDXContent({ source }: MDXContentProps) {
         components={components}
         options={{
           mdxOptions: {
+            remarkPlugins: [remarkGfm],
             rehypePlugins: [[rehypePrettyCode, rehypePrettyCodeOptions]],
           },
         }}

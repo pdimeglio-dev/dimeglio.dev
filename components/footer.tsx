@@ -6,7 +6,7 @@ import { trackEvent } from "@/lib/analytics";
 
 const socialLinks = [
   {
-    href: "https://www.linkedin.com/in/pablodimeglio/",
+    href: "https://www.linkedin.com/in/dimegliopablo/",
     label: "LinkedIn",
     icon: IconBrandLinkedin,
   },
