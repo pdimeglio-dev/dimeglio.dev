@@ -2,7 +2,7 @@ import { Hero } from "@/components/hero";
 import { BentoGrid } from "@/components/bento-grid";
 import { LogoTicker } from "@/components/home/logo-ticker";
 import { SkillsMarquee } from "@/components/home/skills-marquee";
-import { AIOrb } from "@/components/ai-orb";
+// import { AIOrb } from "@/components/ai-orb";
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
       <BentoGrid />
       <LogoTicker />
       <SkillsMarquee />
-      <AIOrb />
+      {/* <AIOrb /> */}
     </main>
   );
 }

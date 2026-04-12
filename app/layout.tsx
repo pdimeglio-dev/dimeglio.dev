@@ -22,11 +22,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Pablo Di Meglio — Senior Full Stack Engineer · AI Architect",
+    default: "Pablo Di Meglio — Senior Full Stack Engineer · AI Native",
     template: "%s | Pablo Di Meglio",
   },
   description:
-    "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Architect. Building software that thinks.",
+    "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Native. Building software that thinks.",
 };
 
 export default function RootLayout({
