@@ -1,4 +1,4 @@
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 import { openai } from "@ai-sdk/openai";
 import { embed, streamText, jsonSchema, stepCountIs } from "ai";
@@ -299,7 +299,7 @@ export async function POST(req: Request) {
       model: openai("gpt-4o"),
       messages,
       system: SYSTEM_PROMPT,
-      stopWhen: stepCountIs(5),
+      stopWhen: stepCountIs(10),
       tools: {
         // ── Data tool — retrieves context from Pinecone, returns to model ───
         searchPortfolio: {
@@ -523,6 +523,14 @@ export async function POST(req: Request) {
           }
         } catch (err) {
           console.error("[Chat API] Stream error:", err);
+          // Surface the error to the frontend so the UI doesn't hang silently
+          try {
+            controller.enqueue(
+              encode({ type: "text", delta: "\n\n_Sorry, something went wrong. Please try again._" })
+            );
+          } catch {
+            // controller may already be closed
+          }
         } finally {
           controller.close();
         }
