@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Maximize2, Minimize2, Send, Bot, User } from "lucide-react";
+import { X, Maximize2, Minimize2, Send, Bot, User, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { SkillGrid } from "@/components/chat/skill-grid";
@@ -336,6 +336,11 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
     await handleSubmitText(text);
   };
 
+  const handleClearChat = useCallback(() => {
+    setMessages([]);
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+  }, []);
+
   const handleClose = () => {
     trackEvent({
       event: "guillermo_chat_closed",
@@ -372,6 +377,16 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
             </div>
           </div>
           <div className="flex items-center gap-1">
+            {messages.length > 0 && (
+              <button
+                onClick={handleClearChat}
+                className="rounded-md p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-red-400"
+                aria-label="Clear chat"
+                title="Clear conversation"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
             <button
               onClick={() => setIsMaximized((v) => !v)}
               className="rounded-md p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
