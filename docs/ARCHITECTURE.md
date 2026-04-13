@@ -41,7 +41,8 @@ dimeglio.dev/
 ├── content/
 │   ├── blog/               # Blog post MDX files
 │   ├── experience/         # Experience MDX (exp-*, cert-*, edu-*)
-│   └── projects/           # Project MDX (proj-*)
+│   ├── projects/           # Project MDX (proj-*)
+│   └── rag/                # RAG-only content (bio, skills, FAQ, interests)
 ├── hooks/
 │   └── use-is-mobile.ts    # Viewport detection hook
 ├── lib/

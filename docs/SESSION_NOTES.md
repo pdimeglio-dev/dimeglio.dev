@@ -61,63 +61,18 @@ Drop files in: `public/projects/proj-batcave/`
 - Add `video` URLs if screencasts exist
 - Verify gallery renders in browser
 
-### 3. RAG Content Interview
+### 3. RAG Content ✅ COMPLETED (April 12)
 
-Create `content/rag/` directory with these documents:
+Created `content/rag/` directory with 4 documents, all interview-validated:
 
-#### bio.md — Personal & Professional Bio
-**Known facts:**
-- Pablo Di Meglio
-- Argentine 🇦🇷, moved to the US (Bay Area)
-- **U.S. Citizen as of February 2026** 🇺🇸 — no sponsorship needed
-- 12+ years in software engineering
-- Career: Argentina → PCCW Global → Disney (Studios + Parks) → Google (Shopping + Cloud Studio + Agile Modeling) → Wells Fargo → Mission Lane → rPotential → Personal projects
-- Currently open to opportunities
+- **bio.md** — Full personal & professional bio (origin story, US journey, Globant relationship, contact info, what he's looking for, recommendation from Sandro Pasquali)
+- **skills-inventory.md** — 70+ skills grouped by category with 4-tier proficiency levels (Expert/Advanced/Proficient/Familiar), each backed by project evidence. Interview-validated by Pablo.
+- **faq.md** — Pre-answered recruiter Q&A (elevator pitch, why looking, ideal company, biggest achievement, management style, visa, availability, deflection rules)
+- **interests.md** — SUP racing (Chattajack, Tahoe Crossing, Sea Trek podiums), kiteboarding (Naish Team Rider), CrossFit, road cycling, fandoms (Batman, Star Wars, Dragon Ball Z, etc.)
 
-**Still need to ask:**
-- What year did you move to the US?
-- Where in Argentina are you from?
-- Family situation you're comfortable sharing? (married, kids, etc.)
-- What's your narrative — what drives you as an engineer?
-- Preferred job title / role you're targeting?
-- Location preference — remote, hybrid, in-office? Which cities?
-- Salary expectations? (optional — RAG can deflect if not provided)
+**Pinecone index:** Created with dense 1536 dimensions for `text-embedding-3-small`. Validated as optimal for this corpus size.
 
-#### skills-inventory.md — Exhaustive Skills List
-**Can auto-generate from MDX data.** Need to:
-- Extract all unique techStack values from all projects
-- Group by category (Frontend, Backend, Cloud, AI/ML, Testing, etc.)
-- Add proficiency levels based on frequency and recency
-- Ask Pablo to fill gaps / correct levels
-
-#### faq.md — Pre-Answered Recruiter Questions
-**Draft common Q&A:**
-- Tell me about yourself
-- Why are you looking for a new role?
-- What's your ideal team/company?
-- What's your biggest achievement?
-- What's your management/leadership experience?
-- What's your salary expectation?
-- Do you need visa sponsorship? → **No, U.S. citizen**
-- Are you open to relocation?
-
-#### interests.md — Personal Interests & Athletics
-**Known facts:**
-- **SUP Racing** — 14' carbon race board, competitive racer
-  - Completed **Chattajack** (31-mile SUP race on the Tennessee River — one of the most prestigious in the world)
-  - Other races TBD (ask for list)
-- **Kiteboarding / Kitesurfing** — active in Bay Area, Argentina, and Maui
-  - **Naish Team Rider (Ambassador)** — sponsored by Naish, a major water sports brand
-- **CrossFit** — active practitioner
-- **The Paddle Games** — built an entire product around the Bay Area paddle sports community
-- **Batman fan** — themed his entire AI agent ecosystem after the DC universe
-
-**Still need to ask:**
-- What other SUP races have you done?
-- How long have you been kiteboarding?
-- What's your CrossFit experience level? (competitions, PRs?)
-- Any other hobbies or interests?
-- Upload action photos? (for future About page or RAG context)
+**Next:** Build ingestion script to chunk all content (MDX + RAG docs), generate embeddings, and upsert to Pinecone.
 
 ---
 

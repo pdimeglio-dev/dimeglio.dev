@@ -15,8 +15,13 @@ content/
 │   ├── exp-*.mdx       # Job entries
 │   ├── cert-*.mdx      # Certifications
 │   └── edu-*.mdx       # Education
-└── projects/           # Professional + personal projects
-    └── proj-*.mdx
+├── projects/           # Professional + personal projects
+│   └── proj-*.mdx
+└── rag/                # RAG-only content (not rendered on site)
+    ├── bio.md          # Personal & professional bio
+    ├── skills-inventory.md  # Exhaustive skills with proficiency levels
+    ├── faq.md          # Pre-answered recruiter questions
+    └── interests.md    # Personal interests & athletics
 ```
 
 ## Naming Conventions
