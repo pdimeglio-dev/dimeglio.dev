@@ -90,6 +90,26 @@ export type AnalyticsEvent =
   | {
       event: "social_link_clicked";
       properties: { platform: string; href: string };
+    }
+  | {
+      event: "guillermo_chat_opened";
+      properties: { from_page: string };
+    }
+  | {
+      event: "guillermo_chat_closed";
+      properties: { message_count: number };
+    }
+  | {
+      event: "guillermo_message_sent";
+      properties: { message_length: number; message_count: number };
+    }
+  | {
+      event: "guillermo_cta_clicked";
+      properties: { cta_type: "email" | "linkedin" | "calendly"; from_page: string };
+    }
+  | {
+      event: "guillermo_lead_signal";
+      properties: { company?: string; role?: string; message_count: number };
     };
 
 /**

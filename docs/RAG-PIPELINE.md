@@ -48,9 +48,49 @@ This model was chosen for its optimal cost/performance ratio. The full corpus (~
 
 **Note:** Unpublished blog posts (`published: false`) are automatically skipped.
 
+## Chunking Strategy
+
+Long documents are split into **section-based chunks** using `##` (h2) headings before embedding. This improves retrieval precision — a question about kiteboarding matches a focused kiteboarding chunk instead of a diluted 76-line interests blob.
+
+### Rules
+
+| Content Type | Chunking | Reason |
+|-------------|----------|--------|
+| RAG docs (`content/rag/*.md`) | ✂️ Split by `##` headings | Large, topically diverse (bio sections, FAQ pairs, skill categories, interest areas) |
+| Blog posts (`content/blog/*.mdx`) | ✂️ Split by `##` headings | Long-form with distinct sections |
+| Experience (`content/experience/*.mdx`) | 📄 Single vector | Already short & focused (~10-20 lines per role) |
+| Projects (`content/projects/*.mdx`) | 📄 Single vector | Already short & focused (~15-25 lines per project) |
+
+### How It Works
+
+1. The markdown body is split on `## ` heading lines (h2 only — `###` and deeper stay with their parent section)
+2. Content before the first `##` becomes an "Introduction" chunk (if non-empty)
+3. Each chunk gets a unique vector ID: `{slug}--{section-slug}` (e.g., `bio--origin-story`, `faq--visa-sponsorship`)
+4. Each chunk's knowledge string includes the **document-level context header** (type, title, company, etc.) plus the section content — so every chunk knows what document it belongs to
+
+### Example: `faq.md` → 10 Vectors
+
+| Vector ID | Section |
+|-----------|---------|
+| `faq--tell-me-about-yourself` | Tell me about yourself. |
+| `faq--why-are-you-looking-for-a-new-role` | Why are you looking for a new role? |
+| `faq--whats-your-ideal-team-or-company` | What's your ideal team or company? |
+| `faq--whats-your-biggest-professional-achievement` | What's your biggest professional achievement? |
+| `faq--do-you-want-to-manage-people` | Do you want to manage people? |
+| `faq--do-you-need-visa-sponsorship` | Do you need visa sponsorship? |
+| `faq--are-you-open-to-relocation` | Are you open to relocation? |
+| `faq--whats-your-availability` | What's your availability? |
+| `faq--whats-your-salary-expectations` | What's your salary expectations? |
+| `faq--what-languages-do-you-speak` | What languages do you speak? |
+
+### Vector ID Format
+
+- **Whole-file vectors:** `{slug}` (e.g., `exp-google-shopping`, `proj-batcave`)
+- **Chunked vectors:** `{slug}--{section-slug}` (e.g., `bio--us-journey`, `interests--kiteboarding`)
+
 ## Knowledge String Construction
 
-Each file is converted into a "knowledge string" — a rich text representation optimized for embedding. The format varies by content type:
+Each chunk (or whole file) is converted into a "knowledge string" — a rich text representation optimized for embedding. The format varies by content type:
 
 ### Experience
 ```
@@ -112,6 +152,10 @@ Each Pinecone record includes filterable metadata:
 | `tech_stack` | string | Project | Comma-separated skills |
 | `tags` | string | Blog | Comma-separated tags |
 | `knowledge_string` | string | All | Full text for LLM context retrieval |
+| `section_title` | string | Chunked vectors | Human-readable section heading (e.g., "Kiteboarding / Kitesurfing") |
+| `chunk_index` | number | Chunked vectors | 0-based position within parent document |
+| `total_chunks` | number | Chunked vectors | Total chunks from parent document |
+| `parent_slug` | string | Chunked vectors | Slug of the source file (same as `slug`) |
 
 ## Running the Pipeline
 
@@ -144,13 +188,15 @@ node scripts/ingest.mjs
 
 1. **Discovery** — Finds all `.mdx` and `.md` files across the 4 content directories
 2. **Parsing** — Uses `gray-matter` to extract frontmatter and markdown body
-3. **Knowledge Strings** — Constructs type-specific text representations
-4. **Embedding** — Sends each knowledge string to `text-embedding-3-small` (1536d)
-5. **Upserting** — Batches vectors (10 at a time) and upserts to Pinecone
+3. **Chunking** — RAG docs and blog posts are split by `##` headings; experience/projects stay whole
+4. **Knowledge Strings** — Constructs type-specific text representations (each chunk gets the document's context header)
+5. **Clear Index** — Deletes all existing vectors to prevent orphans from old ID schemes
+6. **Embedding** — Sends each knowledge string to `text-embedding-3-small` (1536d)
+7. **Upserting** — Batches vectors (10 at a time) and upserts to Pinecone
 
 ### Re-running
 
-The script is **idempotent**. Pinecone upserts overwrite existing records with the same `id` (slug). You can safely re-run the full pipeline anytime:
+The script is **idempotent** — it clears the entire index and re-inserts everything from scratch. You can safely re-run anytime:
 
 - After adding a new blog post
 - After updating an experience or project MDX

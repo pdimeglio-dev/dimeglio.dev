@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { AIOrb } from "@/components/ai-orb";
 import { JsonLd, websiteSchema } from "@/components/json-ld";
 import "./globals.css";
 
@@ -99,6 +100,7 @@ export default function RootLayout({
               <Header />
               <div id="main-content" className="pt-16">{children}</div>
               <Footer />
+              <AIOrb />
             </PostHogProvider>
           </Suspense>
         </ThemeProvider>

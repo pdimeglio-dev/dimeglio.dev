@@ -66,8 +66,9 @@ async function main() {
     for (const match of results.matches) {
       const type = match.metadata?.type || "?";
       const title = match.metadata?.title || match.metadata?.slug || match.id;
+      const section = match.metadata?.section_title ? ` § ${match.metadata.section_title}` : "";
       const score = match.score?.toFixed(4);
-      console.log(`      → [${score}] ${type}: ${title} (${match.id})`);
+      console.log(`      → [${score}] ${type}: ${title}${section} (${match.id})`);
     }
     console.log();
   }
