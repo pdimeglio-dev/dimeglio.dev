@@ -172,13 +172,24 @@ function shouldChunk(type) {
 /**
  * Build a context header for a document (used as prefix for every chunk).
  * This ensures each chunk retains the parent document's identity.
+ *
+ * The first line is a plain-English semantic anchor sentence so that
+ * company/employer queries rank project and experience chunks correctly.
  */
 function buildContextHeader(type, frontmatter, slug) {
   const parts = [];
 
   switch (type) {
     case "experience": {
+      // Semantic anchor — makes "worked at Google" queries match this chunk
+      const dateRange = frontmatter.startDate && frontmatter.endDate
+        ? ` from ${frontmatter.startDate} to ${frontmatter.endDate}`
+        : frontmatter.startDate ? ` since ${frontmatter.startDate}` : "";
+      parts.push(
+        `Pablo Di Meglio worked as ${frontmatter.title || "Engineer"} at ${frontmatter.company || "Unknown"}${dateRange}.`
+      );
       parts.push(`Type: Experience`);
+      parts.push(`Slug: ${slug}`);
       parts.push(`Title: ${frontmatter.title || "Unknown"}`);
       parts.push(`Company: ${frontmatter.company || "Unknown"}`);
       if (frontmatter.location) parts.push(`Location: ${frontmatter.location}`);
@@ -190,17 +201,37 @@ function buildContextHeader(type, frontmatter, slug) {
     }
 
     case "project": {
+      // Semantic anchor — makes "projects at Google / using Kotlin" queries match
+      const atCompany = frontmatter.company ? ` at ${frontmatter.company}` : "";
+      parts.push(
+        `Pablo Di Meglio worked on the project "${frontmatter.title || "Unknown"}"${atCompany}.`
+      );
+      if (frontmatter.description) {
+        parts.push(`Summary: ${frontmatter.description}`);
+      }
       parts.push(`Type: Project`);
+      parts.push(`Slug: ${slug}`);
       parts.push(`Title: ${frontmatter.title || "Unknown"}`);
       if (frontmatter.company) parts.push(`Company: ${frontmatter.company}`);
       parts.push(`Category: ${frontmatter.category || "Unknown"}`);
-      if (frontmatter.description) parts.push(`Description: ${frontmatter.description}`);
       if (frontmatter.techStack?.length) {
         parts.push(`Tech Stack: ${frontmatter.techStack.join(", ")}`);
       }
       if (frontmatter.associatedExperience) {
         parts.push(`Associated Experience: ${frontmatter.associatedExperience}`);
       }
+      // External links — lets the AI cite real URLs when users ask "do you have a link?"
+      if (frontmatter.links && Object.keys(frontmatter.links).length) {
+        const linkPairs = Object.entries(frontmatter.links)
+          .map(([label, url]) => `${label}: ${url}`)
+          .join(", ");
+        parts.push(`Links: ${linkPairs}`);
+      }
+      if (frontmatter.video) {
+        parts.push(`Video: ${frontmatter.video}`);
+      }
+      // Portfolio deep link — always tell the AI where to find this project on the site
+      parts.push(`Portfolio URL: https://dimeglio.dev/projects?projectId=${slug}`);
       break;
     }
 
