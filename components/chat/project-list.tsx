@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ProjectListProps } from "@/lib/chat-widgets";
 import { getValidHref } from "@/lib/chat-slugs";
 
@@ -56,9 +57,11 @@ export function ProjectList({ title, items }: ProjectListProps) {
             <div className="group flex gap-3 px-3 py-3 transition-colors hover:bg-slate-700/20">
               {/* Logo / initials */}
               {hasLogo ? (
-                <img
+                <Image
                   src={`/logos/${item.logoFile}.svg`}
                   alt={item.company}
+                  width={28}
+                  height={28}
                   className="mt-0.5 h-7 w-7 shrink-0 rounded object-contain"
                 />
               ) : (

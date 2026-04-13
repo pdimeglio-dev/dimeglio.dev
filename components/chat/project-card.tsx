@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ProjectCardProps } from "@/lib/chat-widgets";
 import { getValidHref } from "@/lib/chat-slugs";
 
@@ -53,9 +54,11 @@ export function ProjectCard({
       {/* Header: logo + title + company + dates */}
       <div className="mb-2.5 flex items-start gap-3">
         {hasLogo ? (
-          <img
+          <Image
             src={`/logos/${logoFile}.svg`}
             alt={company}
+            width={32}
+            height={32}
             className="mt-0.5 h-8 w-8 shrink-0 rounded object-contain"
           />
         ) : (

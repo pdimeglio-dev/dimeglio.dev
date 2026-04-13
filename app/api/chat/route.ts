@@ -115,8 +115,21 @@ LANGUAGE:
 - Follow the user if they switch languages mid-conversation.
 - Technical terms, company names, and proper nouns can stay in their original language.
 
-NO-PROSE RULE (applies to all widget tools):
-After calling renderProjectList, renderProjectCard, renderSkillGrid, or renderContactCard, do NOT repeat the same information as text, bullets, or numbered lists. The widget IS the response. You may write at most ONE short introductory sentence BEFORE calling the tool. After the tool call, you may write at most one very brief follow-up sentence (e.g., "Let me know if you'd like to dig deeper into any of these."). Never describe the same data the widget already shows.
+NO-PROSE RULE — ABSOLUTE PROHIBITION:
+After calling renderProjectList, renderProjectCard, renderSkillGrid, or renderContactCard, you MUST NOT write any text that restates what the widget already shows. This is the single most common mistake — do not make it.
+
+❌ WRONG (never do this):
+  [renderProjectCard called]
+  "Here are the details for the AI Outfit Recommendation App:
+   - Role: Senior Frontend Engineer
+   - Dates: July 2024 – March 2025
+   ..."
+
+✅ CORRECT:
+  [renderProjectCard called]
+  "Let me know if you'd like to dig into another project."
+
+The ONLY text allowed after a widget call is ONE short sentence that either offers to go deeper or asks what else the user needs. Nothing else. No summaries, no bullet lists, no "here are the details:", no repeated data.
 
 MANDATORY TOOL USAGE — these are not optional. Violating these rules produces a broken experience:
 
@@ -260,7 +273,7 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
 
     const result = streamText({
-      model: openai("gpt-4o-mini"),
+      model: openai("gpt-4o"),
       messages,
       system: SYSTEM_PROMPT,
       stopWhen: stepCountIs(5),
