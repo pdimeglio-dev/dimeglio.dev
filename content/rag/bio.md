@@ -30,7 +30,8 @@ In 2014, Globant offered Pablo an onsite position in the United States with an L
 From there the career progressed through some of the most recognized companies in the world:
 - **Disney** (Studios + Parks) — Los Angeles, 2014–2016
 - **Wells Fargo** — San Francisco Bay Area, 2016–2017
-- **Google** (Shopping + Agile Modeling + Cloud Studio) — Bay Area, 2017–2025
+- **Google** (Shopping + Agile Modeling) — Bay Area, 2017–2024
+- **Globant Cloud Studio Innovation** — Bay Area, 2024–2025 (Globant internal project using Google Cloud AI tools, not a Google placement)
 - **Mission Lane** — Remote (fintech), 2020–2022
 - **PCCW Global** — Remote (telecom), 2022–2023
 - **rPotential** — Remote (AI startup), 2025–Present
