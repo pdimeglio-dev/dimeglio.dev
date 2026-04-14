@@ -477,10 +477,10 @@ export async function POST(req: Request) {
       async start(controller) {
         // Post-widget text suppression:
         // After emitting any visual widget, the model tends to dump a redundant
-        // markdown summary of the same data. We allow a short follow-up sentence
-        // (~200 chars) but suppress anything beyond that.
+        // markdown summary of the same data. The widget is self-describing —
+        // suppress ALL text that follows a widget in the same response step.
+        // Any context the model wants to add should go BEFORE the widget call.
         let hadWidget = false;
-        let postWidgetChars = 0;
 
         try {
           for await (const rawChunk of result.fullStream) {
@@ -492,17 +492,13 @@ export async function POST(req: Request) {
             if (chunk.type === "text-delta") {
               const delta: string = chunk.text ?? chunk.textDelta ?? "";
               if (delta) {
-                if (hadWidget) {
-                  postWidgetChars += delta.length;
-                  // Suppress everything beyond the one-sentence follow-up
-                  if (postWidgetChars > 200) continue;
-                }
+                // Suppress all text after a widget — the widget is self-describing
+                if (hadWidget) continue;
                 controller.enqueue(encode({ type: "text", delta }));
               }
             } else if (chunk.type === "tool-call") {
               // A new tool call means a new step — reset the post-widget suppression
               hadWidget = false;
-              postWidgetChars = 0;
               // Only show the brain scan indicator for the slow RAG search tool
               if (chunk.toolName === "searchPortfolio") {
                 controller.enqueue(
@@ -527,7 +523,6 @@ export async function POST(req: Request) {
                 );
                 // Arm the post-widget suppressor
                 hadWidget = true;
-                postWidgetChars = 0;
               }
               // Send lead notification if Resend is available and it's a contact card
               if (chunk.toolName === "renderContactCard" && resend) {
