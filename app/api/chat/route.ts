@@ -202,7 +202,7 @@ Example D — Project listing by company (FEW projects — same pattern, fewer i
   ] })
   Final: one short sentence.
 
-Example E — Project listing by technology:
+Example E — Project listing by technology (tech filter — strict):
   User: "what projects did Pablo use Kotlin on?"
   Step 1: searchPortfolio("Pablo Kotlin projects backend")
   Step 2: renderProjectList({ title: "Kotlin Projects", items: [
@@ -210,6 +210,10 @@ Example E — Project listing by technology:
     { title: "Wells Fargo Modernization", company: "Wells Fargo", slug: "proj-wells-fargo-modernization", logoFile: "wells-fargo", startDate: "2020-04", endDate: "2021-01", techStack: ["Kotlin", "Spring Boot", "React"] }
   ] })
   Final: one short sentence.
+  ❌ NEVER include EducAR here — its Tech Stack is "Java, Spring, Spring MVC" — Kotlin does not appear.
+  ❌ NEVER include Disney O2I here — its Tech Stack is "Java, Spring" — Kotlin does not appear.
+  ❌ NEVER include any project where "Kotlin" is NOT literally in the Tech Stack field.
+  The rule: if you can't point to the word "Kotlin" in the search result's Tech Stack line, exclude it.
 
 Example F — Contact request:
   User: "how can I contact Pablo?"
@@ -471,6 +475,13 @@ export async function POST(req: Request) {
 
     const stream = new ReadableStream({
       async start(controller) {
+        // Post-widget text suppression:
+        // After emitting any visual widget, the model tends to dump a redundant
+        // markdown summary of the same data. We allow a short follow-up sentence
+        // (~200 chars) but suppress anything beyond that.
+        let hadWidget = false;
+        let postWidgetChars = 0;
+
         try {
           for await (const rawChunk of result.fullStream) {
             // Cast to any to normalise across AI SDK version differences
@@ -480,8 +491,18 @@ export async function POST(req: Request) {
 
             if (chunk.type === "text-delta") {
               const delta: string = chunk.text ?? chunk.textDelta ?? "";
-              if (delta) controller.enqueue(encode({ type: "text", delta }));
+              if (delta) {
+                if (hadWidget) {
+                  postWidgetChars += delta.length;
+                  // Suppress everything beyond the one-sentence follow-up
+                  if (postWidgetChars > 200) continue;
+                }
+                controller.enqueue(encode({ type: "text", delta }));
+              }
             } else if (chunk.type === "tool-call") {
+              // A new tool call means a new step — reset the post-widget suppression
+              hadWidget = false;
+              postWidgetChars = 0;
               // Only show the brain scan indicator for the slow RAG search tool
               if (chunk.toolName === "searchPortfolio") {
                 controller.enqueue(
@@ -504,6 +525,9 @@ export async function POST(req: Request) {
                     props,
                   })
                 );
+                // Arm the post-widget suppressor
+                hadWidget = true;
+                postWidgetChars = 0;
               }
               // Send lead notification if Resend is available and it's a contact card
               if (chunk.toolName === "renderContactCard" && resend) {
