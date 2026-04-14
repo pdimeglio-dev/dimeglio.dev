@@ -12,23 +12,24 @@ import type {
 } from "@/lib/chat-widgets";
 
 // ---------------------------------------------------------------------------
-// Environment validation
+// Clients — lazy, initialised at request time (not build time).
+// Top-level throws crash `next build` in CI where secrets are not available.
 // ---------------------------------------------------------------------------
 
-const requiredEnvVars = ["OPENAI_API_KEY", "PINECONE_API_KEY", "PINECONE_INDEX_NAME"];
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    throw new Error(`Missing required environment variable: ${envVar}`);
+let _pineconeIndex: ReturnType<Pinecone["index"]> | null = null;
+
+function getPineconeIndex() {
+  if (_pineconeIndex) return _pineconeIndex;
+  const apiKey = process.env.PINECONE_API_KEY;
+  const indexName = process.env.PINECONE_INDEX_NAME;
+  if (!apiKey || !indexName) {
+    throw new Error("Missing PINECONE_API_KEY or PINECONE_INDEX_NAME env vars");
   }
+  _pineconeIndex = new Pinecone({ apiKey }).index(indexName);
+  return _pineconeIndex;
 }
 
-// ---------------------------------------------------------------------------
-// Clients
-// ---------------------------------------------------------------------------
-
-const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
-const index = pinecone.index(process.env.PINECONE_INDEX_NAME!);
-
+// Resend is optional — gracefully omitted when the key is absent
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // ---------------------------------------------------------------------------
@@ -249,7 +250,7 @@ async function executeSearchPortfolio(args: { query: string }): Promise<string> 
       value: args.query,
     });
 
-    const queryResponse = await index.query({
+    const queryResponse = await getPineconeIndex().query({
       vector: embeddingResponse.embedding,
       topK: 20,
       includeMetadata: true,
