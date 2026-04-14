@@ -110,6 +110,10 @@ export type AnalyticsEvent =
   | {
       event: "guillermo_lead_signal";
       properties: { company?: string; role?: string; message_count: number };
+    }
+  | {
+      event: "contact_form_submitted";
+      properties: { has_company: boolean; has_message: boolean };
     };
 
 /**
