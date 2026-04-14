@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Maximize2, Minimize2, Send, Bot, User, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Link from "next/link";
 import { SkillGrid } from "@/components/chat/skill-grid";
 import { ContactCard } from "@/components/chat/contact-card";
 import { ProjectCard } from "@/components/chat/project-card";
@@ -44,16 +45,32 @@ const MD_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>["components"] = 
   ul: ({ children }) => <ul className="mb-2 ml-4 list-disc list-outside space-y-1">{children}</ul>,
   ol: ({ children }) => <ol className="mb-2 ml-4 list-decimal list-outside space-y-1">{children}</ol>,
   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-purple-400 underline underline-offset-2 transition-colors hover:text-purple-300"
-    >
-      {children}
-    </a>
-  ),
+  a: ({ href, children }) => {
+    // Use Next.js client-side navigation for internal dimeglio.dev links
+    const isInternal =
+      href?.startsWith("/") ||
+      href?.startsWith("https://dimeglio.dev") ||
+      href?.startsWith("http://dimeglio.dev");
+    const cls = "text-purple-400 underline underline-offset-2 transition-colors hover:text-purple-300";
+    if (isInternal && href) {
+      const path = href.replace(/^https?:\/\/dimeglio\.dev/, "");
+      return (
+        <Link href={path} className={cls}>
+          {children}
+        </Link>
+      );
+    }
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cls}
+      >
+        {children}
+      </a>
+    );
+  },
   code: ({ children, className }) => {
     const isBlock = className?.startsWith("language-");
     return isBlock ? (

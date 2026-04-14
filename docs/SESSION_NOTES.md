@@ -81,9 +81,45 @@ Pass `recentMessages` to `streamText` instead of `messages`.
 - The "aha moment": production MCP use, not just dev tooling
 - Blog voice: "I expected this to take a day. It took 3 hours and most of that was reading the MCP spec."
 
+### Agent eval suite — LLM-as-Judge + regression tests
+**Goal:** Reliable, repeatable testing of Guillermo's responses. Mirrors the rPotential testing suite work.
+
+**Three layers:**
+
+1. **Regression tests (Vitest, deterministic)** — fast CI tests for non-model logic:
+   - Stream handler: post-widget text suppression works
+   - TOOL_TO_COMPONENT mapping is correct
+   - Pinecone results sorted by recency
+   - `getPineconeIndex()` throws cleanly when env vars missing
+
+2. **Eval suite (`scripts/eval-agent.ts`)** — end-to-end agent behavior:
+   ```ts
+   const evals = [
+     { name: "skills-question-uses-skill-grid", input: "what are Pablo's skills?",
+       expect: { toolsCalled: ["searchPortfolio", "renderSkillGrid"] } },
+     { name: "kotlin-filter-excludes-java", input: "what projects used Kotlin?",
+       expect: { toolsCalled: ["renderProjectList"], propsNotContain: [/EducAR|Disney O2I/] } },
+     { name: "contact-card-on-recruiter-interest", input: "I'm a recruiter at Stripe",
+       expect: { toolsCalled: ["renderContactCard"] } },
+     { name: "no-prose-after-widget", input: "list his Google projects",
+       expect: { toolsCalled: ["renderProjectList"], textAfterWidgetMaxChars: 0 } },
+   ];
+   ```
+   Run: `npm run eval` → outputs pass/fail + score card.
+
+3. **Production monitoring (PostHog)** — add events:
+   - `guillermo_tool_called` with `{ toolName, query }`
+   - `guillermo_no_tool_used` when model answers without searching
+   - Thumbs up/down button in chat UI → `guillermo_feedback`
+
+**Blog entry idea: "How I test my AI agent in production"**
+- Connect to the rPotential testing suite work (LLM-as-Judge pattern)
+- Show the three-layer approach: unit → integration → production monitoring
+- Real test cases from Guillermo
+
 ### Other parked items
 - **Resend domain verification** — add SPF/DKIM/MX DNS records for `dimeglio.dev` in Resend dashboard → inbox delivery
-- **System prompt trimming** — ~4K tokens, could compress few-shot examples to reduce TPM usage
+- **System prompt** — now compact (~2K tokens). Further trimming not needed.
 
 ---
 
