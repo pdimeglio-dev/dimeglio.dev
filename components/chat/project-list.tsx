@@ -5,18 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { ProjectListProps, ProjectListItem } from "@/lib/chat-widgets";
-import { getValidHref } from "@/lib/chat-slugs";
-
-const KNOWN_LOGOS = new Set([
-  "argentina-gob-ar",
-  "disney",
-  "globant",
-  "google",
-  "mission-lane",
-  "pccw-global",
-  "rpotential",
-  "wells-fargo",
-]);
+import { getValidHref, getLogoSrc } from "@/lib/chat-slugs";
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -38,16 +27,16 @@ function formatDateRange(start?: string, end?: string): string {
 
 function ProjectRow({ item }: { item: ProjectListItem }) {
   const href = getValidHref(item.slug);
-  const hasLogo = !!item.logoFile && KNOWN_LOGOS.has(item.logoFile);
+  const logoSrc = getLogoSrc(item.logoFile);
   const initials = item.company.slice(0, 2).toUpperCase();
   const dateRange = formatDateRange(item.startDate, item.endDate);
   const badges = (item.techStack ?? []).slice(0, 3);
 
   const inner = (
     <div className="group flex gap-3 px-3 py-3 transition-colors hover:bg-slate-700/20">
-      {hasLogo ? (
+      {logoSrc ? (
         <Image
-          src={`/logos/${item.logoFile}.svg`}
+          src={logoSrc}
           alt={item.company}
           width={28}
           height={28}
