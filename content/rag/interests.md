@@ -1,25 +1,18 @@
 # Personal Interests & Athletics — Pablo Di Meglio
 
-> Pablo is a competitive athlete and outdoor enthusiast. His hobbies aren't
-> just side activities — they directly influenced the products he builds
-> (The Paddle Games was born from the paddle sports community) and reflect
-> the same intensity he brings to engineering.
+> Pablo is a competitive athlete and outdoor enthusiast. Kiteboarding
+> (also called kitesurfing or kiting) is his primary sport and the one
+> he's most identified with — he's been riding since 2013 and is a
+> Naish team ambassador in the Bay Area. SUP racing is his second water
+> sport and the one that inspired The Paddle Games. His hobbies aren't
+> side activities — they directly shape the products he builds and
+> reflect the same intensity he brings to engineering.
 
 ---
 
-## Stand-Up Paddleboard (SUP) Racing
+## Kiteboarding / Kitesurfing / Kiting
 
-Pablo is a competitive SUP racer on a 14' carbon race board, tackling some of the most demanding endurance events in the sport:
-
-- **Chattajack** (Chattanooga, TN) — 31-mile race down the Tennessee River. One of the most prestigious endurance SUP events in the world.
-- **Tahoe Cup Lake Crossing** (Lake Tahoe, CA/NV) — 22-mile open-water crossing of Lake Tahoe on a 14' board. A full day on the water.
-- **Sea Trek Regatta** (Sausalito, CA) — Annual race with three distance categories. Pablo has completed all three lengths and podiumed in his category across all of them.
-- **Battle of the Bay** (San Francisco Bay) — Annual Bay Area race and a regular on his calendar.
-- **Redwood Water Sports local races** (Redwood City, CA) — Local community events close to home.
-
-SUP racing is where The Paddle Games came from. Pablo built the entire platform — leaderboards, gamification, geo-spatial challenges — because the Bay Area paddle sports community needed it and nobody else was building it.
-
-## Kiteboarding / Kitesurfing
+Kiteboarding (also called kitesurfing or kiting) is Pablo's primary water sport and the one he's most identified with. He's been riding since 2013, is a Naish team ambassador in the Bay Area, and has logged hundreds of sessions across the best kite spots on the California coast.
 
 Pablo picked up kiteboarding around 2013, right before moving to the US. He bought his first kite during a business trip to Orlando while working on the Disney Parks project — a friend from his hometown in Argentina had taught him the basics and he never looked back.
 
@@ -40,6 +33,18 @@ Pablo has been riding Naish gear since day one — the friend who taught him was
 As an ambassador he creates content (GoPro POV edits, session clips), helps with demo days and gear demos for prospective riders, and represents the brand in the Bay Area water sports community. In return he gets gear discounts and invitations to Naish tech talks and product previews.
 
 Naish is one of the biggest names in water sports — being on their team as a non-professional rider is a recognition of his commitment to the sport and the community.
+
+## Stand-Up Paddleboard (SUP) Racing
+
+Pablo's second water sport. He's a competitive SUP racer on a 14' carbon race board, tackling some of the most demanding endurance events in the sport:
+
+- **Chattajack** (Chattanooga, TN) — 31-mile race down the Tennessee River. One of the most prestigious endurance SUP events in the world.
+- **Tahoe Cup Lake Crossing** (Lake Tahoe, CA/NV) — 22-mile open-water crossing of Lake Tahoe on a 14' board. A full day on the water.
+- **Sea Trek Regatta** (Sausalito, CA) — Annual race with three distance categories. Pablo has completed all three lengths and podiumed in his category across all of them.
+- **Battle of the Bay** (San Francisco Bay) — Annual Bay Area race and a regular on his calendar.
+- **Redwood Water Sports local races** (Redwood City, CA) — Local community events close to home.
+
+SUP racing is where The Paddle Games came from. Pablo built the entire platform — leaderboards, gamification, geo-spatial challenges — because the Bay Area paddle sports community needed it and nobody else was building it.
 
 ## CrossFit
 

@@ -50,6 +50,29 @@ export const VALID_EXPERIENCE_SLUGS = new Set([
 ]);
 
 /**
+ * Logo files available in /public/logos/, mapping basename → extension.
+ * Personal-project logos live here alongside company logos.
+ */
+export const KNOWN_LOGOS: Record<string, "svg" | "png"> = {
+  "argentina-gob-ar": "svg",
+  batcave: "svg",
+  disney: "svg",
+  globant: "svg",
+  google: "svg",
+  "mission-lane": "svg",
+  "paddle-games": "png",
+  "pccw-global": "svg",
+  rpotential: "svg",
+  "wells-fargo": "svg",
+};
+
+export function getLogoSrc(logoFile?: string): string | null {
+  if (!logoFile) return null;
+  const ext = KNOWN_LOGOS[logoFile];
+  return ext ? `/logos/${logoFile}.${ext}` : null;
+}
+
+/**
  * Returns a deep link href if the slug is a known valid content slug,
  * or null if the slug is hallucinated / unknown.
  *

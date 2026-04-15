@@ -214,6 +214,7 @@ function buildContextHeader(type, frontmatter, slug) {
       parts.push(`Title: ${frontmatter.title || "Unknown"}`);
       if (frontmatter.company) parts.push(`Company: ${frontmatter.company}`);
       parts.push(`Category: ${frontmatter.category || "Unknown"}`);
+      if (frontmatter.logoFile) parts.push(`Logo File: ${frontmatter.logoFile}`);
       if (frontmatter.startDate) parts.push(`Start Date: ${frontmatter.startDate}`);
       if (frontmatter.endDate) parts.push(`End Date: ${frontmatter.endDate}`);
       if (frontmatter.techStack?.length) {
@@ -291,6 +292,7 @@ function buildMetadata(type, frontmatter, knowledgeString, slug, chunkInfo) {
   if (frontmatter.title) meta.title = frontmatter.title;
   if (frontmatter.company) meta.company = frontmatter.company;
   if (frontmatter.category) meta.category = frontmatter.category;
+  if (frontmatter.logoFile) meta.logo_file = frontmatter.logoFile;
   if (frontmatter.startDate) meta.start_date = frontmatter.startDate;
   if (frontmatter.endDate) meta.end_date = frontmatter.endDate;
   if (frontmatter.date) meta.date = frontmatter.date;

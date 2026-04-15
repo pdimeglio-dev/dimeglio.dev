@@ -1,19 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { ProjectCardProps } from "@/lib/chat-widgets";
-import { getValidHref } from "@/lib/chat-slugs";
-
-/** Logos available in /public/logos/ (without .svg extension) */
-const KNOWN_LOGOS = new Set([
-  "argentina-gob-ar",
-  "disney",
-  "globant",
-  "google",
-  "mission-lane",
-  "pccw-global",
-  "rpotential",
-  "wells-fargo",
-]);
+import { getValidHref, getLogoSrc } from "@/lib/chat-slugs";
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -44,7 +32,7 @@ export function ProjectCard({
   logoFile,
   slug,
 }: ProjectCardProps) {
-  const hasLogo = !!logoFile && KNOWN_LOGOS.has(logoFile);
+  const logoSrc = getLogoSrc(logoFile);
   const initials = company.slice(0, 2).toUpperCase();
   const dateRange = formatDateRange(startDate, endDate);
   const href = getValidHref(slug);
@@ -53,9 +41,9 @@ export function ProjectCard({
     <>
       {/* Header: logo + title + company + dates */}
       <div className="mb-2.5 flex items-start gap-3">
-        {hasLogo ? (
+        {logoSrc ? (
           <Image
-            src={`/logos/${logoFile}.svg`}
+            src={logoSrc}
             alt={company}
             width={32}
             height={32}

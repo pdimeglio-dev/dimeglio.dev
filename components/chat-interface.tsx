@@ -51,7 +51,7 @@ const MD_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>["components"] = 
       href?.startsWith("/") ||
       href?.startsWith("https://dimeglio.dev") ||
       href?.startsWith("http://dimeglio.dev");
-    const cls = "text-purple-400 underline underline-offset-2 transition-colors hover:text-purple-300";
+    const cls = "text-purple-400 no-underline transition-colors hover:text-purple-300";
     if (isInternal && href) {
       const path = href.replace(/^https?:\/\/dimeglio\.dev/, "");
       return (
