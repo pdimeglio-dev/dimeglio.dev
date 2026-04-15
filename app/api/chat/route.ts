@@ -4,6 +4,8 @@ import { openai } from "@ai-sdk/openai";
 import { embed, streamText, jsonSchema, stepCountIs } from "ai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { Resend } from "resend";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import type {
   SkillGridProps,
   ContactCardProps,
@@ -32,6 +34,22 @@ function getPineconeIndex() {
 
 // Resend is optional — gracefully omitted when the key is absent
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+// Upstash rate limiter — lazy, fail-open when env vars are absent (dev, CI)
+let _ratelimit: Ratelimit | null = null;
+function getRatelimit(): Ratelimit | null {
+  if (_ratelimit) return _ratelimit;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  _ratelimit = new Ratelimit({
+    redis: new Redis({ url, token }),
+    limiter: Ratelimit.slidingWindow(20, "1 m"),
+    analytics: true,
+    prefix: "guillermo",
+  });
+  return _ratelimit;
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -153,7 +171,29 @@ function makeEncoder() {
 
 export async function POST(req: Request) {
   try {
+    const ratelimit = getRatelimit();
+    if (ratelimit) {
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
+      const { success, reset } = await ratelimit.limit(ip);
+      if (!success) {
+        return new Response("Rate limit exceeded. Try again in a minute.", {
+          status: 429,
+          headers: { "Retry-After": String(Math.ceil((reset - Date.now()) / 1000)) },
+        });
+      }
+    }
+
     const { messages } = await req.json();
+
+    if (!Array.isArray(messages) || messages.length > 50) {
+      return new Response("Invalid request", { status: 400 });
+    }
+    const oversized = messages.some(
+      (m) => typeof m?.content === "string" && m.content.length > 4000
+    );
+    if (oversized) {
+      return new Response("Message too long", { status: 400 });
+    }
 
     const result = streamText({
       model: openai("gpt-4o-mini"),
