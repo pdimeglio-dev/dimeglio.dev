@@ -80,7 +80,7 @@ const components: MDXComponents = {
     return (
       <a
         {...props}
-        className="text-white underline underline-offset-4 transition-colors hover:text-blue-400"
+        className="text-purple-400 underline underline-offset-4 decoration-purple-400/40 transition-colors hover:text-purple-300 hover:decoration-purple-400"
         {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       />
     );

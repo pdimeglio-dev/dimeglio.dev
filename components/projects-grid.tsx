@@ -121,7 +121,13 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
   };
 
   const handleSheetClose = () => {
-    router.back();
+    // When the user lands directly on a deep link (no browser history), router.back()
+    // does nothing. Fall back to the projects page so the sheet actually closes.
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/projects", { scroll: false });
+    }
   };
 
   return (
