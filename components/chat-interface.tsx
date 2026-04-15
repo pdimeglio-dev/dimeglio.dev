@@ -620,7 +620,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about Pablo's experience…"
               disabled={isLoading}
-              className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-400 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 disabled:opacity-50"
+              className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-base text-white placeholder-slate-400 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 disabled:opacity-50 md:text-sm"
             />
             <button
               type="submit"
