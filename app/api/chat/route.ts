@@ -86,7 +86,7 @@ You communicate data visually. Think of your text as the conversational bridge t
 - **One Widget Per Response:** Call each widget tool at most ONCE per turn. For a general skills query ("what are Pablo's skills?"), make exactly ONE \`renderSkillGrid\` call containing ALL skills — never split categories (Languages, Cloud, etc.) into separate calls. Only the first call renders; duplicates are dropped server-side.
 - **Nothing The Widget Already Shows Goes In Prose:** After ANY widget renders (\`renderSkillGrid\`, \`renderProjectList\`, \`renderProjectCard\`, \`renderContactCard\`), the text that follows is capped at ≤1 short framing sentence and must NOT repeat data the widget already shows. Examples of what's forbidden after a widget fires: project titles, roles, dates, tech-stack lists, summaries, skill names, proficiency levels, contact methods, categories, markdown tables. The widget IS the answer — restating it is a text-dump and breaks the UX.
 - **One Intro, No Outro:** Write ≤1 short intro sentence *before* the widget. Do not write the same content again *after* the widget. Especially for \`renderContactCard\`: if your intro already says "here's the best way to reach Pablo," do not repeat that sentence after the card renders — end the turn.
-- **Never Write URLs or Embedded Content:** NEVER write links, URLs, markdown link syntax (\`[text](url)\`), markdown image syntax (\`![alt](url)\`), data URLs (\`data:image/...\`), HTML tags (\`<img>\`, \`<svg>\`, \`<a>\`, etc.), or any embedded binary/base64 content in your text responses — not for project pages, not for GitHub, not for Instagram, not for decorative images, not for anything. Your text is plain prose only. The widgets handle all navigation and all visual content. If a user asks for "a link" to a project, respond with a short conversational sentence and then call \`renderProjectCard\` with the project's slug — the card is the link. External links (GitHub, Instagram, website, video) already live inside the rendered project page. Do NOT add decorative images, diagrams, or illustrations after a widget renders — the widget is the visual.
+- **Plain Prose Only:** Your text output is plain prose, meaning natural sentences the user will read. All navigation and visual content (project pages, images, diagrams, external references) is handled by widgets; prose has no other job. When a user asks for a link or reference, write one short conversational sentence and call the matching widget (for example, \`renderProjectCard\` with the project's slug); the widget is the link. GitHub, Instagram, website, and video links live inside the rendered project page, so the user reaches them by clicking through.
 - **Conversational Intros:** Always write 1–2 natural, conversational sentences *before* calling a search or widget so the user isn't waiting on a blank screen. (e.g., "Pablo has done some great work with React. Let me pull up those specific projects for you.")
 - **Text-Only Contexts:** Only use text-only responses (no widgets) for greetings, casual small talk, or simple one-sentence facts (e.g., "Yes, Pablo is open to remote work.").
 
@@ -424,6 +424,35 @@ export async function POST(req: Request) {
         // renderProjectList calls when it decides to search a second time).
         const emittedWidgets = new Set<string>();
 
+        // Post-widget hallucination filter. gpt-4o-mini occasionally serializes
+        // the widget's own tool-call payload into markdown-image + JSON after
+        // the widget renders. We buffer post-widget text and drop it on flush
+        // only if it matches the hallucination shape, preserving legitimate
+        // short framing sentences the model may want to add.
+        const HALLUCINATION_SHAPE = [
+          /!\[[^\]]*\]\(/,
+          /data:image\//i,
+          /<svg[\s>]/i,
+          /<img[\s>]/i,
+          /<a\s+href/i,
+          /[A-Za-z0-9+/=]{40,}/,
+        ];
+        let hadWidget = false;
+        let postWidgetBuffer = "";
+        const flushPostWidget = () => {
+          if (!postWidgetBuffer) return;
+          const text = postWidgetBuffer;
+          postWidgetBuffer = "";
+          if (HALLUCINATION_SHAPE.some((re) => re.test(text))) {
+            console.warn(
+              "[Chat API] Dropped hallucinated post-widget text:",
+              text.slice(0, 120)
+            );
+            return;
+          }
+          controller.enqueue(encode({ type: "text", delta: text }));
+        };
+
         try {
           for await (const rawChunk of result.fullStream) {
             // Cast to any to normalise across AI SDK version differences
@@ -433,10 +462,15 @@ export async function POST(req: Request) {
 
             if (chunk.type === "text-delta") {
               const delta: string = chunk.text ?? chunk.textDelta ?? "";
-              if (delta) {
+              if (!delta) continue;
+              if (hadWidget) {
+                postWidgetBuffer += delta;
+              } else {
                 controller.enqueue(encode({ type: "text", delta }));
               }
             } else if (chunk.type === "tool-call") {
+              flushPostWidget();
+              hadWidget = false;
               // Only show the brain scan indicator for the slow RAG search tool
               if (chunk.toolName === "searchPortfolio") {
                 controller.enqueue(
@@ -509,6 +543,8 @@ export async function POST(req: Request) {
                     props,
                   })
                 );
+                hadWidget = true;
+                postWidgetBuffer = "";
               }
               // Send lead notification if Resend is available and it's a contact card
               if (chunk.toolName === "renderContactCard" && resend) {
@@ -537,6 +573,7 @@ export async function POST(req: Request) {
             // controller may already be closed
           }
         } finally {
+          try { flushPostWidget(); } catch { /* already closed */ }
           // Emit a done sentinel so the client can unlock the input immediately
           // without waiting for the TCP stream to close (avoids ~100–500ms dead time).
           try { controller.enqueue(encode({ type: "done" })); } catch { /* already closed */ }
