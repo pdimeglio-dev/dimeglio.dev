@@ -125,9 +125,11 @@ function BlockRenderer({
   onAction: (message: string) => void;
 }) {
   if (block.type === "text") {
+    const cleaned = block.content.replace(/<!--[\s\S]*?(?:-->|$)/g, "");
+    if (!cleaned.trim()) return null;
     return (
       <ReactMarkdown key={index} remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
-        {block.content}
+        {cleaned}
       </ReactMarkdown>
     );
   }
@@ -460,11 +462,11 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 20 }}
         transition={{ duration: 0.2 }}
-        className={`fixed z-50 ${
+        className={`fixed z-50 inset-0 ${
           isMaximized
-            ? "inset-4 md:inset-8"
-            : "bottom-4 right-4 w-96 h-[560px]"
-        } flex flex-col rounded-lg border border-slate-800 bg-black/90 shadow-2xl backdrop-blur-md`}
+            ? "md:inset-8"
+            : "md:inset-auto md:top-auto md:left-auto md:bottom-4 md:right-4 md:w-96 md:h-[560px]"
+        } flex flex-col rounded-none md:rounded-lg border border-slate-800 bg-black/90 shadow-2xl backdrop-blur-md`}
       >
         {/* ── Header ── */}
         <div className="flex items-center justify-between border-b border-slate-800 p-4">
@@ -491,7 +493,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
             )}
             <button
               onClick={() => setIsMaximized((v) => !v)}
-              className="rounded-md p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+              className="hidden md:inline-flex rounded-md p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
               aria-label={isMaximized ? "Minimize" : "Maximize"}
             >
               {isMaximized ? (
