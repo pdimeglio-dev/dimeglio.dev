@@ -180,6 +180,10 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Each request gets a monotonically-increasing ID so the `finally` block of an
+  // older request doesn't reset `isLoading` after a newer one has already started.
+  const requestIdRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Persist messages on every change
   useEffect(() => {
@@ -190,6 +194,15 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
+
+  // Refocus input after agent finishes responding
+  const prevIsLoadingRef = useRef(false);
+  useEffect(() => {
+    if (prevIsLoadingRef.current && !isLoading) {
+      inputRef.current?.focus();
+    }
+    prevIsLoadingRef.current = isLoading;
+  }, [isLoading]);
 
   // Focus input when chat opens
   useEffect(() => {
@@ -203,6 +216,12 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
   const handleSubmitText = useCallback(
     async (text: string) => {
       if (!text.trim() || isLoading) return;
+
+      // Cancel any previous in-flight request and claim a new request ID.
+      abortControllerRef.current?.abort();
+      const ac = new AbortController();
+      abortControllerRef.current = ac;
+      const requestId = ++requestIdRef.current;
 
       const userMessage: Message = {
         id: Date.now().toString(),
@@ -237,11 +256,28 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [...messages, userMessage].map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
+            messages: [...messages, userMessage].map((m) => {
+              if (m.role !== "assistant") return { role: m.role, content: m.content };
+              const hasWidget = m.blocks.some((b) => b.type === "widget");
+              if (hasWidget) {
+                // Strip the intro text entirely for widget responses.
+                // Keeping phrases like "Pablo worked on two notable projects for Disney"
+                // causes the model to anchor on the previous company/topic and reuse
+                // it instead of searching fresh. Replace with a neutral comment only.
+                return {
+                  role: m.role,
+                  content: "<!-- widget_shown: tool data unavailable, must call searchPortfolio fresh -->",
+                };
+              }
+              // For text-only responses, keep the content but remind the model to search.
+              return {
+                role: m.role,
+                content: (m.content || "") +
+                  "\n<!-- reminder: must call searchPortfolio fresh for any project or skill question -->",
+              };
+            }),
           }),
+          signal: ac.signal,
         });
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -315,10 +351,41 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                   };
                 })
               );
+            } else if (chunk.type === "thinking") {
+              // no-op — dots are now driven purely by isLoading + blocks.length > 0
+            } else if (chunk.type === "done") {
+              // Server finished — unlock the input right away instead of waiting
+              // for the TCP stream's EOF (avoids ~100–500ms of dead time).
+              if (requestId === requestIdRef.current) {
+                setIsLoading(false);
+              }
+              break;
+            } else if (chunk.type === "widget-append" && chunk.component === "ProjectList") {
+              setMessages((prev) =>
+                prev.map((m) => {
+                  if (m.id !== assistantId) return m;
+                  const blocks = [...m.blocks];
+                  for (let i = blocks.length - 1; i >= 0; i--) {
+                    const block = blocks[i];
+                    if (block.type === "widget" && block.component === "ProjectList") {
+                      blocks[i] = {
+                        ...block,
+                        props: {
+                          ...block.props,
+                          items: [...block.props.items, ...chunk.items],
+                        },
+                      };
+                      break;
+                    }
+                  }
+                  return { ...m, blocks };
+                })
+              );
             }
           }
         }
       } catch (error) {
+        if (ac.signal.aborted) return; // superseded by a newer request — silently drop
         console.error("[Chat] Error:", error);
         setMessages((prev) =>
           prev.map((m) =>
@@ -339,7 +406,11 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
           )
         );
       } finally {
-        setIsLoading(false);
+        // Only reset loading state if this is still the active request.
+        // Without this guard, an old stream's finally can clobber a newer request.
+        if (requestId === requestIdRef.current) {
+          setIsLoading(false);
+        }
       }
     },
     [isLoading, messages]
@@ -439,8 +510,12 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
 
           {messages.map((message, msgIndex) => {
             const isLastMessage = msgIndex === messages.length - 1;
-            // Show the dot loader inside the bubble when assistant message is still empty
+            // Dots inside empty bubble — waiting for first chunk
             const showLoader = isLastMessage && isLoading && message.role === "assistant" && message.blocks.length === 0;
+            // Dots below content — show any time the stream is still open and content exists.
+            // Using isLoading (not isAppending) so dots appear the moment the intro text
+            // lands and stay until the stream closes, with no gap between text and tool call.
+            const showAppendLoader = isLastMessage && isLoading && message.role === "assistant" && message.blocks.length > 0;
 
             return (
               <div
@@ -491,6 +566,18 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                             }}
                           />
                         ))}
+                        {showAppendLoader && (
+                          <div className="mt-2 flex items-center gap-1">
+                            {[0, 1, 2].map((i) => (
+                              <motion.div
+                                key={i}
+                                className="h-1.5 w-1.5 rounded-full bg-purple-400"
+                                animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1, 0.8] }}
+                                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

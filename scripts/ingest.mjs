@@ -214,6 +214,8 @@ function buildContextHeader(type, frontmatter, slug) {
       parts.push(`Title: ${frontmatter.title || "Unknown"}`);
       if (frontmatter.company) parts.push(`Company: ${frontmatter.company}`);
       parts.push(`Category: ${frontmatter.category || "Unknown"}`);
+      if (frontmatter.startDate) parts.push(`Start Date: ${frontmatter.startDate}`);
+      if (frontmatter.endDate) parts.push(`End Date: ${frontmatter.endDate}`);
       if (frontmatter.techStack?.length) {
         parts.push(`Tech Stack: ${frontmatter.techStack.join(", ")}`);
       }

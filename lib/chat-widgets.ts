@@ -62,12 +62,33 @@ export interface ProjectListItem {
   logoFile?: string;
   /** Slug for deep link: exp-* or proj-* */
   slug?: string;
+  /** Used for sort ordering — Personal projects always surface first */
+  category?: "Personal" | "Professional";
 }
 
 export interface ProjectListProps {
   /** Optional heading, e.g. "Kotlin Projects" */
   title?: string;
   items: ProjectListItem[];
+  /** When true the component renders a "Load more" button */
+  hasMore?: boolean;
+  /**
+   * Pinecone search query to use when loading more results.
+   * Required when hasMore is true.
+   */
+  searchQuery?: string;
+  /**
+   * Exact technology name used to filter this list (e.g. "React", "Java").
+   * Server enforces this — items whose techStack doesn't include this word are removed.
+   * Omit for company-filtered or all-projects lists.
+   */
+  filterTech?: string;
+  /**
+   * Company name used to filter this list (e.g. "rPotential", "Disney", "Google").
+   * Server enforces this — items whose company doesn't match are removed.
+   * Omit for tech-filtered or all-projects lists.
+   */
+  filterCompany?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -80,7 +101,9 @@ export type GuillermoChunk =
   | { type: "widget"; component: "SkillGrid"; props: SkillGridProps }
   | { type: "widget"; component: "ContactCard"; props: ContactCardProps }
   | { type: "widget"; component: "ProjectCard"; props: ProjectCardProps }
-  | { type: "widget"; component: "ProjectList"; props: ProjectListProps };
+  | { type: "widget"; component: "ProjectList"; props: ProjectListProps }
+  | { type: "widget-append"; component: "ProjectList"; items: ProjectListItem[] }
+  | { type: "done" };
 
 // ---------------------------------------------------------------------------
 // Content block union — ordered list used by the chat UI to render a message
