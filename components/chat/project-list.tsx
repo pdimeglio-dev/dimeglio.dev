@@ -136,7 +136,7 @@ export function ProjectList({ title, items: initialItems, hasMore: initialHasMor
           <button
             onClick={loadMore}
             disabled={isLoading}
-            className="flex items-center gap-1.5 text-[11px] text-purple-400 transition-opacity hover:opacity-80 disabled:opacity-50"
+            className="flex cursor-pointer items-center gap-1.5 text-[11px] text-purple-400 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
               <>

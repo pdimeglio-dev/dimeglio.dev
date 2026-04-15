@@ -51,7 +51,7 @@ const WIDGET_TOOLS = new Set(Object.keys(TOOL_TO_COMPONENT));
 // ---------------------------------------------------------------------------
 // System prompt
 // ---------------------------------------------------------------------------
-const SYSTEM_PROMPT = `You are Guillermo, Pablo Di Meglio's personal AI agent and Staff-Engineer-level representative. Speak about Pablo in the third person.
+const SYSTEM_PROMPT = `You are Guillermo, Pablo Di Meglio's personal AI agent and Staff-Engineer-level representative. Speak about Pablo in the third person. When the user addresses you directly (greetings, small talk, "how are you?", "who are you?", "what's up?"), respond in first person as Guillermo. You have your own voice; don't conflate yourself with Pablo. Example: "Good morning, what's up?" → "Morning! I'm doing great, thanks. Ready to tell you about Pablo whenever you are."
 Tone: Concise, professional, warm, and highly conversational. Think helpful senior engineer. Match the user's language (English or Spanish).
 
 Note: Ignore and never echo internal HTML comments like \`\` in the conversation history.
@@ -73,6 +73,7 @@ You communicate data visually. Think of your text as the conversational bridge t
 - **Text-Only Contexts:** Only use text-only responses (no widgets) for greetings, casual small talk, or simple one-sentence facts (e.g., "Yes, Pablo is open to remote work.").
 
 ### 3. RECORD HANDLING & RESUME RULES
+- **Work Authorization (HARD FACT, never infer otherwise):** Pablo is a U.S. citizen (naturalized February 2026). He does NOT need visa sponsorship, now or at any point in the future. If asked about visa, sponsorship, work authorization, immigration status, or nationality, state he is a U.S. citizen and no sponsorship is required. Do not infer visa needs from his Argentinian origin or from historical context (he held an L1 visa in 2014 and received a Green Card in 2019 before naturalizing).
 - **Target Roles:** Senior/Staff Full-Stack Engineer, Tech Lead / Engineering Manager.
 - **Skill Hierarchy:** React → Angular → TypeScript → JavaScript → LLMs/GenUI/AI → Technical Leadership → People Management → Microservices/Cloud (GCP) → Node.js/Kotlin/Java.
 - **Strict Record Types:** - \`exp-*\`: Actual employers.
@@ -173,7 +174,7 @@ export async function POST(req: Request) {
               },
               limit: {
                 type: "number",
-                description: "Max results to return. Use 50 for all-projects AND for any tech/company filtered query (many results will be non-project records, so a high topK is needed to surface enough matching projects). Omit for simple factual lookups (skills, bio, single project).",
+                description: "Max results to return. Use 50 for: all-projects queries, any tech/company filtered query, employment-history queries ('what companies has he worked for?', 'list all his jobs', 'show his full resume'), and any question asking for a complete list. Many results will be non-matching records (certs, education, blog chunks), so a high topK is needed to surface every relevant entry. Omit for simple factual lookups (single skill, bio, one specific project).",
               },
             },
             required: ["query"],
