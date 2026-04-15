@@ -92,6 +92,20 @@ const MD_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>["components"] = 
   h2: ({ children }) => <h2 className="mb-1 text-sm font-semibold text-white">{children}</h2>,
   h3: ({ children }) => <h3 className="mb-1 text-sm font-medium text-slate-200">{children}</h3>,
   hr: () => <hr className="my-2 border-slate-700" />,
+  table: ({ children }) => (
+    <div className="my-3 overflow-x-auto">
+      <table className="w-full border-collapse text-xs">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="border-b border-slate-600">{children}</thead>,
+  tbody: ({ children }) => <tbody className="divide-y divide-slate-800">{children}</tbody>,
+  tr: ({ children }) => <tr>{children}</tr>,
+  th: ({ children }) => (
+    <th className="px-3 py-2 text-left font-semibold text-white whitespace-nowrap">{children}</th>
+  ),
+  td: ({ children }) => (
+    <td className="px-3 py-2 align-top text-slate-300">{children}</td>
+  ),
   // Suppress images — the AI hallucinates logo paths that don't resolve correctly.
   // Images in the chat have no reliable source of truth, so we hide them entirely.
   img: () => null,
@@ -554,7 +568,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                         ))}
                       </div>
                     ) : (
-                      <div>
+                      <div className="space-y-5">
                         {message.blocks.map((block, i) => (
                           <BlockRenderer
                             key={i}

@@ -467,12 +467,6 @@ export async function POST(req: Request) {
 
     const stream = new ReadableStream({
       async start(controller) {
-        // Post-widget text suppression:
-        // After emitting any visual widget, the model tends to dump a redundant
-        // markdown summary of the same data. The widget is self-describing —
-        // suppress ALL text that follows a widget in the same response step.
-        // Any context the model wants to add should go BEFORE the widget call.
-        let hadWidget = false;
         // Track which widget components have already been emitted this response.
         // Prevents the model from rendering the same widget twice (e.g. two
         // renderProjectList calls when it decides to search a second time).
@@ -488,13 +482,9 @@ export async function POST(req: Request) {
             if (chunk.type === "text-delta") {
               const delta: string = chunk.text ?? chunk.textDelta ?? "";
               if (delta) {
-                // Suppress all text after a widget — the widget is self-describing
-                if (hadWidget) continue;
                 controller.enqueue(encode({ type: "text", delta }));
               }
             } else if (chunk.type === "tool-call") {
-              // A new tool call means a new step — reset the post-widget suppression
-              hadWidget = false;
               // Only show the brain scan indicator for the slow RAG search tool
               if (chunk.toolName === "searchPortfolio") {
                 controller.enqueue(
@@ -516,10 +506,16 @@ export async function POST(req: Request) {
                   // requested tech in their techStack. The LLM frequently includes
                   // Angular/Java/Node projects in React lists etc.
                   if (props.filterTech) {
-                    const ft = (props.filterTech as string).toLowerCase();
+                    // Word-boundary match so "React" catches "React.js" / "React Native"
+                    // but "Java" does NOT catch "JavaScript".
+                    const escaped = (props.filterTech as string).replace(
+                      /[.*+?^${}()|[\]\\]/g,
+                      "\\$&"
+                    );
+                    const ftRe = new RegExp(`\\b${escaped}\\b`, "i");
                     props.items = (props.items ?? []).filter(
                       (item: ProjectListItem) =>
-                        item.techStack?.some((t) => t.toLowerCase() === ft) ?? false
+                        item.techStack?.some((t) => ftRe.test(t)) ?? false
                     );
                   }
                   if (props.filterCompany) {
@@ -551,7 +547,6 @@ export async function POST(req: Request) {
                   // Model called the same widget twice — silently drop the duplicate.
                   // All results should have been merged into the first call per the
                   // ONE WIDGET PER RESPONSE rule in the system prompt.
-                  hadWidget = true;
                   continue;
                 }
                 emittedWidgets.add(component);
@@ -562,8 +557,6 @@ export async function POST(req: Request) {
                     props,
                   })
                 );
-                // Arm the post-widget suppressor
-                hadWidget = true;
               }
               // Send lead notification if Resend is available and it's a contact card
               if (chunk.toolName === "renderContactCard" && resend) {
