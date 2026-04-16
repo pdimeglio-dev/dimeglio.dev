@@ -1,14 +1,8 @@
 export const maxDuration = 120;
 
 import { openai } from "@ai-sdk/openai";
-import * as ai from "ai";
-import {
-  wrapAISDK,
-  createLangSmithProviderOptions,
-} from "langsmith/experimental/vercel";
-
-const { streamText, embed } = wrapAISDK(ai);
-const { jsonSchema, stepCountIs } = ai;
+import { embed, streamText, jsonSchema, stepCountIs } from "ai";
+import { traceable } from "langsmith/traceable";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -202,21 +196,23 @@ export async function POST(req: Request) {
       return new Response("Message too long", { status: 400 });
     }
 
-    // Do NOT await — wrapAISDK returns a Proxy that delegates property access
-    // to the underlying StreamTextResult. Awaiting causes a deadlock on
-    // multi-step conversations (processOutputs awaits result.content which
-    // can't resolve until fullStream is consumed).
-    const result = streamText({
+    const tracedStreamText = traceable(
+      (params: Parameters<typeof streamText>[0]) => streamText(params),
+      {
+        name: "guillermo-chat",
+        run_type: "chain",
+        metadata: { session_id: conversationId ?? "anonymous" },
+        __finalTracedIteratorKey: "fullStream",
+      } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    );
+
+    // traceable returns a Proxy that delegates property access to the
+    // underlying StreamTextResult at runtime, but TypeScript sees Promise.
+    const result: any = tracedStreamText({ // eslint-disable-line @typescript-eslint/no-explicit-any
       model: openai("gpt-4o-mini"),
       messages,
       system: SYSTEM_PROMPT,
       stopWhen: stepCountIs(10),
-      providerOptions: {
-        langsmith: createLangSmithProviderOptions({
-          name: "guillermo-chat",
-          metadata: { session_id: conversationId ?? "anonymous" },
-        }),
-      },
       tools: {
         // ── Data tool — retrieves context from Pinecone, returns to model ───
         searchPortfolio: {
@@ -594,9 +590,6 @@ export async function POST(req: Request) {
           // Emit a done sentinel so the client can unlock the input immediately
           // without waiting for the TCP stream to close (avoids ~100–500ms dead time).
           try { controller.enqueue(encode({ type: "done" })); } catch { /* already closed */ }
-          // Signal trace closure to LangSmith. fullStream is already consumed
-          // at this point, so result.text resolves immediately — no deadlock.
-          try { await result.text; } catch { /* ignore */ }
           controller.close();
         }
       },
