@@ -1,7 +1,14 @@
 export const maxDuration = 120;
 
 import { openai } from "@ai-sdk/openai";
-import { embed, streamText, jsonSchema, stepCountIs } from "ai";
+import * as ai from "ai";
+import {
+  wrapAISDK,
+  createLangSmithProviderOptions,
+} from "langsmith/experimental/vercel";
+
+const { streamText, embed } = wrapAISDK(ai);
+const { jsonSchema, stepCountIs } = ai;
 import { Pinecone } from "@pinecone-database/pinecone";
 import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -183,7 +190,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const { messages } = await req.json();
+    const { messages, conversationId } = await req.json();
 
     if (!Array.isArray(messages) || messages.length > 50) {
       return new Response("Invalid request", { status: 400 });
@@ -200,6 +207,12 @@ export async function POST(req: Request) {
       messages,
       system: SYSTEM_PROMPT,
       stopWhen: stepCountIs(10),
+      providerOptions: {
+        langsmith: createLangSmithProviderOptions({
+          name: "guillermo-chat",
+          metadata: { session_id: conversationId ?? "anonymous" },
+        }),
+      },
       tools: {
         // ── Data tool — retrieves context from Pinecone, returns to model ───
         searchPortfolio: {
