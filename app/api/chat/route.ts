@@ -1,17 +1,8 @@
 export const maxDuration = 120;
 
 import { openai } from "@ai-sdk/openai";
-import * as ai from "ai";
-import {
-  wrapAISDK,
-  createLangSmithProviderOptions,
-} from "langsmith/experimental/vercel";
-import { Client } from "langsmith";
-import { after } from "next/server";
-
-const { streamText, embed } = wrapAISDK(ai);
-const { jsonSchema, stepCountIs } = ai;
-const langsmithClient = new Client();
+import { embed, streamText, jsonSchema, stepCountIs } from "ai";
+import { traceable } from "langsmith/traceable";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -205,21 +196,23 @@ export async function POST(req: Request) {
       return new Response("Message too long", { status: 400 });
     }
 
-    // Flush LangSmith traces after the response ends. Vercel keeps the
-    // function alive for after() callbacks, so traces don't get dropped.
-    after(() => langsmithClient.awaitPendingTraceBatches());
+    const tracedStreamText = traceable(
+      (params: Parameters<typeof streamText>[0]) => streamText(params),
+      {
+        name: "guillermo-chat",
+        run_type: "chain",
+        metadata: { session_id: conversationId ?? "anonymous" },
+        __finalTracedIteratorKey: "fullStream",
+      } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    );
 
-    const result = streamText({
+    // traceable returns a Proxy that delegates property access to the
+    // underlying StreamTextResult at runtime, but TypeScript sees Promise.
+    const result: any = tracedStreamText({ // eslint-disable-line @typescript-eslint/no-explicit-any
       model: openai("gpt-4o-mini"),
       messages,
       system: SYSTEM_PROMPT,
       stopWhen: stepCountIs(10),
-      providerOptions: {
-        langsmith: createLangSmithProviderOptions({
-          name: "guillermo-chat",
-          metadata: { session_id: conversationId ?? "anonymous" },
-        }),
-      },
       tools: {
         // ── Data tool — retrieves context from Pinecone, returns to model ───
         searchPortfolio: {
