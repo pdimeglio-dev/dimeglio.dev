@@ -207,6 +207,7 @@ export async function POST(req: Request) {
         id: runId,
         name: "guillermo-chat",
         run_type: "chain",
+        project_name: process.env.LANGCHAIN_PROJECT ?? "guillermo-chat",
         inputs: { messages },
         extra: { metadata: { session_id: conversationId ?? "anonymous" } },
         start_time: runStartTime,
