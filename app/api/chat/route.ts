@@ -2,7 +2,9 @@ export const maxDuration = 120;
 
 import { openai } from "@ai-sdk/openai";
 import { embed, streamText, jsonSchema, stepCountIs } from "ai";
-import { traceable } from "langsmith/traceable";
+import { Client } from "langsmith";
+
+const langsmith = new Client();
 import { Pinecone } from "@pinecone-database/pinecone";
 import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -196,19 +198,24 @@ export async function POST(req: Request) {
       return new Response("Message too long", { status: 400 });
     }
 
-    const tracedStreamText = traceable(
-      (params: Parameters<typeof streamText>[0]) => streamText(params),
-      {
+    // Create a LangSmith run manually — wrappers (wrapAISDK, traceable)
+    // don't close reliably on Vercel serverless.
+    const runId = crypto.randomUUID();
+    const runStartTime = Date.now();
+    langsmith
+      .createRun({
+        id: runId,
         name: "guillermo-chat",
         run_type: "chain",
-        metadata: { session_id: conversationId ?? "anonymous" },
-        __finalTracedIteratorKey: "fullStream",
-      } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-    );
+        inputs: { messages },
+        extra: { metadata: { session_id: conversationId ?? "anonymous" } },
+        start_time: runStartTime,
+      })
+      .catch((e) => console.error("[LangSmith] createRun error:", e));
 
-    // traceable returns a Proxy that delegates property access to the
-    // underlying StreamTextResult at runtime, but TypeScript sees Promise.
-    const result: any = tracedStreamText({ // eslint-disable-line @typescript-eslint/no-explicit-any
+    let collectedOutput = "";
+
+    const result = streamText({
       model: openai("gpt-4o-mini"),
       messages,
       system: SYSTEM_PROMPT,
@@ -476,6 +483,7 @@ export async function POST(req: Request) {
             if (chunk.type === "text-delta") {
               const delta: string = chunk.text ?? chunk.textDelta ?? "";
               if (!delta) continue;
+              collectedOutput += delta;
               if (hadWidget) {
                 postWidgetBuffer += delta;
               } else {
@@ -577,6 +585,7 @@ export async function POST(req: Request) {
           }
         } catch (err) {
           console.error("[Chat API] Stream error:", err);
+          collectedOutput += `\n\n[ERROR: ${String(err)}]`;
           // Surface the error to the frontend so the UI doesn't hang silently
           try {
             controller.enqueue(
@@ -590,6 +599,16 @@ export async function POST(req: Request) {
           // Emit a done sentinel so the client can unlock the input immediately
           // without waiting for the TCP stream to close (avoids ~100–500ms dead time).
           try { controller.enqueue(encode({ type: "done" })); } catch { /* already closed */ }
+          // Close the LangSmith run before ending the response stream —
+          // this guarantees the update completes before Vercel kills the function.
+          try {
+            await langsmith.updateRun(runId, {
+              outputs: { response: collectedOutput },
+              end_time: Date.now(),
+            });
+          } catch (e) {
+            console.error("[LangSmith] updateRun error:", e);
+          }
           controller.close();
         }
       },
