@@ -18,6 +18,7 @@ export function initPostHog() {
     console.warn("[analytics] NEXT_PUBLIC_POSTHOG_KEY is not set — skipping.");
     return;
   }
+  if (window.location.hostname !== "dimeglio.dev") return;
 
   posthog.init(POSTHOG_KEY, {
     api_host: POSTHOG_HOST,
