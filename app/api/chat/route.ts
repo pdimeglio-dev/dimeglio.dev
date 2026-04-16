@@ -590,6 +590,8 @@ export async function POST(req: Request) {
           // Emit a done sentinel so the client can unlock the input immediately
           // without waiting for the TCP stream to close (avoids ~100–500ms dead time).
           try { controller.enqueue(encode({ type: "done" })); } catch { /* already closed */ }
+          // Signal to LangSmith that the stream is fully consumed so the trace closes
+          try { await result.response; } catch { /* ignore */ }
           controller.close();
         }
       },
