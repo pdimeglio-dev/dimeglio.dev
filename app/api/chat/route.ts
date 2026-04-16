@@ -1,14 +1,10 @@
 export const maxDuration = 120;
 
 import { openai } from "@ai-sdk/openai";
-import * as ai from "ai";
-import {
-  wrapAISDK,
-  createLangSmithProviderOptions,
-} from "langsmith/experimental/vercel";
+import { embed, streamText, jsonSchema, stepCountIs } from "ai";
+import { Client } from "langsmith";
 
-const { streamText, embed } = wrapAISDK(ai);
-const { jsonSchema, stepCountIs } = ai;
+const langsmith = new Client();
 import { Pinecone } from "@pinecone-database/pinecone";
 import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -202,21 +198,29 @@ export async function POST(req: Request) {
       return new Response("Message too long", { status: 400 });
     }
 
-    // Do NOT await — wrapAISDK returns a Proxy that delegates property access
-    // to the underlying StreamTextResult. Awaiting causes a deadlock on
-    // multi-step conversations (processOutputs awaits result.content which
-    // can't resolve until fullStream is consumed).
+    // Create a LangSmith run manually — wrappers (wrapAISDK, traceable)
+    // don't close reliably on Vercel serverless.
+    const runId = crypto.randomUUID();
+    const runStartTime = Date.now();
+    langsmith
+      .createRun({
+        id: runId,
+        name: "guillermo-chat",
+        run_type: "chain",
+        project_name: process.env.LANGCHAIN_PROJECT ?? "guillermo-chat",
+        inputs: { messages },
+        extra: { metadata: { session_id: conversationId ?? "anonymous" } },
+        start_time: runStartTime,
+      })
+      .catch((e) => console.error("[LangSmith] createRun error:", e));
+
+    let collectedOutput = "";
+
     const result = streamText({
       model: openai("gpt-4o-mini"),
       messages,
       system: SYSTEM_PROMPT,
       stopWhen: stepCountIs(10),
-      providerOptions: {
-        langsmith: createLangSmithProviderOptions({
-          name: "guillermo-chat",
-          metadata: { session_id: conversationId ?? "anonymous" },
-        }),
-      },
       tools: {
         // ── Data tool — retrieves context from Pinecone, returns to model ───
         searchPortfolio: {
@@ -480,6 +484,7 @@ export async function POST(req: Request) {
             if (chunk.type === "text-delta") {
               const delta: string = chunk.text ?? chunk.textDelta ?? "";
               if (!delta) continue;
+              collectedOutput += delta;
               if (hadWidget) {
                 postWidgetBuffer += delta;
               } else {
@@ -581,6 +586,7 @@ export async function POST(req: Request) {
           }
         } catch (err) {
           console.error("[Chat API] Stream error:", err);
+          collectedOutput += `\n\n[ERROR: ${String(err)}]`;
           // Surface the error to the frontend so the UI doesn't hang silently
           try {
             controller.enqueue(
@@ -594,9 +600,16 @@ export async function POST(req: Request) {
           // Emit a done sentinel so the client can unlock the input immediately
           // without waiting for the TCP stream to close (avoids ~100–500ms dead time).
           try { controller.enqueue(encode({ type: "done" })); } catch { /* already closed */ }
-          // Signal trace closure to LangSmith. fullStream is already consumed
-          // at this point, so result.text resolves immediately — no deadlock.
-          try { await result.text; } catch { /* ignore */ }
+          // Close the LangSmith run before ending the response stream —
+          // this guarantees the update completes before Vercel kills the function.
+          try {
+            await langsmith.updateRun(runId, {
+              outputs: { response: collectedOutput },
+              end_time: Date.now(),
+            });
+          } catch (e) {
+            console.error("[LangSmith] updateRun error:", e);
+          }
           controller.close();
         }
       },
