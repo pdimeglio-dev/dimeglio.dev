@@ -119,10 +119,12 @@ function BlockRenderer({
   block,
   index,
   onAction,
+  conversationId,
 }: {
   block: ContentBlock;
   index: number;
   onAction: (message: string) => void;
+  conversationId?: string;
 }) {
   if (block.type === "text") {
     const cleaned = block.content.replace(/<!--[\s\S]*?(?:-->|$)/g, "");
@@ -139,7 +141,7 @@ function BlockRenderer({
       case "SkillGrid":
         return <SkillGrid key={index} {...block.props} />;
       case "ContactCard":
-        return <ContactCard key={index} {...block.props} onAction={onAction} />;
+        return <ContactCard key={index} {...block.props} onAction={onAction} conversationId={conversationId} />;
       case "ProjectCard":
         return <ProjectCard key={index} {...block.props} />;
       case "ProjectList":
@@ -599,6 +601,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                             key={i}
                             block={block}
                             index={i}
+                            conversationId={conversationIdRef.current}
                             onAction={(msg) => {
                               setInput("");
                               handleSubmitText(msg);
