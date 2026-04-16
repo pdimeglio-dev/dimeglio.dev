@@ -202,7 +202,11 @@ export async function POST(req: Request) {
       return new Response("Message too long", { status: 400 });
     }
 
-    const result = await streamText({
+    // Do NOT await — wrapAISDK returns a Proxy that delegates property access
+    // to the underlying StreamTextResult. Awaiting causes a deadlock on
+    // multi-step conversations (processOutputs awaits result.content which
+    // can't resolve until fullStream is consumed).
+    const result = streamText({
       model: openai("gpt-4o-mini"),
       messages,
       system: SYSTEM_PROMPT,
@@ -590,9 +594,9 @@ export async function POST(req: Request) {
           // Emit a done sentinel so the client can unlock the input immediately
           // without waiting for the TCP stream to close (avoids ~100–500ms dead time).
           try { controller.enqueue(encode({ type: "done" })); } catch { /* already closed */ }
-          // Ensure all AI SDK step streams are fully consumed so LangSmith
-          // middleware flush() fires and closes every child span.
-          try { await result.usage; } catch { /* ignore */ }
+          // Signal trace closure to LangSmith. fullStream is already consumed
+          // at this point, so result.text resolves immediately — no deadlock.
+          try { await result.text; } catch { /* ignore */ }
           controller.close();
         }
       },
