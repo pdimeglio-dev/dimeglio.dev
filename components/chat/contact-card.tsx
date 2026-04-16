@@ -4,10 +4,12 @@ import { useState } from "react";
 import { Mail, CheckCircle } from "lucide-react";
 import type { ContactCardProps } from "@/lib/chat-widgets";
 import { ContactForm } from "@/components/chat/contact-form";
+import { trackEvent } from "@/lib/analytics";
 
 interface Props extends ContactCardProps {
   /** Called when a button injects a message into the chat (kept for API compat). */
   onAction: (message: string) => void;
+  conversationId?: string;
 }
 
 function LinkedInIcon({ className }: { className?: string }) {
@@ -26,7 +28,7 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 type CardState = "idle" | "form" | "sent";
 
-export function ContactCard({ context }: Props) {
+export function ContactCard({ context, conversationId }: Props) {
   const [state, setState] = useState<CardState>("idle");
 
   return (
@@ -39,7 +41,13 @@ export function ContactCard({ context }: Props) {
         {/* Email Pablo — idle shows button, form shows inline form, sent shows nothing (form has its own success UI) */}
         {state === "idle" && (
           <button
-            onClick={() => setState("form")}
+            onClick={() => {
+              trackEvent({
+                event: "guillermo_cta_clicked",
+                properties: { cta_type: "email", from_page: window.location.pathname, conversation_id: conversationId },
+              });
+              setState("form");
+            }}
             className="flex items-center gap-2.5 rounded-md border border-slate-600/60 bg-slate-800/50 px-3 py-2 text-sm text-slate-300 transition-colors hover:bg-slate-700/50 active:scale-[0.98] cursor-pointer"
           >
             <Mail className="h-4 w-4 shrink-0" />
@@ -68,6 +76,12 @@ export function ContactCard({ context }: Props) {
             href="https://linkedin.com/in/dimegliopablo"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              trackEvent({
+                event: "guillermo_cta_clicked",
+                properties: { cta_type: "linkedin", from_page: window.location.pathname, conversation_id: conversationId },
+              });
+            }}
             className="flex items-center gap-2.5 rounded-md border border-slate-600/60 bg-slate-800/50 px-3 py-2 text-sm text-slate-300 transition-colors hover:bg-slate-700/50 cursor-pointer"
           >
             <LinkedInIcon className="h-4 w-4 shrink-0" />
