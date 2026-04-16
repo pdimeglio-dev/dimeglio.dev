@@ -202,7 +202,7 @@ export async function POST(req: Request) {
       return new Response("Message too long", { status: 400 });
     }
 
-    const result = streamText({
+    const result = await streamText({
       model: openai("gpt-4o-mini"),
       messages,
       system: SYSTEM_PROMPT,
