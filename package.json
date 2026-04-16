@@ -30,6 +30,7 @@
     "framer-motion": "^12.38.0",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
+    "langsmith": "^0.5.20",
     "lucide-react": "^1.8.0",
     "mermaid": "^11.14.0",
     "motion": "^12.38.0",

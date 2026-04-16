@@ -156,14 +156,27 @@ function BlockRenderer({
 
 const STORAGE_KEY = "guillermo-chat-session";
 
-function loadMessages(): Message[] {
-  if (typeof window === "undefined") return [];
+interface StoredSession {
+  conversationId: string;
+  messages: Message[];
+}
+
+function loadSession(): StoredSession {
+  const fallback: StoredSession = {
+    conversationId: crypto.randomUUID(),
+    messages: [],
+  };
+  if (typeof window === "undefined") return fallback;
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return [];
-    const parsed = JSON.parse(saved) as Message[];
+    if (!saved) return fallback;
+    const parsed = JSON.parse(saved);
+    // Backward-compat: old format stored Message[] directly
+    const raw: StoredSession = Array.isArray(parsed)
+      ? { conversationId: crypto.randomUUID(), messages: parsed }
+      : parsed;
     // Backfill `blocks` for messages saved before the ContentBlock era
-    return parsed.map((m) => ({
+    raw.messages = raw.messages.map((m) => ({
       ...m,
       blocks: m.blocks?.length
         ? m.blocks
@@ -171,14 +184,16 @@ function loadMessages(): Message[] {
         ? [{ type: "text" as const, content: m.content }]
         : [],
     }));
+    return raw;
   } catch {
-    return [];
+    return fallback;
   }
 }
 
-function saveMessages(messages: Message[]) {
+function saveSession(conversationId: string, messages: Message[]) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    const session: StoredSession = { conversationId, messages };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   } catch {
     // Quota exceeded or private mode — silently ignore
   }
@@ -190,10 +205,12 @@ function saveMessages(messages: Message[]) {
 
 export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
   const [isMaximized, setIsMaximized] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(loadMessages);
+  const [initialSession] = useState(loadSession);
+  const [messages, setMessages] = useState<Message[]>(initialSession.messages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const conversationIdRef = useRef(initialSession.conversationId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   // Each request gets a monotonically-increasing ID so the `finally` block of an
@@ -203,7 +220,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
 
   // Persist messages on every change
   useEffect(() => {
-    saveMessages(messages);
+    saveSession(conversationIdRef.current, messages);
   }, [messages]);
 
   // Auto-scroll to bottom
@@ -254,6 +271,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
         properties: {
           message_length: text.length,
           message_count: messages.length + 1,
+          conversation_id: conversationIdRef.current,
         },
       });
 
@@ -272,6 +290,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            conversationId: conversationIdRef.current,
             messages: [...messages, userMessage].map((m) => {
               if (m.role !== "assistant") return { role: m.role, content: m.content };
               const hasWidget = m.blocks.some((b) => b.type === "widget");
@@ -442,13 +461,17 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
 
   const handleClearChat = useCallback(() => {
     setMessages([]);
+    conversationIdRef.current = crypto.randomUUID();
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   }, []);
 
   const handleClose = () => {
     trackEvent({
       event: "guillermo_chat_closed",
-      properties: { message_count: messages.length },
+      properties: {
+        message_count: messages.length,
+        conversation_id: conversationIdRef.current,
+      },
     });
     onClose();
   };

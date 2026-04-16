@@ -98,19 +98,19 @@ export type AnalyticsEvent =
     }
   | {
       event: "guillermo_chat_closed";
-      properties: { message_count: number };
+      properties: { message_count: number; conversation_id?: string };
     }
   | {
       event: "guillermo_message_sent";
-      properties: { message_length: number; message_count: number };
+      properties: { message_length: number; message_count: number; conversation_id?: string };
     }
   | {
       event: "guillermo_cta_clicked";
-      properties: { cta_type: "email" | "linkedin" | "calendly"; from_page: string };
+      properties: { cta_type: "email" | "linkedin" | "calendly"; from_page: string; conversation_id?: string };
     }
   | {
       event: "guillermo_lead_signal";
-      properties: { company?: string; role?: string; message_count: number };
+      properties: { company?: string; role?: string; message_count: number; conversation_id?: string };
     }
   | {
       event: "contact_form_submitted";
