@@ -462,9 +462,9 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 20 }}
         transition={{ duration: 0.2 }}
-        className={`fixed z-50 inset-0 ${
+        className={`fixed z-50 top-0 left-0 h-[100dvh] w-screen ${
           isMaximized
-            ? "md:inset-8"
+            ? "md:inset-8 md:h-auto md:w-auto"
             : "md:inset-auto md:top-auto md:left-auto md:bottom-4 md:right-4 md:w-96 md:h-[560px]"
         } flex flex-col rounded-none md:rounded-lg border border-slate-800 bg-black/90 shadow-2xl backdrop-blur-md`}
       >
@@ -620,7 +620,8 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about Pablo's experience…"
               disabled={isLoading}
-              className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-base text-white placeholder-slate-400 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 disabled:opacity-50 md:text-sm"
+              style={{ fontSize: "16px" }}
+              className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder-slate-400 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 disabled:opacity-50"
             />
             <button
               type="submit"

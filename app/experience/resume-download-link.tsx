@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/analytics";
 export function ResumeDownloadLink() {
   return (
     <div className="mt-6 flex items-center gap-2 text-sm text-zinc-400">
-      <span>Looking for a focused summary?</span>
+      <span>Prefer a printable summary?</span>
       <a
         href="/pablo-di-meglio-resume.pdf"
         target="_blank"
