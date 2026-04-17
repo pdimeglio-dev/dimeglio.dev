@@ -134,6 +134,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
   html,
   body {
     overflow-x: hidden;
