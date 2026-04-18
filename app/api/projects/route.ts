@@ -4,6 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import { embed } from "ai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import type { ProjectListItem } from "@/lib/chat-widgets";
+import { captureServerError } from "@/lib/posthog-server";
 
 // ---------------------------------------------------------------------------
 // Logo inference — maps company name fragments to known logo basenames
@@ -123,6 +124,7 @@ export async function GET(req: Request) {
     return Response.json({ items, hasMore });
   } catch (error) {
     console.error("[/api/projects] Error:", error);
+    captureServerError(error, { route: "/api/projects" });
     return Response.json({ error: "Failed to load projects" }, { status: 500 });
   }
 }

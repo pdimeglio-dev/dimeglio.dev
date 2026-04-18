@@ -18,6 +18,26 @@ trackEvent() (lib/analytics.ts)
   ├── No-ops on server (safe to import anywhere)
   └── No-ops when NEXT_PUBLIC_POSTHOG_KEY is empty
 
+captureError() (lib/analytics.ts)
+  ├── Client-side wrapper around posthog.captureException()
+  ├── Use in catch blocks alongside console.error
+  └── No-ops on server
+
+captureServerError() (lib/posthog-server.ts)
+  ├── Server-side error reporting via posthog-node
+  ├── Use in API route catch blocks
+  └── No-ops when NEXT_PUBLIC_POSTHOG_KEY is empty
+
+instrumentation.ts (project root)
+  ├── Exports onRequestError — catches all unhandled server errors
+  ├── Reports to PostHog via captureServerError()
+  └── Covers API routes, Server Components, Server Actions
+
+Error boundaries (app/error.tsx, app/global-error.tsx)
+  ├── Catch React render crashes, show fallback UI
+  ├── Report via captureError() + error_boundary_displayed event
+  └── global-error.tsx catches root layout errors
+
 BlogPostTracker (components/blog-post-tracker.tsx)
   ├── Fires blog_post_viewed on mount
   └── Fires blog_post_scroll_depth at 25/50/75/100% thresholds
@@ -27,8 +47,10 @@ BlogPostTracker (components/blog-post-tracker.tsx)
 
 | Env Variable | Required | Default | Description |
 |---|---|---|---|
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | — | PostHog project API key |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | — | PostHog project API key (used by both client and server) |
 | `NEXT_PUBLIC_POSTHOG_HOST` | No | `https://us.i.posthog.com` | PostHog API host |
+| `POSTHOG_PERSONAL_API_KEY` | No | — | Personal API key for source map uploads (Vercel only, `error_tracking:write` scope) |
+| `POSTHOG_PROJECT_ID` | No | — | PostHog project ID for source map uploads (Vercel only) |
 
 ### Privacy Mode
 
@@ -48,6 +70,7 @@ Trade-off: returning visitors are not recognized across sessions.
 |---|---|---|
 | `$pageview` | Every Next.js route change | `path`, `referrer`, `$current_url` |
 | `$pageleave` | User leaves page (built-in PostHog) | Time on page, scroll depth |
+| `$exception` | Unhandled JS error or promise rejection (frontend), or `captureError()`/`captureServerError()` call | Stack trace, error message, `$lib` (`web` or `posthog-node`) |
 
 ### Custom Events
 
@@ -183,6 +206,53 @@ Fired when a user changes the category filter on the Projects page.
 
 ---
 
+#### `error_boundary_displayed`
+Fired when a user sees the error boundary fallback UI after a React render crash.
+
+| Property | Type | Example |
+|---|---|---|
+| `error_message` | string | `"Cannot read properties of null"` |
+| `digest` | string? | `"abc123"` (Next.js error digest, if available) |
+
+**Component:** `app/error.tsx`
+
+---
+
+## Error Monitoring
+
+PostHog handles both analytics and error monitoring for this project. No Sentry.
+
+### Where errors go
+
+| Error type | How it's captured | PostHog filter |
+|---|---|---|
+| Frontend unhandled error | Automatic (`capture_exceptions` in posthog-js) | `$exception` where `$lib` = `web` |
+| Frontend caught error | Manual `captureError(error)` in catch blocks | `$exception` where `$lib` = `web` |
+| Server unhandled error | Automatic (`instrumentation.ts` → `onRequestError`) | `$exception` where `$lib` = `posthog-node` |
+| Server caught error | Manual `captureServerError(error, ctx)` in API routes | `$exception` where `$lib` = `posthog-node` |
+| React render crash | Error boundary + `captureError` | `$exception` + `error_boundary_displayed` |
+
+### Source maps
+
+`@posthog/nextjs-config` uploads source maps to PostHog during `next build` so
+production stack traces show real file names. This only runs when
+`POSTHOG_PERSONAL_API_KEY` is set (Vercel builds). Local builds skip the upload.
+
+Configuration: `next.config.ts` → `withPostHogConfig()` wrapper.
+
+### Key files
+
+| File | Purpose |
+|---|---|
+| `lib/analytics.ts` | `captureError()` — client-side error reporting |
+| `lib/posthog-server.ts` | `captureServerError()` — server-side error reporting via `posthog-node` |
+| `instrumentation.ts` | `onRequestError` — catches unhandled server errors |
+| `app/error.tsx` | Route-level error boundary |
+| `app/global-error.tsx` | Root layout error boundary |
+| `next.config.ts` | `withPostHogConfig()` — source map uploads |
+
+---
+
 ## Adding a New Event
 
 1. **Define the event** in `lib/analytics.ts` — add a new variant to the `AnalyticsEvent` union type:
@@ -216,3 +286,10 @@ Set up these dashboards in PostHog for the insights Pablo wants:
 - **Experience → Project Funnel** → `experience_project_clicked` grouped by `from_company`
 - **Navigation Patterns** → Count `nav_link_clicked` grouped by `href` + `from_page`
 - **Visitor Geography** → Use PostHog's built-in geo breakdown on `$pageview`
+
+### Error Monitoring Dashboard (separate from analytics)
+
+- **Frontend Errors (24h)** → Count `$exception` where `$lib` = `web`, breakdown by `$exception_message`
+- **Server Errors (24h)** → Count `$exception` where `$lib` = `posthog-node`, breakdown by `$exception_message`
+- **Error Boundary Views** → Count `error_boundary_displayed`, breakdown by `error_message`
+- **Error Spike Alert** → Alert when `$exception` count > 10 in 1 hour

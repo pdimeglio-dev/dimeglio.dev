@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { ProjectListProps, ProjectListItem } from "@/lib/chat-widgets";
 import { getValidHref, getLogoSrc } from "@/lib/chat-slugs";
+import { captureError } from "@/lib/analytics";
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -108,8 +109,8 @@ export function ProjectList({ title, items: initialItems, hasMore: initialHasMor
       const data = await res.json() as { items: ProjectListItem[]; hasMore: boolean };
       setItems((prev) => [...prev, ...data.items]);
       setHasMore(data.hasMore);
-    } catch {
-      // silently fail — button stays visible so user can retry
+    } catch (error) {
+      captureError(error);
     } finally {
       setIsLoading(false);
     }

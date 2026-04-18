@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Send, CheckCircle, AlertCircle, Loader2, Mail } from "lucide-react";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, captureError } from "@/lib/analytics";
 
 interface ContactFormProps {
   onSuccess?: () => void;
@@ -55,7 +55,8 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
 
       setStatus("success");
       onSuccess?.();
-    } catch {
+    } catch (error) {
+      captureError(error);
       setErrorMessage("Network error. Please try again.");
       setStatus("error");
     }
