@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { captureServerError } from "@/lib/posthog-server";
 import { ContactNotificationEmail } from "@/emails/contact-notification";
 import { ContactConfirmationEmail } from "@/emails/contact-confirmation";
 
@@ -50,6 +51,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[Contact API] Error:", error);
+    captureServerError(error, { route: "/api/contact" });
     // If Resend fails for any reason (template error, network, etc.), send the visitor
     // to the mailto fallback instead of showing a dead-end red error.
     return NextResponse.json({ fallback: true });

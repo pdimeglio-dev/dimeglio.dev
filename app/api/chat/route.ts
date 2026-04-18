@@ -8,6 +8,7 @@ const langsmith = new Client();
 import { Pinecone } from "@pinecone-database/pinecone";
 import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
+import { captureServerError } from "@/lib/posthog-server";
 import { Redis } from "@upstash/redis";
 import type {
   SkillGridProps,
@@ -586,6 +587,7 @@ export async function POST(req: Request) {
           }
         } catch (err) {
           console.error("[Chat API] Stream error:", err);
+          captureServerError(err, { route: "/api/chat", phase: "stream" });
           collectedOutput += `\n\n[ERROR: ${String(err)}]`;
           // Surface the error to the frontend so the UI doesn't hang silently
           try {
@@ -620,6 +622,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("[Chat API] Error:", error);
+    captureServerError(error, { route: "/api/chat", phase: "handler" });
     return new Response(
       JSON.stringify({ error: "Failed to process chat message" }),
       {

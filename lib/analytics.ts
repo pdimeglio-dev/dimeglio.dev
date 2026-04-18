@@ -32,6 +32,12 @@ export function initPostHog() {
     autocapture: false,
     // Session replay (opt-in, free tier includes it)
     disable_session_recording: false,
+    // Capture unhandled errors and promise rejections
+    capture_exceptions: {
+      capture_unhandled_errors: true,
+      capture_unhandled_rejections: true,
+      capture_console_errors: false,
+    },
   });
 }
 
@@ -115,6 +121,10 @@ export type AnalyticsEvent =
   | {
       event: "contact_form_submitted";
       properties: { has_company: boolean; has_message: boolean };
+    }
+  | {
+      event: "error_boundary_displayed";
+      properties: { error_message: string; digest?: string };
     };
 
 /**
@@ -130,6 +140,15 @@ export function trackEvent<E extends AnalyticsEvent>(payload: E) {
   if (!POSTHOG_KEY) return;
 
   posthog.capture(payload.event, payload.properties);
+}
+
+/**
+ * Report a caught error to PostHog. Safe to call server-side (no-ops).
+ */
+export function captureError(error: unknown) {
+  if (typeof window === "undefined") return;
+  if (!POSTHOG_KEY) return;
+  posthog.captureException(error);
 }
 
 /**

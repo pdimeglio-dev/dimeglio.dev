@@ -10,7 +10,7 @@ import { SkillGrid } from "@/components/chat/skill-grid";
 import { ContactCard } from "@/components/chat/contact-card";
 import { ProjectCard } from "@/components/chat/project-card";
 import { ProjectList } from "@/components/chat/project-list";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, captureError } from "@/lib/analytics";
 import type {
   GuillermoChunk,
   ContentBlock,
@@ -424,6 +424,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
       } catch (error) {
         if (ac.signal.aborted) return; // superseded by a newer request — silently drop
         console.error("[Chat] Error:", error);
+        captureError(error);
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
