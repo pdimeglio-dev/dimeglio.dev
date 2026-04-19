@@ -19,23 +19,31 @@ trackEvent() (lib/analytics.ts)
   └── No-ops when NEXT_PUBLIC_POSTHOG_KEY is empty
 
 captureError() (lib/analytics.ts)
-  ├── Client-side wrapper around posthog.captureException()
-  ├── Use in catch blocks alongside console.error
-  └── No-ops on server
+  ├── Calls Sentry.captureException() — works on client and server
+  ├── Sentry forwards the error to PostHog via posthog.sentryIntegration()
+  └── Use in catch blocks alongside console.error
 
 captureServerError() (lib/posthog-server.ts)
-  ├── Server-side error reporting via posthog-node
-  ├── Use in API route catch blocks
-  └── No-ops when NEXT_PUBLIC_POSTHOG_KEY is empty
+  ├── Calls Sentry.captureException() AND posthog-node.captureException()
+  ├── Both are called explicitly — posthog.sentryIntegration() is browser-only
+  └── No-ops to PostHog when NEXT_PUBLIC_POSTHOG_KEY is empty; Sentry always runs
+
+sentry.client.config.ts (project root)
+  ├── Inits Sentry on the client with posthog.sentryIntegration() bridge
+  └── Bridge: each Sentry error → PostHog $exception event with $sentry_url link
+
+sentry.server.config.ts (project root)
+  └── Inits Sentry on the server (loaded by instrumentation.ts register())
 
 instrumentation.ts (project root)
-  ├── Exports onRequestError — catches all unhandled server errors
-  ├── Reports to PostHog via captureServerError()
+  ├── register() — loads sentry.server.config.ts on server boot
+  ├── onRequestError — catches all unhandled server errors
+  ├── Reports to both Sentry + PostHog via captureServerError()
   └── Covers API routes, Server Components, Server Actions
 
 Error boundaries (app/error.tsx, app/global-error.tsx)
   ├── Catch React render crashes, show fallback UI
-  ├── Report via captureError() + error_boundary_displayed event
+  ├── Report via captureError() (→ Sentry → PostHog) + error_boundary_displayed event
   └── global-error.tsx catches root layout errors
 
 BlogPostTracker (components/blog-post-tracker.tsx)
@@ -49,8 +57,29 @@ BlogPostTracker (components/blog-post-tracker.tsx)
 |---|---|---|---|
 | `NEXT_PUBLIC_POSTHOG_KEY` | Yes | — | PostHog project API key (used by both client and server) |
 | `NEXT_PUBLIC_POSTHOG_HOST` | No | `https://us.i.posthog.com` | PostHog API host |
-| `POSTHOG_PERSONAL_API_KEY` | No | — | Personal API key for source map uploads (Vercel only, `error_tracking:write` scope) |
+| `POSTHOG_PERSONAL_API_KEY` | No | — | Personal API key for PostHog source map uploads (Vercel only, `error_tracking:write` scope) |
 | `POSTHOG_PROJECT_ID` | No | — | PostHog project ID for source map uploads (Vercel only) |
+| `NEXT_PUBLIC_SENTRY_DSN` | No | — | Sentry DSN — enables error capture. No-ops when unset. |
+| `NEXT_PUBLIC_SENTRY_ORG` | No | — | Sentry org slug — for PostHog→Sentry links and source map uploads |
+| `NEXT_PUBLIC_SENTRY_PROJECT_ID` | No | — | Sentry project ID (numeric) — for PostHog→Sentry links |
+| `SENTRY_PROJECT` | No | — | Sentry project slug — for `withSentryConfig` source map uploads |
+| `SENTRY_AUTH_TOKEN` | No | — | Sentry auth token for source map uploads during build (needs `project:releases` + `org:read`) |
+
+### Getting Sentry env vars
+
+**Prerequisites:** Create a free account at sentry.io, then create a new project (choose Next.js as the platform, name it e.g. `dimeglio-dev`).
+
+| Variable | Where to find it |
+|---|---|
+| `NEXT_PUBLIC_SENTRY_DSN` | Shown immediately after project creation. Also at: Settings → Projects → `dimeglio-dev` → Client Keys (DSN) → DSN |
+| `NEXT_PUBLIC_SENTRY_ORG` | Settings → Organization → General Settings → **Organization Slug** (lowercase, hyphenated, e.g. `pablo-dimeglio`) |
+| `NEXT_PUBLIC_SENTRY_PROJECT_ID` | Settings → Projects → `dimeglio-dev` → scroll to bottom → **Project ID** (numeric, e.g. `1234567`) |
+| `SENTRY_PROJECT` | Same page — the **Project Slug** (e.g. `dimeglio-dev`), not the numeric ID |
+| `SENTRY_AUTH_TOKEN` | Settings → Auth Tokens → Create New Token → scopes: `project:releases` + `org:read` |
+
+**Vercel setup:** Add all five to Vercel → dimeglio.dev → Settings → Environment Variables.
+- `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_ORG`, `NEXT_PUBLIC_SENTRY_PROJECT_ID` → all environments (baked into client bundle)
+- `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` → Production only (used at build time for source map uploads)
 
 ### Privacy Mode
 
@@ -220,36 +249,47 @@ Fired when a user sees the error boundary fallback UI after a React render crash
 
 ## Error Monitoring
 
-PostHog handles both analytics and error monitoring for this project. No Sentry.
+This project uses **Sentry** as the error capture engine and **PostHog** as the analytics/visibility layer.
+They are linked via `posthog.sentryIntegration()`: Sentry forwards frontend errors to PostHog as
+`$exception` events with a clickable `$sentry_url`. Click it in PostHog → jump to Sentry for the full
+stack trace, breadcrumbs, and release info. In Sentry, the event tags back with a PostHog Recording URL.
 
 ### Where errors go
 
-| Error type | How it's captured | PostHog filter |
-|---|---|---|
-| Frontend unhandled error | Automatic (`capture_exceptions` in posthog-js) | `$exception` where `$lib` = `web` |
-| Frontend caught error | Manual `captureError(error)` in catch blocks | `$exception` where `$lib` = `web` |
-| Server unhandled error | Automatic (`instrumentation.ts` → `onRequestError`) | `$exception` where `$lib` = `posthog-node` |
-| Server caught error | Manual `captureServerError(error, ctx)` in API routes | `$exception` where `$lib` = `posthog-node` |
-| React render crash | Error boundary + `captureError` | `$exception` + `error_boundary_displayed` |
+| Error type | Captured by | Sentry | PostHog |
+|---|---|---|---|
+| Frontend unhandled error | Sentry (`sentry.client.config.ts`) | ✅ | ✅ via `sentryIntegration()` |
+| Frontend caught error | `captureError()` → `Sentry.captureException()` | ✅ | ✅ via `sentryIntegration()` |
+| Server unhandled error | `instrumentation.ts` → `captureServerError()` | ✅ | ✅ via `posthog-node` |
+| Server caught error | `captureServerError()` in API routes | ✅ | ✅ via `posthog-node` |
+| React render crash | Error boundary → `captureError()` | ✅ | ✅ + `error_boundary_displayed` |
+
+### Debugging workflow
+
+1. See `$exception` in PostHog (or get an alert) → click `$sentry_url` → Sentry issue with full stack trace
+2. In Sentry, click "PostHog Recording URL" → watch exactly what the user was doing
+3. Server errors: Sentry for stack traces + Vercel logs for console output
 
 ### Source maps
 
-`@posthog/nextjs-config` uploads source maps to PostHog during `next build` so
-production stack traces show real file names. This only runs when
-`POSTHOG_PERSONAL_API_KEY` is set (Vercel builds). Local builds skip the upload.
+Both services upload source maps during `next build`:
+- **PostHog** (`@posthog/nextjs-config`): needs `POSTHOG_PERSONAL_API_KEY` + `POSTHOG_PROJECT_ID`
+- **Sentry** (`@sentry/nextjs`): needs `SENTRY_AUTH_TOKEN` + `SENTRY_PROJECT` + `NEXT_PUBLIC_SENTRY_ORG`
 
-Configuration: `next.config.ts` → `withPostHogConfig()` wrapper.
+Local builds skip uploads (env vars not set locally). Vercel builds get real stack traces in both dashboards.
 
 ### Key files
 
 | File | Purpose |
 |---|---|
-| `lib/analytics.ts` | `captureError()` — client-side error reporting |
-| `lib/posthog-server.ts` | `captureServerError()` — server-side error reporting via `posthog-node` |
-| `instrumentation.ts` | `onRequestError` — catches unhandled server errors |
+| `sentry.client.config.ts` | Sentry client init with `posthog.sentryIntegration()` bridge |
+| `sentry.server.config.ts` | Sentry server init (loaded by `instrumentation.ts`) |
+| `lib/analytics.ts` | `captureError()` — calls `Sentry.captureException()` |
+| `lib/posthog-server.ts` | `captureServerError()` — calls both Sentry and `posthog-node` |
+| `instrumentation.ts` | `register()` (Sentry server boot) + `onRequestError` (unhandled server errors) |
 | `app/error.tsx` | Route-level error boundary |
 | `app/global-error.tsx` | Root layout error boundary |
-| `next.config.ts` | `withPostHogConfig()` — source map uploads |
+| `next.config.ts` | `withSentryConfig()` + `withPostHogConfig()` — source map uploads |
 
 ---
 

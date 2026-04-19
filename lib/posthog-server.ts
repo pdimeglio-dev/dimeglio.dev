@@ -1,4 +1,5 @@
 import { PostHog } from "posthog-node";
+import * as Sentry from "@sentry/nextjs";
 
 // ---------------------------------------------------------------------------
 // Server-side PostHog client (singleton)
@@ -23,13 +24,22 @@ function getClient(): PostHog | null {
 }
 
 /**
- * Report a server-side error to PostHog.
- * Safe to call even when PostHog is not configured (no-ops).
+ * Report a server-side error to both Sentry and PostHog.
+ * - Sentry: deep debugging (stack traces, breadcrumbs, releases)
+ * - PostHog: visibility alongside session replays and analytics
+ *
+ * Safe to call even when either service is not configured (no-ops).
+ * Note: the posthog-js sentryIntegration() bridge is browser-only, so for
+ * server errors we call both services explicitly.
  */
 export function captureServerError(
   error: unknown,
   context?: Record<string, unknown>
 ) {
+  // Sentry: rich debugging context
+  Sentry.captureException(error, { extra: context });
+
+  // PostHog: visibility in the same dashboard as frontend errors
   const ph = getClient();
   if (!ph) return;
   ph.captureException(error, "server", context);

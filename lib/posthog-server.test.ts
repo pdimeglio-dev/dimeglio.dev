@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { mockCaptureException } = vi.hoisted(() => ({
+const { mockCaptureException, mockSentryCaptureException } = vi.hoisted(() => ({
   mockCaptureException: vi.fn(),
+  mockSentryCaptureException: vi.fn(),
 }));
 
 vi.mock("posthog-node", () => ({
@@ -10,23 +11,30 @@ vi.mock("posthog-node", () => ({
   },
 }));
 
+vi.mock("@sentry/nextjs", () => ({
+  captureException: mockSentryCaptureException,
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.unstubAllEnvs();
 });
 
 describe("captureServerError", () => {
-  it("no-ops when POSTHOG_KEY is not set", async () => {
+  it("still calls Sentry even when POSTHOG_KEY is not set", async () => {
     vi.stubEnv("NEXT_PUBLIC_POSTHOG_KEY", "");
 
     vi.resetModules();
     const { captureServerError } = await import("./posthog-server");
 
-    captureServerError(new Error("test"));
+    const err = new Error("test");
+    captureServerError(err);
+
+    expect(mockSentryCaptureException).toHaveBeenCalledWith(err, { extra: undefined });
     expect(mockCaptureException).not.toHaveBeenCalled();
   });
 
-  it("calls PostHog.captureException when key is set", async () => {
+  it("calls both Sentry and PostHog when key is set", async () => {
     vi.stubEnv("NEXT_PUBLIC_POSTHOG_KEY", "phc_test");
 
     vi.resetModules();
@@ -35,6 +43,9 @@ describe("captureServerError", () => {
     const err = new Error("something broke");
     captureServerError(err, { route: "/api/chat" });
 
+    expect(mockSentryCaptureException).toHaveBeenCalledWith(err, {
+      extra: { route: "/api/chat" },
+    });
     expect(mockCaptureException).toHaveBeenCalledWith(
       err,
       "server",

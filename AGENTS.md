@@ -34,33 +34,33 @@ Full documentation lives in `docs/ANALYTICS.md`.
 <!-- END:analytics-agent-rules -->
 
 <!-- BEGIN:error-monitoring-agent-rules -->
-## Error Monitoring — PostHog Exception Tracking
+## Error Monitoring — Sentry + PostHog
 
-This project captures frontend and backend errors via **PostHog** (no Sentry).
+This project uses **Sentry** as the error capture engine and **PostHog** as the analytics/visibility layer.
 Full documentation lives in `docs/ANALYTICS.md` under "Error Monitoring".
 
 ### How it works:
 
-- **Frontend (automatic):** `posthog-js` captures unhandled errors and promise rejections
-  via `capture_exceptions` in `lib/analytics.ts`. These appear as `$exception` events in PostHog.
+- **Frontend (automatic):** Sentry captures unhandled errors and promise rejections.
+  `posthog.sentryIntegration()` in `sentry.client.config.ts` forwards each error to PostHog
+  as a `$exception` event with a `$sentry_url` link. Click it in PostHog to jump to Sentry.
 
 - **Frontend (manual):** Use `captureError(error)` from `@/lib/analytics` in catch blocks.
-  This is a client-safe wrapper around `posthog.captureException()`.
+  It calls `Sentry.captureException()`, which forwards to PostHog automatically.
 
-- **Backend (automatic):** `instrumentation.ts` exports `onRequestError` which catches
-  all unhandled server errors (API routes, Server Components, Server Actions) and reports
-  them via `posthog-node`.
+- **Backend (automatic):** `instrumentation.ts` exports both `register()` (loads Sentry server
+  config) and `onRequestError` (catches all unhandled server errors and calls `captureServerError`).
 
 - **Backend (manual):** Use `captureServerError(error, context)` from `@/lib/posthog-server`
-  in API route catch blocks. Pass a `{ route }` context object for filtering.
+  in API route catch blocks. It calls **both** Sentry and PostHog (server-side bridge is explicit
+  because `posthog.sentryIntegration()` is browser-only).
 
-- **Error boundaries:** `app/error.tsx` and `app/global-error.tsx` catch React render
-  crashes and show a fallback UI. They fire both `captureError` and an
-  `error_boundary_displayed` analytics event.
+- **Error boundaries:** `app/error.tsx` and `app/global-error.tsx` catch React render crashes.
+  They fire `captureError` (→ Sentry → PostHog) and an `error_boundary_displayed` analytics event.
 
-- **Source maps:** `@posthog/nextjs-config` uploads source maps during `next build` so
-  stack traces in PostHog show real file names. Requires `POSTHOG_PERSONAL_API_KEY` and
-  `POSTHOG_PROJECT_ID` env vars (set in Vercel, not needed locally).
+- **Source maps:** Both `@posthog/nextjs-config` and `@sentry/nextjs` upload source maps during
+  `next build`. PostHog needs them for its Error Tracking view; Sentry for its own. Both services
+  need their respective env vars set in Vercel.
 
 ### When you create or modify components:
 
@@ -72,7 +72,7 @@ Full documentation lives in `docs/ANALYTICS.md` under "Error Monitoring".
    in the catch block.
 
 3. **Never swallow errors silently** — at minimum call `captureError`/`captureServerError`
-   so errors are visible in PostHog.
+   so errors are visible in both Sentry and PostHog.
 <!-- END:error-monitoring-agent-rules -->
 
 <!-- BEGIN:blog-voice-rules -->
