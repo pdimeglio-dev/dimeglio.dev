@@ -65,7 +65,7 @@ describe("getContentBySlug", () => {
     );
     expect(post!.frontmatter.published).toBe(true);
     expect(post!.frontmatter.tags).toContain("nextjs");
-    expect(post!.content).toContain("# How I Built dimeglio.dev");
+    expect(post!.content).toContain("I've been meaning to build");
   });
 
   it("returns null for non-existent slug", () => {
