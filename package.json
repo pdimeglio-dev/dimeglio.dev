@@ -20,6 +20,7 @@
     "@posthog/nextjs-config": "^1.9.2",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.6",
+    "@sentry/nextjs": "^10.49.0",
     "@tabler/icons-react": "^3.41.1",
     "@tailwindcss/typography": "^0.5.19",
     "@upstash/ratelimit": "^2.0.8",

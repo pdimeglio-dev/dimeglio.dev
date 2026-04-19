@@ -1,4 +1,5 @@
 import posthog from "posthog-js";
+import * as Sentry from "@sentry/nextjs";
 
 // ---------------------------------------------------------------------------
 // PostHog initialisation
@@ -32,12 +33,9 @@ export function initPostHog() {
     autocapture: false,
     // Session replay (opt-in, free tier includes it)
     disable_session_recording: false,
-    // Capture unhandled errors and promise rejections
-    capture_exceptions: {
-      capture_unhandled_errors: true,
-      capture_unhandled_rejections: true,
-      capture_console_errors: false,
-    },
+    // Sentry owns unhandled error capture — it forwards to PostHog via
+    // posthog.sentryIntegration() in sentry.client.config.ts
+    capture_exceptions: false,
   });
 }
 
@@ -143,12 +141,11 @@ export function trackEvent<E extends AnalyticsEvent>(payload: E) {
 }
 
 /**
- * Report a caught error to PostHog. Safe to call server-side (no-ops).
+ * Report a caught error to Sentry. Safe to call on client or server.
+ * Sentry forwards the error to PostHog automatically via posthog.sentryIntegration().
  */
 export function captureError(error: unknown) {
-  if (typeof window === "undefined") return;
-  if (!POSTHOG_KEY) return;
-  posthog.captureException(error);
+  Sentry.captureException(error);
 }
 
 /**

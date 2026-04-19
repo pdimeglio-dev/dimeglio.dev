@@ -8,10 +8,15 @@ const { mockCaptureException, mockCapture } = vi.hoisted(() => ({
 
 vi.mock("posthog-js", () => ({
   default: {
-    captureException: mockCaptureException,
     capture: mockCapture,
     init: vi.fn(),
+    sentryIntegration: vi.fn(),
   },
+}));
+
+// captureError now delegates to Sentry, which forwards to PostHog via the integration
+vi.mock("@sentry/nextjs", () => ({
+  captureException: mockCaptureException,
 }));
 
 import { captureError, trackEvent } from "./analytics";
@@ -32,7 +37,13 @@ describe("captureError", () => {
     expect(() => captureError(undefined)).not.toThrow();
   });
 
-  it("does not throw when called server-side (no window)", () => {
+  it("calls Sentry.captureException with the error", () => {
+    const err = new Error("something broke");
+    captureError(err);
+    expect(mockCaptureException).toHaveBeenCalledWith(err);
+  });
+
+  it("works when called server-side (no window)", () => {
     const original = globalThis.window;
     // @ts-expect-error — simulating server environment
     delete globalThis.window;
