@@ -10,6 +10,7 @@ import { SkillGrid } from "@/components/chat/skill-grid";
 import { ContactCard } from "@/components/chat/contact-card";
 import { ProjectCard } from "@/components/chat/project-card";
 import { ProjectList } from "@/components/chat/project-list";
+import { BlogPostCard } from "@/components/chat/blog-post-card";
 import { trackEvent, captureError } from "@/lib/analytics";
 import type {
   GuillermoChunk,
@@ -146,6 +147,8 @@ function BlockRenderer({
         return <ProjectCard key={index} {...block.props} />;
       case "ProjectList":
         return <ProjectList key={index} {...block.props} />;
+      case "BlogPostCard":
+        return <BlogPostCard key={index} {...block.props} />;
     }
   }
 

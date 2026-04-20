@@ -92,6 +92,22 @@ export interface ProjectListProps {
 }
 
 // ---------------------------------------------------------------------------
+// BlogPostCard — blog post with cover image hero
+// ---------------------------------------------------------------------------
+
+export interface BlogPostCardProps {
+  title: string;
+  description: string;
+  /** Publication date in YYYY-MM-DD format */
+  date: string;
+  tags: string[];
+  /** Path to cover image, e.g. "/blog/building-dimeglio-dev-with-ai/cover.jpg" */
+  coverImage: string;
+  /** Blog post slug (bare, no prefix), e.g. "building-dimeglio-dev-with-ai" */
+  slug: string;
+}
+
+// ---------------------------------------------------------------------------
 // NDJSON chunk types emitted by the API route (server → client)
 // ---------------------------------------------------------------------------
 
@@ -102,6 +118,7 @@ export type GuillermoChunk =
   | { type: "widget"; component: "ContactCard"; props: ContactCardProps }
   | { type: "widget"; component: "ProjectCard"; props: ProjectCardProps }
   | { type: "widget"; component: "ProjectList"; props: ProjectListProps }
+  | { type: "widget"; component: "BlogPostCard"; props: BlogPostCardProps }
   | { type: "widget-append"; component: "ProjectList"; items: ProjectListItem[] }
   | { type: "done" };
 
@@ -115,4 +132,5 @@ export type ContentBlock =
   | { type: "widget"; component: "SkillGrid"; props: SkillGridProps }
   | { type: "widget"; component: "ContactCard"; props: ContactCardProps }
   | { type: "widget"; component: "ProjectCard"; props: ProjectCardProps }
-  | { type: "widget"; component: "ProjectList"; props: ProjectListProps };
+  | { type: "widget"; component: "ProjectList"; props: ProjectListProps }
+  | { type: "widget"; component: "BlogPostCard"; props: BlogPostCardProps };
