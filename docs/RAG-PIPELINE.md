@@ -118,14 +118,18 @@ Details:
 
 ### Blog Post
 ```
+Pablo Di Meglio wrote a blog post titled "How I Built dimeglio.dev in 3 Days with AI".
 Type: Blog Post
+Slug: building-dimeglio-dev-with-ai
 Title: How I Built dimeglio.dev in 3 Days with AI
 Date: 2026-04-12
 Description: A behind-the-scenes look at building...
 Tags: ai, nextjs, react, portfolio
+Cover Image: /blog/building-dimeglio-dev-with-ai/cover.jpg
+Portfolio URL: https://dimeglio.dev/blog/building-dimeglio-dev-with-ai
 
-Details:
-[markdown body]
+Section: Two AIs, Two Jobs
+[section markdown body]
 ```
 
 ### RAG Document
@@ -149,6 +153,7 @@ Each Pinecone record includes filterable metadata:
 | `start_date` | string | Experience | `YYYY-MM` format |
 | `end_date` | string | Experience | `YYYY-MM` or `Present` |
 | `date` | string | Blog | ISO date |
+| `cover_image` | string | Blog | Cover image path (e.g., `/blog/slug/cover.jpg`) |
 | `tech_stack` | string | Project | Comma-separated skills |
 | `tags` | string | Blog | Comma-separated tags |
 | `knowledge_string` | string | All | Full text for LLM context retrieval |
@@ -193,6 +198,7 @@ node scripts/ingest.mjs
 5. **Clear Index** — Deletes all existing vectors to prevent orphans from old ID schemes
 6. **Embedding** — Sends each knowledge string to `text-embedding-3-small` (1536d)
 7. **Upserting** — Batches vectors (10 at a time) and upserts to Pinecone
+8. **Blog Slug Sync** — Auto-generates `lib/generated-blog-slugs.ts` with the slugs of all published blog posts that were ingested. This file is imported by `lib/chat-slugs.ts` so that Guillermo's chat widgets can validate blog deep links without manual slug list maintenance.
 
 ### Re-running
 

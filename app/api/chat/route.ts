@@ -16,6 +16,7 @@ import type {
   ProjectCardProps,
   ProjectListProps,
   ProjectListItem,
+  BlogPostCardProps,
 } from "@/lib/chat-widgets";
 
 // ---------------------------------------------------------------------------
@@ -65,6 +66,7 @@ const TOOL_TO_COMPONENT: Record<string, string> = {
   renderContactCard: "ContactCard",
   renderProjectCard: "ProjectCard",
   renderProjectList: "ProjectList",
+  renderBlogPostCard: "BlogPostCard",
 };
 
 /** Tools that emit a visual widget to the frontend (vs. tools that return data to the model) */
@@ -104,7 +106,14 @@ You communicate data visually. Think of your text as the conversational bridge t
 - **Contractor Nuance:** Pablo was a Globant contractor. Only attribute projects explicitly tagged to a client as that client's work (e.g., "Google Shopping List" is Google). Do not invent client projects.
 
 ### 4. CONVERSION (THE SALES FUNNEL)
-Your goal is to get Pablo an interview. Call \`renderContactCard\` to hand the user off to Pablo whenever the conversation shows hiring interest (availability, salary, the user's company, or genuine engagement after a few substantive questions) — and also whenever you don't have a proper answer (the question falls outside what's in your search results, or you'd otherwise have to guess).`;
+Your goal is to get Pablo an interview. Call \`renderContactCard\` to hand the user off to Pablo whenever the conversation shows hiring interest (availability, salary, the user's company, or genuine engagement after a few substantive questions) — and also whenever you don't have a proper answer (the question falls outside what's in your search results, or you'd otherwise have to guess).
+
+### 5. BLOG POSTS AS EVIDENCE OF EXPERTISE
+- Pablo writes technical blog posts. These are personal knowledge-sharing, NOT professional work engagements.
+- When search results return blog content (type: "blog"), always use \`renderBlogPostCard\` to display them. NEVER use \`renderProjectCard\` or \`renderProjectList\` for blog content — different data shape (cover image, not company logo).
+- Blog posts are supplementary evidence of expertise. When a user asks about a topic and your search results contain blog posts but NO matching professional project/experience, frame it honestly: "Pablo hasn't listed that as a dedicated professional project, but he's clearly worked with it — he wrote about it in depth." Then render the blog post card.
+- When BOTH professional experience AND blog posts exist for a topic, mention the professional work first (with the appropriate project/experience widget), then mention the blog post as additional context: "He also wrote about this — here's the post."
+- Blog post slugs have no prefix (unlike exp-*/proj-*). Example: "welcome-guillermo-the-ai-agent".`;
 
 // ---------------------------------------------------------------------------
 // Tool execution functions
@@ -423,6 +432,42 @@ export async function POST(req: Request) {
             },
           }),
           execute: async (args: ContactCardProps) => args,
+        },
+
+        renderBlogPostCard: {
+          description:
+            "Render a visual blog post card with cover image. Use this when the user asks about Pablo's blog posts, writing, or articles — or when search results return blog content (type: 'blog') relevant to the question. Blog posts represent Pablo's personal knowledge-sharing and thought leadership, NOT professional work engagements. Call searchPortfolio first to retrieve the blog post data, then extract the structured information into this card.",
+          inputSchema: jsonSchema<BlogPostCardProps>({
+            type: "object",
+            properties: {
+              title: { type: "string", description: "Blog post title" },
+              description: {
+                type: "string",
+                description: "Blog post description or summary",
+              },
+              date: {
+                type: "string",
+                description: "Publication date in YYYY-MM-DD format",
+              },
+              tags: {
+                type: "array",
+                items: { type: "string" },
+                description: "Topic tags for the blog post",
+              },
+              coverImage: {
+                type: "string",
+                description:
+                  "Path to the cover image from the search results (e.g., '/blog/building-dimeglio-dev-with-ai/cover.jpg')",
+              },
+              slug: {
+                type: "string",
+                description:
+                  "Blog post slug for deep linking (e.g., 'building-dimeglio-dev-with-ai'). No prefix — bare slug.",
+              },
+            },
+            required: ["title", "description", "date", "tags", "coverImage", "slug"],
+          }),
+          execute: async (args: BlogPostCardProps) => args,
         },
       },
     });

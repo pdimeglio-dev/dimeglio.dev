@@ -105,7 +105,8 @@ order: 1                                 # Optional — sort order within same e
 1. Create `content/blog/my-post-slug.mdx`
 2. Add frontmatter (see above) with `published: true`
 3. Write MDX body — supports full Markdown + JSX
-4. Visit `/blog/my-post-slug`
+4. Run `npm run ingest` — this updates Pinecone vectors **and** auto-generates `lib/generated-blog-slugs.ts` so Guillermo can link to the post
+5. Visit `/blog/my-post-slug`
 
 ### New Experience Entry
 
