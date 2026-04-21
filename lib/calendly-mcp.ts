@@ -12,8 +12,6 @@
  * MCP client code is preserved below (unused) for the future migration.
  */
 
-import { Client } from "@modelcontextprotocol/sdk/client";
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { captureServerError } from "@/lib/posthog-server";
 
 // ---------------------------------------------------------------------------
@@ -21,13 +19,9 @@ import { captureServerError } from "@/lib/posthog-server";
 // ---------------------------------------------------------------------------
 
 const CALENDLY_API_BASE = "https://api.calendly.com";
-const CALENDLY_MCP_URL = "https://mcp.calendly.com";
 
 /** Hard timeout for REST API calls (ms). */
 const API_TIMEOUT_MS = 8_000;
-
-/** Hard timeout for a single MCP tool call (ms). */
-const MCP_TIMEOUT_MS = 8_000;
 
 // ---------------------------------------------------------------------------
 // Public: feature flag
@@ -72,6 +66,7 @@ async function calendlyFetch(
 
 export interface AvailabilitySlot {
   startTime: string; // ISO 8601
+  displayTime?: string; // e.g. "4:30 PM" — formatted in user's timezone for model text
 }
 
 export async function fetchAvailableSlots(): Promise<AvailabilitySlot[] | null> {
@@ -200,86 +195,18 @@ export function groupSlotsByDay(
     return {
       date,
       label,
-      slots: daySlots.sort(
-        (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-      ),
+      slots: daySlots
+        .sort(
+          (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        )
+        .map((slot) => ({
+          ...slot,
+          displayTime: new Date(slot.startTime).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            timeZone: timezone,
+          }),
+        })),
     };
   });
-}
-
-// ---------------------------------------------------------------------------
-// MCP tool call helper (UNUSED — preserved for future dedicated service)
-// ---------------------------------------------------------------------------
-// The Calendly MCP server (mcp.calendly.com) uses StreamableHTTP transport.
-// This works locally but hangs on Vercel serverless due to:
-//   1. The SDK's StreamableHTTPClientTransport overwrites AbortSignal
-//   2. SSE streams don't flush reliably through Vercel's network layer
-//   3. MCP OAuth tokens (mcp:scheduling:*) are siloed from REST API scopes
-//
-// When Guillermo moves to a long-running service (Railway/Fly.io), swap
-// fetchAvailableSlots/createSchedulingLink back to callCalendlyMCP().
-// The OAuth tokens in Redis (via `npm run calendly-auth`) are still valid.
-// ---------------------------------------------------------------------------
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function callCalendlyMCP(
-  toolName: string,
-  args: Record<string, unknown>,
-  accessToken: string
-): Promise<unknown | null> {
-  const transport = new StreamableHTTPClientTransport(
-    new URL(CALENDLY_MCP_URL),
-    {
-      requestInit: {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-    }
-  );
-
-  const client = new Client(
-    { name: "dimeglio-dev-guillermo", version: "1.0.0" },
-    { capabilities: {} }
-  );
-
-  try {
-    const result = await Promise.race([
-      (async () => {
-        await client.connect(transport);
-        return client.callTool({ name: toolName, arguments: args });
-      })(),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`Calendly MCP timeout after ${MCP_TIMEOUT_MS}ms`)),
-          MCP_TIMEOUT_MS
-        )
-      ),
-    ]);
-
-    if (result.isError) {
-      console.error(`[Calendly MCP] Tool ${toolName} returned error:`, result.content);
-      return null;
-    }
-
-    const content = result.content as Array<{ type: string; text?: string }>;
-    const textParts = content
-      .filter((c): c is { type: "text"; text: string } => c.type === "text" && typeof c.text === "string")
-      .map((c) => c.text);
-
-    if (textParts.length === 0) return null;
-
-    try {
-      return JSON.parse(textParts.join(""));
-    } catch {
-      return textParts.join("");
-    }
-  } catch (err) {
-    captureServerError(err, { route: "calendly-mcp", phase: "tool-call", toolName });
-    return null;
-  } finally {
-    try {
-      await client.close();
-    } catch {
-      // Transport may already be closed
-    }
-  }
 }
