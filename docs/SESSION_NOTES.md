@@ -39,51 +39,76 @@ Tokens stored in Redis: `calendly:tokens`, `calendly:client_info`
 
 ### Blog material — what actually happened
 
-#### What worked well
-- Calendly's MCP server at `https://mcp.calendly.com` is a proper remote MCP server using Streamable HTTP transport — drop-in with `@modelcontextprotocol/sdk`
-- OAuth 2.1 with PKCE + Dynamic Client Registration (DCR) — no pre-registered app ID needed, the client registers itself at auth time
-- Tokens stored in Upstash Redis: both local dev and Vercel production share the same token — zero extra config for deployment
-- Redis optimistic locking (`SET NX EX`) to handle concurrent token refresh races in serverless
-- `checkAvailability` as a hybrid tool: fetches MCP data AND emits the widget — the LLM never sees raw slot data
-- Booking bypasses the LLM entirely: AvailabilityPicker POSTs directly to `/api/schedule` (same pattern as ContactForm → `/api/contact`)
+#### Post structure idea
+1. **Brief MCP intro** — what it is, local vs remote servers, Streamable HTTP transport, why it matters beyond dev tooling
+2. **The implementation** — walk through the actual flow with code snippets (see below)
+3. **Where the standard MCP flow broke down** — honest section on workarounds (see deviations below)
 
-#### Surprises and gotchas
+---
 
-**OAuth scopes are completely separate from REST API scopes.**
-The MCP token uses `mcp:scheduling:read mcp:scheduling:write`. These don't overlap with Calendly's REST API scopes (`event_types:read`, etc.). You can't use the MCP token to hit REST endpoints — you have to use MCP tools for everything.
+#### The actual flow (for the code walkthrough section)
 
-**Dynamic Client Registration returns a `client_id` but no `client_secret`.**
-Calendly registers you as a public client (no secret). The DCR response includes `client_id` and optional metadata — store it all because you need it for token refresh.
+The flow has two layers that are easy to conflate — make this explicit in the post:
 
-**`discoverOAuthMetadata` was deprecated.**
-The MCP SDK deprecated it in favor of `discoverAuthorizationServerMetadata`. Same behavior, just a rename — but worth knowing if you copy examples from older docs.
+**Layer 1 — AI SDK (tool dispatch)**
+The LLM calls `checkAvailability`. This is an AI SDK tool with an `execute()` function. The LLM doesn't know about MCP at all. `execute()` is just a TypeScript function as far as the AI SDK is concerned.
 
-**Availability window is capped at 7 days, not 14.**
-`event_types-list_event_type_available_times` returns a 400 if `end_time - start_time > 7 days`. Also: `start_time` must be strictly in the future — passing `new Date().toISOString()` fails because it's already in the past by the time the request arrives. Add a 5-minute buffer.
+**Layer 2 — MCP (transport + auth)**
+Inside `execute()`, `fetchAvailableSlots()` opens a `StreamableHTTPClientTransport` connection to `mcp.calendly.com` and calls an MCP tool. This is the actual MCP interaction.
 
-**The scheduling link tool requires a nested wrapper argument.**
-`scheduling_links-create_single_use_scheduling_link` expects:
-```json
-{ "create_scheduling_link_request": { "max_event_count": 1, "owner": "...", "owner_type": "EventType" } }
+They look like two steps but they're nested — step 3 in the flow IS step 4:
 ```
-Not flat top-level fields. The error is a Pydantic validation error, not an MCP error — easy to misread.
+LLM calls checkAvailability          ← AI SDK layer
+  └── execute() runs
+        └── fetchAvailableSlots()    ← MCP layer starts here
+              └── callCalendlyMCP("event_types-list_event_type_available_times")
+                    └── StreamableHTTPClientTransport → mcp.calendly.com
+```
 
-**`@upstash/redis` and JSON double-encoding.**
-The auth script used the raw Upstash REST API with `JSON.stringify(JSON.stringify(value))` — this double-encodes the token. `@upstash/redis`'s `get()` parses one level, returning a string. The fix: check `typeof raw === "string"` and parse again. After the first automatic token refresh, tokens are re-written correctly by `@upstash/redis`'s native `.set()`.
+Same nesting on the booking side:
+```
+User clicks slot in widget           ← no LLM involved at all
+  └── POST /api/schedule
+        └── createSchedulingLink()   ← MCP layer
+              └── callCalendlyMCP("scheduling_links-create_single_use_scheduling_link")
+```
 
-#### What Calendly MCP can't do (the honest part)
+**Key point for the post:** the LLM is only involved in deciding to call `checkAvailability` and writing one sentence of text. Everything else — auth, slot fetching, link creation, widget rendering — happens outside the LLM.
 
-**No time pre-selection on single-use links via URL.**
-Calendly's single-use links (`/d/xxxx`) don't support pre-navigating to a specific time via URL parameters or path-based timestamps. `?date=YYYY-MM-DD` pre-selects the date (works). `?time=HH:MM` is silently ignored. Path-based ISO timestamps (`/d/xxxx/2026-04-21T09:00:00-07:00`) are also ignored. The user must click the time again on Calendly. This is a Calendly limitation, not an MCP limitation.
+---
 
-**No direct booking (create_invitee) on the free plan.**
-The free plan doesn't expose `create_invitee` — you can't book on behalf of the user. The single-use link approach is the workaround: MCP creates a link, user completes booking on Calendly.
+#### Where the standard MCP flow broke down (workarounds section)
 
-**The slot is not held.**
-Selecting a time and clicking "Complete Booking on Calendly" doesn't reserve the slot. It generates a single-use link for the event type — another user could book the same time in the window between clicks. The single-use property means the link itself can only be used once, not that the slot is reserved.
+**1. We're not using `listTools` — intentional deviation.**
+Standard MCP: call `client.listTools()` → get the server's full tool catalog → pass tools to the LLM → LLM calls them directly. We skip all of that. We hardcode the two tool names and call them manually from AI SDK `execute()` functions.
 
-#### The 4o-mini prompt quirk
-The system prompt originally had `"do NOT describe time slots as text"` — and 4o-mini dutifully listed every time slot as text in its response. Negative constraints are read as templates. The fix: positive prescription — "Your text response must be exactly one short sentence like '...'"
+*Why:* If we passed MCP tools through to the LLM, Calendly's raw JSON slot data would reach the model. The model would describe every time slot as text. We needed the slots to render as a visual widget, not prose. So MCP handles transport + auth; the AI SDK handles dispatch.
+
+*The bridge pattern:* `AI SDK tool execute()` → `callCalendlyMCP()` → `StreamableHTTPClientTransport`
+
+**2. No time pre-selection on single-use links.**
+Standard expectation: generate a link that opens on the exact slot the user picked. Reality: Calendly's single-use links (`/d/xxxx`) ignore all time-related URL parameters. `?time=HH:MM` — ignored. Path-based ISO timestamps (`/d/xxxx/2026-04-21T09:00:00-07:00`) — ignored. `?date=YYYY-MM-DD` works for date. The workaround: pre-navigate to the date and show the selected time in the UI ("Select 9:30 AM on Calendly to confirm"). One extra click for the user. This is a Calendly limitation, not MCP.
+
+**3. No direct booking on the free plan.**
+Standard expectation: book the slot on behalf of the user (like a real scheduling agent would). Reality: `create_invitee` is not available on the free plan. The workaround: generate a single-use scheduling link and hand the user off to Calendly. The slot is not held — another person could book the same time between clicks.
+
+**4. OAuth scopes are siloed — MCP token can't touch REST.**
+The MCP token (`mcp:scheduling:*`) and Calendly's REST API scopes (`event_types:read`, etc.) are completely separate. You can't use the MCP token to hit `api.calendly.com` directly. Everything must go through MCP tools. This forced us to use `event_types-list_event_types` (MCP) instead of a direct REST call to get the event type URI during setup.
+
+---
+
+#### Technical gotchas (for footnotes / sidebar)
+
+- **Availability window: 7 days max, start_time must be in the future.** `event_types-list_event_type_available_times` returns 400 for > 7-day windows. Also: `new Date().toISOString()` is already "in the past" by the time the request arrives — add a 5-minute buffer.
+- **Nested wrapper argument.** `scheduling_links-create_single_use_scheduling_link` expects `{ create_scheduling_link_request: { ... } }`, not flat fields. The error is a Pydantic validation error, easy to misread as an MCP error.
+- **`@upstash/redis` double-encoding.** Auth script used raw REST API with `JSON.stringify(JSON.stringify(value))`. Fixed in `readTokens()` by checking `typeof raw === "string"` and parsing again.
+- **`discoverOAuthMetadata` deprecated.** Renamed to `discoverAuthorizationServerMetadata` in the MCP SDK. Old examples in docs still use the old name.
+- **DCR public client — no secret.** Calendly issues a `client_id` but no `client_secret`. Store the full DCR response — you need `client_id` for token refresh.
+
+---
+
+#### The 4o-mini prompt quirk (good sidebar)
+System prompt said `"do NOT describe time slots as text"` → model listed every time slot as text. Negative constraints are read as templates. Fix: positive prescription — "Your text response must be exactly one short sentence." The model can't echo a constraint it was never told to avoid.
 
 ---
 
