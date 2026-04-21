@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, CheckCircle } from "lucide-react";
+import { Mail, Calendar, CheckCircle } from "lucide-react";
 import type { ContactCardProps } from "@/lib/chat-widgets";
 import { ContactForm } from "@/components/chat/contact-form";
 import { trackEvent } from "@/lib/analytics";
@@ -28,7 +28,7 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 type CardState = "idle" | "form" | "sent";
 
-export function ContactCard({ context, conversationId }: Props) {
+export function ContactCard({ context, onAction, conversationId }: Props) {
   const [state, setState] = useState<CardState>("idle");
 
   return (
@@ -38,6 +38,23 @@ export function ContactCard({ context, conversationId }: Props) {
       </p>
 
       <div className="flex flex-col gap-2">
+        {/* Schedule a Call — injects a message so Guillermo triggers checkAvailability */}
+        {state === "idle" && (
+          <button
+            onClick={() => {
+              trackEvent({
+                event: "guillermo_cta_clicked",
+                properties: { cta_type: "calendly", from_page: window.location.pathname, conversation_id: conversationId },
+              });
+              onAction("I'd like to schedule a call with Pablo");
+            }}
+            className="flex items-center gap-2.5 rounded-md border border-slate-600/60 bg-slate-800/50 px-3 py-2 text-sm text-slate-300 transition-colors hover:bg-slate-700/50 active:scale-[0.98] cursor-pointer"
+          >
+            <Calendar className="h-4 w-4 shrink-0" />
+            <span className="font-medium">Schedule a Call</span>
+          </button>
+        )}
+
         {/* Email Pablo — idle shows button, form shows inline form, sent shows nothing (form has its own success UI) */}
         {state === "idle" && (
           <button

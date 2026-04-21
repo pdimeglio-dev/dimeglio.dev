@@ -108,6 +108,34 @@ export interface BlogPostCardProps {
 }
 
 // ---------------------------------------------------------------------------
+// AvailabilityPicker — Calendly scheduling via MCP
+// ---------------------------------------------------------------------------
+
+export interface TimeSlot {
+  /** Slot start time in ISO 8601 format */
+  startTime: string;
+}
+
+export interface DayGroup {
+  /** Date string in YYYY-MM-DD format */
+  date: string;
+  /** Human-readable label, e.g. "Mon, Apr 21" */
+  label: string;
+  slots: TimeSlot[];
+}
+
+export interface AvailabilityPickerProps {
+  /** Available time slots grouped by day */
+  days: DayGroup[];
+  /** Calendly event type URI (used by /api/schedule) */
+  eventTypeUri: string;
+  /** User's IANA timezone for display formatting */
+  timezone: string;
+  /** When set, MCP failed — render a single "Open Calendly" fallback button */
+  fallbackUrl?: string;
+}
+
+// ---------------------------------------------------------------------------
 // NDJSON chunk types emitted by the API route (server → client)
 // ---------------------------------------------------------------------------
 
@@ -119,6 +147,7 @@ export type GuillermoChunk =
   | { type: "widget"; component: "ProjectCard"; props: ProjectCardProps }
   | { type: "widget"; component: "ProjectList"; props: ProjectListProps }
   | { type: "widget"; component: "BlogPostCard"; props: BlogPostCardProps }
+  | { type: "widget"; component: "AvailabilityPicker"; props: AvailabilityPickerProps }
   | { type: "widget-append"; component: "ProjectList"; items: ProjectListItem[] }
   | { type: "done" };
 
@@ -133,4 +162,5 @@ export type ContentBlock =
   | { type: "widget"; component: "ContactCard"; props: ContactCardProps }
   | { type: "widget"; component: "ProjectCard"; props: ProjectCardProps }
   | { type: "widget"; component: "ProjectList"; props: ProjectListProps }
-  | { type: "widget"; component: "BlogPostCard"; props: BlogPostCardProps };
+  | { type: "widget"; component: "BlogPostCard"; props: BlogPostCardProps }
+  | { type: "widget"; component: "AvailabilityPicker"; props: AvailabilityPickerProps };

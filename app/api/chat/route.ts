@@ -17,7 +17,13 @@ import type {
   ProjectListProps,
   ProjectListItem,
   BlogPostCardProps,
+  AvailabilityPickerProps,
 } from "@/lib/chat-widgets";
+import {
+  isCalendlyConfigured,
+  fetchAvailableSlots,
+  groupSlotsByDay,
+} from "@/lib/calendly-mcp";
 
 // ---------------------------------------------------------------------------
 // Clients — lazy, initialised at request time (not build time).
@@ -67,6 +73,7 @@ const TOOL_TO_COMPONENT: Record<string, string> = {
   renderProjectCard: "ProjectCard",
   renderProjectList: "ProjectList",
   renderBlogPostCard: "BlogPostCard",
+  checkAvailability: "AvailabilityPicker",
 };
 
 /** Tools that emit a visual widget to the frontend (vs. tools that return data to the model) */
@@ -113,7 +120,10 @@ Your goal is to get Pablo an interview. Call \`renderContactCard\` to hand the u
 - When search results return blog content (type: "blog"), always use \`renderBlogPostCard\` to display them. NEVER use \`renderProjectCard\` or \`renderProjectList\` for blog content — different data shape (cover image, not company logo).
 - Blog posts are supplementary evidence of expertise. When a user asks about a topic and your search results contain blog posts but NO matching professional project/experience, frame it honestly: "Pablo hasn't listed that as a dedicated professional project, but he's clearly worked with it — he wrote about it in depth." Then render the blog post card.
 - When BOTH professional experience AND blog posts exist for a topic, mention the professional work first (with the appropriate project/experience widget), then mention the blog post as additional context: "He also wrote about this — here's the post."
-- Blog post slugs have no prefix (unlike exp-*/proj-*). Example: "welcome-guillermo-the-ai-agent".`;
+- Blog post slugs have no prefix (unlike exp-*/proj-*). Example: "welcome-guillermo-the-ai-agent".
+
+### 6. SCHEDULING CALLS
+When the user asks to schedule a call, book a meeting, or find available times, call \`checkAvailability\`. Pass the user's timezone if known. This renders an interactive availability picker widget. Your text response must be exactly one short sentence like "Here are Pablo's available slots — pick a time that works for you!" The widget already shows all dates and times visually, so your text adds only a brief invitation. If \`checkAvailability\` is not available (Calendly is not configured), call \`renderContactCard\` and suggest emailing Pablo to set up a time.`;
 
 // ---------------------------------------------------------------------------
 // Tool execution functions
@@ -196,7 +206,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const { messages, conversationId } = await req.json();
+    const { messages, conversationId, timezone } = await req.json();
 
     if (!Array.isArray(messages) || messages.length > 50) {
       return new Response("Invalid request", { status: 400 });
@@ -226,10 +236,14 @@ export async function POST(req: Request) {
 
     let collectedOutput = "";
 
+    const systemWithTimezone =
+      SYSTEM_PROMPT +
+      `\n\nThe user's detected timezone is: ${timezone || "America/New_York"}. Always pass this timezone when calling \`checkAvailability\`.`;
+
     const result = streamText({
       model: openai("gpt-4o-mini"),
       messages,
-      system: SYSTEM_PROMPT,
+      system: systemWithTimezone,
       stopWhen: stepCountIs(10),
       tools: {
         // ── Data tool — retrieves context from Pinecone, returns to model ───
@@ -469,6 +483,45 @@ export async function POST(req: Request) {
           }),
           execute: async (args: BlogPostCardProps) => args,
         },
+
+        // ── Calendly scheduling — conditionally registered ────────────────
+        ...(isCalendlyConfigured()
+          ? {
+              checkAvailability: {
+                description:
+                  "Check Pablo's calendar availability and show an interactive time slot picker. Use this when the user wants to schedule a call, book a meeting, or find available times. The tool fetches real availability from Calendly and renders a visual picker widget — do NOT list time slots as text.",
+                inputSchema: jsonSchema<{ timezone?: string }>({
+                  type: "object",
+                  properties: {
+                    timezone: {
+                      type: "string",
+                      description:
+                        "The user's IANA timezone (e.g. 'America/New_York'). Pass the detected timezone from the system prompt.",
+                    },
+                  },
+                }),
+                execute: async (args: { timezone?: string }): Promise<AvailabilityPickerProps> => {
+                  const tz = args.timezone || "America/New_York";
+                  const slots = await fetchAvailableSlots();
+                  if (!slots) {
+                    return {
+                      days: [],
+                      eventTypeUri: "",
+                      timezone: tz,
+                      fallbackUrl:
+                        process.env.CALENDLY_FALLBACK_URL ||
+                        "https://calendly.com/dimeglio-pablo",
+                    };
+                  }
+                  return {
+                    days: groupSlotsByDay(slots, tz),
+                    eventTypeUri: process.env.CALENDLY_EVENT_TYPE_URI!,
+                    timezone: tz,
+                  };
+                },
+              },
+            }
+          : {}),
       },
     });
 
@@ -623,6 +676,19 @@ export async function POST(req: Request) {
                     to: "dimeglio.pablo@gmail.com",
                     subject: "🧠 Guillermo Lead Alert — Contact Card Shown",
                     text: `A visitor triggered the Contact Card.\n\nContext: ${props.context ?? "N/A"}\n\nTime: ${new Date().toISOString()}`,
+                  })
+                  .catch((err) =>
+                    console.error("[Chat API] Resend error:", err)
+                  );
+              }
+              // Send notification when a visitor views scheduling availability
+              if (chunk.toolName === "checkAvailability" && resend) {
+                resend.emails
+                  .send({
+                    from: "guillermo@dimeglio.dev",
+                    to: "dimeglio.pablo@gmail.com",
+                    subject: "📅 Guillermo Lead Alert — Availability Viewed",
+                    text: `A visitor is viewing your calendar availability.\n\nTime: ${new Date().toISOString()}`,
                   })
                   .catch((err) =>
                     console.error("[Chat API] Resend error:", err)

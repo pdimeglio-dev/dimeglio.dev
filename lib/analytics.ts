@@ -123,6 +123,18 @@ export type AnalyticsEvent =
   | {
       event: "error_boundary_displayed";
       properties: { error_message: string; digest?: string };
+    }
+  | {
+      event: "calendly_slot_selected";
+      properties: { slot_time: string; timezone: string; conversation_id?: string };
+    }
+  | {
+      event: "calendly_booking_completed";
+      properties: { conversation_id?: string };
+    }
+  | {
+      event: "calendly_fallback_shown";
+      properties: { reason: "mcp_unavailable" | "booking_failed"; conversation_id?: string };
     };
 
 /**
