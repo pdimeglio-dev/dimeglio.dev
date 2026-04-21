@@ -1,6 +1,89 @@
 # Session Notes — dimeglio.dev Portfolio Build
 
-> Last updated: 2026-04-13 4:42 PM PT
+> Last updated: 2026-04-20
+
+---
+
+## ✅ Completed — Calendly MCP Integration
+
+### What was built
+"Schedule a Call" inside Guillermo's chat. Fetches Pablo's real availability from Calendly via MCP, renders an interactive slot picker inside the chat, and generates a single-use scheduling link when the user picks a time.
+
+```
+ContactCard "Schedule a Call" button
+  → onAction injects message into chat
+  → Guillermo calls checkAvailability tool
+  → lib/calendly-mcp.ts connects to mcp.calendly.com (StreamableHTTP + OAuth 2.1)
+  → Calls event_types-list_event_type_available_times (7-day window)
+  → AvailabilityPicker widget renders in chat (day pills + time grid)
+  → User selects a slot → POST /api/schedule
+  → calls scheduling_links-create_single_use_scheduling_link via MCP
+  → Opens Calendly with ?date= param on the single-use link
+```
+
+### Key files
+- `scripts/calendly-auth.mjs` — One-time OAuth 2.1 setup (DCR + PKCE, stores tokens in Redis)
+- `lib/calendly-mcp.ts` — MCP client, token management (with Redis lock), slot fetching, link creation
+- `app/api/schedule/route.ts` — Rate-limited booking endpoint
+- `components/chat/availability-picker.tsx` — State machine: selecting → booking → booked | fallback
+- `lib/chat-widgets.ts` — `DayGroup`, `AvailabilityPickerProps`
+
+### Env vars
+```
+CALENDLY_EVENT_TYPE_URI=https://api.calendly.com/event_types/XXXX
+CALENDLY_FALLBACK_URL=https://calendly.com/dimeglio-pablo/30min
+```
+Tokens stored in Redis: `calendly:tokens`, `calendly:client_info`
+
+---
+
+### Blog material — what actually happened
+
+#### What worked well
+- Calendly's MCP server at `https://mcp.calendly.com` is a proper remote MCP server using Streamable HTTP transport — drop-in with `@modelcontextprotocol/sdk`
+- OAuth 2.1 with PKCE + Dynamic Client Registration (DCR) — no pre-registered app ID needed, the client registers itself at auth time
+- Tokens stored in Upstash Redis: both local dev and Vercel production share the same token — zero extra config for deployment
+- Redis optimistic locking (`SET NX EX`) to handle concurrent token refresh races in serverless
+- `checkAvailability` as a hybrid tool: fetches MCP data AND emits the widget — the LLM never sees raw slot data
+- Booking bypasses the LLM entirely: AvailabilityPicker POSTs directly to `/api/schedule` (same pattern as ContactForm → `/api/contact`)
+
+#### Surprises and gotchas
+
+**OAuth scopes are completely separate from REST API scopes.**
+The MCP token uses `mcp:scheduling:read mcp:scheduling:write`. These don't overlap with Calendly's REST API scopes (`event_types:read`, etc.). You can't use the MCP token to hit REST endpoints — you have to use MCP tools for everything.
+
+**Dynamic Client Registration returns a `client_id` but no `client_secret`.**
+Calendly registers you as a public client (no secret). The DCR response includes `client_id` and optional metadata — store it all because you need it for token refresh.
+
+**`discoverOAuthMetadata` was deprecated.**
+The MCP SDK deprecated it in favor of `discoverAuthorizationServerMetadata`. Same behavior, just a rename — but worth knowing if you copy examples from older docs.
+
+**Availability window is capped at 7 days, not 14.**
+`event_types-list_event_type_available_times` returns a 400 if `end_time - start_time > 7 days`. Also: `start_time` must be strictly in the future — passing `new Date().toISOString()` fails because it's already in the past by the time the request arrives. Add a 5-minute buffer.
+
+**The scheduling link tool requires a nested wrapper argument.**
+`scheduling_links-create_single_use_scheduling_link` expects:
+```json
+{ "create_scheduling_link_request": { "max_event_count": 1, "owner": "...", "owner_type": "EventType" } }
+```
+Not flat top-level fields. The error is a Pydantic validation error, not an MCP error — easy to misread.
+
+**`@upstash/redis` and JSON double-encoding.**
+The auth script used the raw Upstash REST API with `JSON.stringify(JSON.stringify(value))` — this double-encodes the token. `@upstash/redis`'s `get()` parses one level, returning a string. The fix: check `typeof raw === "string"` and parse again. After the first automatic token refresh, tokens are re-written correctly by `@upstash/redis`'s native `.set()`.
+
+#### What Calendly MCP can't do (the honest part)
+
+**No time pre-selection on single-use links via URL.**
+Calendly's single-use links (`/d/xxxx`) don't support pre-navigating to a specific time via URL parameters or path-based timestamps. `?date=YYYY-MM-DD` pre-selects the date (works). `?time=HH:MM` is silently ignored. Path-based ISO timestamps (`/d/xxxx/2026-04-21T09:00:00-07:00`) are also ignored. The user must click the time again on Calendly. This is a Calendly limitation, not an MCP limitation.
+
+**No direct booking (create_invitee) on the free plan.**
+The free plan doesn't expose `create_invitee` — you can't book on behalf of the user. The single-use link approach is the workaround: MCP creates a link, user completes booking on Calendly.
+
+**The slot is not held.**
+Selecting a time and clicking "Complete Booking on Calendly" doesn't reserve the slot. It generates a single-use link for the event type — another user could book the same time in the window between clicks. The single-use property means the link itself can only be used once, not that the slot is reserved.
+
+#### The 4o-mini prompt quirk
+The system prompt originally had `"do NOT describe time slots as text"` — and 4o-mini dutifully listed every time slot as text in its response. Negative constraints are read as templates. The fix: positive prescription — "Your text response must be exactly one short sentence like '...'"
 
 ---
 

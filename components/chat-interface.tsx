@@ -11,6 +11,7 @@ import { ContactCard } from "@/components/chat/contact-card";
 import { ProjectCard } from "@/components/chat/project-card";
 import { ProjectList } from "@/components/chat/project-list";
 import { BlogPostCard } from "@/components/chat/blog-post-card";
+import { AvailabilityPicker } from "@/components/chat/availability-picker";
 import { trackEvent, captureError } from "@/lib/analytics";
 import type {
   GuillermoChunk,
@@ -149,6 +150,8 @@ function BlockRenderer({
         return <ProjectList key={index} {...block.props} />;
       case "BlogPostCard":
         return <BlogPostCard key={index} {...block.props} />;
+      case "AvailabilityPicker":
+        return <AvailabilityPicker key={index} {...block.props} />;
     }
   }
 
@@ -291,11 +294,13 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
       setMessages((prev) => [...prev, assistantMessage]);
 
       try {
+        const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             conversationId: conversationIdRef.current,
+            timezone: detectedTimezone,
             messages: [...messages, userMessage].map((m) => {
               if (m.role !== "assistant") return { role: m.role, content: m.content };
               const hasWidget = m.blocks.some((b) => b.type === "widget");
