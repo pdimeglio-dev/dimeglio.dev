@@ -1,60 +1,33 @@
 /**
- * Calendly MCP Client
+ * Calendly Integration
  *
- * Connects to Calendly's remote MCP server (https://mcp.calendly.com) via
- * Streamable HTTP transport to fetch calendar availability and create
- * single-use scheduling links.
+ * Fetches calendar availability and creates single-use scheduling links
+ * via the Calendly REST API using a Personal Access Token.
  *
- * OAuth tokens are stored in Upstash Redis (same instance used for rate
- * limiting). Pablo authorises once via `npm run calendly-auth`; the server
- * refreshes tokens automatically at runtime.
+ * The OAuth/MCP token flow (stored in Redis via `npm run calendly-auth`)
+ * uses mcp:scheduling:* scopes which are siloed from the REST API.
+ * Until Guillermo moves to a dedicated long-running service where MCP
+ * transport works reliably, the REST API + PAT is the production path.
+ *
+ * MCP client code is preserved below (unused) for the future migration.
  */
 
 import { Client } from "@modelcontextprotocol/sdk/client";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import { refreshAuthorization, discoverAuthorizationServerMetadata } from "@modelcontextprotocol/sdk/client/auth.js";
-import type { OAuthTokens, OAuthClientInformation } from "@modelcontextprotocol/sdk/shared/auth.js";
-import { Redis } from "@upstash/redis";
 import { captureServerError } from "@/lib/posthog-server";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
+const CALENDLY_API_BASE = "https://api.calendly.com";
 const CALENDLY_MCP_URL = "https://mcp.calendly.com";
-const CALENDLY_AUTH_SERVER_URL = "https://auth.calendly.com";
 
-const REDIS_KEY_TOKENS = "calendly:tokens";
-const REDIS_KEY_CLIENT_INFO = "calendly:client_info";
-const REDIS_KEY_LOCK = "calendly:tokens:lock";
-
-/** Buffer before expiry to trigger a proactive refresh (60 s). */
-const EXPIRY_BUFFER_MS = 60_000;
+/** Hard timeout for REST API calls (ms). */
+const API_TIMEOUT_MS = 8_000;
 
 /** Hard timeout for a single MCP tool call (ms). */
 const MCP_TIMEOUT_MS = 8_000;
-
-// ---------------------------------------------------------------------------
-// Stored token shape (extends OAuthTokens with a timestamp)
-// ---------------------------------------------------------------------------
-
-interface StoredTokens extends OAuthTokens {
-  obtained_at: number; // Date.now() when tokens were saved
-}
-
-// ---------------------------------------------------------------------------
-// Lazy Redis client (fail-open when env vars are absent)
-// ---------------------------------------------------------------------------
-
-let _redis: Redis | null = null;
-function getRedis(): Redis | null {
-  if (_redis) return _redis;
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-  _redis = new Redis({ url, token });
-  return _redis;
-}
 
 // ---------------------------------------------------------------------------
 // Public: feature flag
@@ -62,208 +35,35 @@ function getRedis(): Redis | null {
 
 /**
  * Returns `true` when the Calendly integration has a chance of working:
- * Redis env vars exist AND the event type URI is configured.
+ * a Personal Access Token and event type URI are configured.
  */
 export function isCalendlyConfigured(): boolean {
   return !!(
-    process.env.UPSTASH_REDIS_REST_URL &&
-    process.env.UPSTASH_REDIS_REST_TOKEN &&
+    process.env.CALENDLY_API_TOKEN &&
     process.env.CALENDLY_EVENT_TYPE_URI
   );
 }
 
 // ---------------------------------------------------------------------------
-// Token management
+// REST API helpers
 // ---------------------------------------------------------------------------
 
-async function readTokens(): Promise<StoredTokens | null> {
-  const redis = getRedis();
-  if (!redis) return null;
-  try {
-    const raw = await redis.get<StoredTokens | string>(REDIS_KEY_TOKENS);
-    if (!raw) return null;
-    // The auth script may have double-encoded the value (stored as a JSON string
-    // of a JSON string). @upstash/redis parses one level — parse again if needed.
-    if (typeof raw === "string") {
-      try {
-        return JSON.parse(raw) as StoredTokens;
-      } catch {
-        return null;
-      }
-    }
-    return raw;
-  } catch {
-    return null;
-  }
-}
+async function calendlyFetch(
+  path: string,
+  options?: RequestInit
+): Promise<Response> {
+  const token = process.env.CALENDLY_API_TOKEN;
+  if (!token) throw new Error("CALENDLY_API_TOKEN is not set");
 
-async function writeTokens(tokens: StoredTokens): Promise<void> {
-  const redis = getRedis();
-  if (!redis) return;
-  await redis.set(REDIS_KEY_TOKENS, tokens);
-}
-
-async function readClientInfo(): Promise<OAuthClientInformation | null> {
-  const redis = getRedis();
-  if (!redis) return null;
-  try {
-    const raw = await redis.get<OAuthClientInformation | string>(REDIS_KEY_CLIENT_INFO);
-    if (!raw) return null;
-    if (typeof raw === "string") {
-      try {
-        return JSON.parse(raw) as OAuthClientInformation;
-      } catch {
-        return null;
-      }
-    }
-    return raw;
-  } catch {
-    return null;
-  }
-}
-
-function isExpired(tokens: StoredTokens): boolean {
-  if (!tokens.expires_in) return false; // no expiry info → assume valid
-  const expiresAt = tokens.obtained_at + tokens.expires_in * 1000;
-  return Date.now() >= expiresAt - EXPIRY_BUFFER_MS;
-}
-
-/**
- * Returns a valid access token, refreshing if necessary.
- * Uses a Redis lock to prevent concurrent refresh races.
- */
-async function getValidAccessToken(): Promise<string | null> {
-  const tokens = await readTokens();
-  if (!tokens) {
-    captureServerError(new Error("Calendly tokens missing from Redis — run npm run calendly-auth"), { route: "calendly-mcp", phase: "read-tokens" });
-    return null;
-  }
-
-  // Token is still fresh
-  if (!isExpired(tokens)) return tokens.access_token;
-
-  // Need refresh — try to acquire lock
-  if (!tokens.refresh_token) return null;
-
-  const redis = getRedis();
-  if (!redis) return null;
-
-  const lockAcquired = await redis.set(REDIS_KEY_LOCK, "1", { nx: true, ex: 10 });
-
-  if (!lockAcquired) {
-    // Another request is refreshing — wait briefly and read the updated token
-    await new Promise((r) => setTimeout(r, 2000));
-    const refreshed = await readTokens();
-    return refreshed?.access_token ?? null;
-  }
-
-  try {
-    const clientInfo = await readClientInfo();
-    if (!clientInfo) return null;
-
-    // Discover auth server metadata for the refresh endpoint
-    const metadata = await discoverAuthorizationServerMetadata(CALENDLY_AUTH_SERVER_URL).catch(() => undefined);
-
-    const newTokens = await refreshAuthorization(CALENDLY_AUTH_SERVER_URL, {
-      metadata,
-      clientInformation: clientInfo,
-      refreshToken: tokens.refresh_token,
-    });
-
-    const stored: StoredTokens = {
-      ...newTokens,
-      // Preserve refresh token if the server didn't issue a new one
-      refresh_token: newTokens.refresh_token ?? tokens.refresh_token,
-      obtained_at: Date.now(),
-    };
-    await writeTokens(stored);
-    return stored.access_token;
-  } catch (err) {
-    captureServerError(err, { route: "calendly-mcp", phase: "token-refresh" });
-    return null;
-  } finally {
-    await redis.del(REDIS_KEY_LOCK).catch(() => {});
-  }
-}
-
-// ---------------------------------------------------------------------------
-// MCP tool call helper
-// ---------------------------------------------------------------------------
-
-/**
- * Opens a fresh MCP connection, calls a single tool, and disconnects.
- * Each invocation is independent — suitable for Vercel serverless.
- *
- * The SDK's StreamableHTTPClientTransport overwrites any `signal` we pass
- * in `requestInit` with its own internal AbortController, so we can't
- * rely on AbortSignal for timeouts. Instead we use Promise.race() to
- * enforce a hard deadline and call client.close() to tear down the
- * transport if it's still hanging.
- */
-async function callCalendlyMCP(
-  toolName: string,
-  args: Record<string, unknown>
-): Promise<unknown | null> {
-  const accessToken = await getValidAccessToken();
-  if (!accessToken) return null;
-
-  const transport = new StreamableHTTPClientTransport(
-    new URL(CALENDLY_MCP_URL),
-    {
-      requestInit: {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-    }
-  );
-
-  const client = new Client(
-    { name: "dimeglio-dev-guillermo", version: "1.0.0" },
-    { capabilities: {} }
-  );
-
-  try {
-    const result = await Promise.race([
-      (async () => {
-        await client.connect(transport);
-        return client.callTool({ name: toolName, arguments: args });
-      })(),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`Calendly MCP timeout after ${MCP_TIMEOUT_MS}ms`)),
-          MCP_TIMEOUT_MS
-        )
-      ),
-    ]);
-
-    if (result.isError) {
-      console.error(`[Calendly MCP] Tool ${toolName} returned error:`, result.content);
-      return null;
-    }
-
-    // Extract text content from result — cast content to the expected shape
-    const content = result.content as Array<{ type: string; text?: string }>;
-    const textParts = content
-      .filter((c): c is { type: "text"; text: string } => c.type === "text" && typeof c.text === "string")
-      .map((c) => c.text);
-
-    if (textParts.length === 0) return null;
-
-    // Try parsing as JSON (most Calendly tools return JSON)
-    try {
-      return JSON.parse(textParts.join(""));
-    } catch {
-      return textParts.join("");
-    }
-  } catch (err) {
-    captureServerError(err, { route: "calendly-mcp", phase: "tool-call", toolName });
-    return null;
-  } finally {
-    try {
-      await client.close();
-    } catch {
-      // Transport may already be closed
-    }
-  }
+  return fetch(`${CALENDLY_API_BASE}${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -282,34 +82,43 @@ export async function fetchAvailableSlots(): Promise<AvailabilitySlot[] | null> 
   // timestamp is unambiguously in the future when the request arrives.
   const startDate = new Date(Date.now() + 5 * 60 * 1000);
   const endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const startTime = startDate.toISOString();
-  const endTime = endDate.toISOString();
 
-  const result = await callCalendlyMCP(
-    "event_types-list_event_type_available_times",
-    {
-      event_type: eventTypeUri,
-      start_time: startTime,
-      end_time: endTime,
+  const params = new URLSearchParams({
+    event_type: eventTypeUri,
+    start_time: startDate.toISOString(),
+    end_time: endDate.toISOString(),
+  });
+
+  try {
+    const res = await calendlyFetch(`/event_type_available_times?${params}`);
+
+    if (!res.ok) {
+      console.error(`[Calendly] Available times API returned ${res.status}`);
+      captureServerError(new Error(`Calendly API ${res.status}`), {
+        route: "calendly",
+        phase: "fetch-available-times",
+      });
+      return null;
     }
-  );
 
-  if (!result || typeof result !== "object") return null;
+    // Calendly returns { collection: [{ status: "available", start_time: "...", invitees_remaining: N }] }
+    const data = (await res.json()) as {
+      collection?: Array<{
+        status: string;
+        start_time: string;
+        invitees_remaining?: number;
+      }>;
+    };
 
-  // Calendly returns { collection: [{ status: "available", start_time: "...", invitees_remaining: N }] }
-  const data = result as {
-    collection?: Array<{
-      status: string;
-      start_time: string;
-      invitees_remaining?: number;
-    }>;
-  };
+    if (!data.collection || !Array.isArray(data.collection)) return null;
 
-  if (!data.collection || !Array.isArray(data.collection)) return null;
-
-  return data.collection
-    .filter((slot) => slot.status === "available")
-    .map((slot) => ({ startTime: slot.start_time }));
+    return data.collection
+      .filter((slot) => slot.status === "available")
+      .map((slot) => ({ startTime: slot.start_time }));
+  } catch (err) {
+    captureServerError(err, { route: "calendly", phase: "fetch-available-times" });
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -320,25 +129,35 @@ export async function createSchedulingLink(): Promise<string | null> {
   const eventTypeUri = process.env.CALENDLY_EVENT_TYPE_URI;
   if (!eventTypeUri) return null;
 
-  const result = await callCalendlyMCP(
-    "scheduling_links-create_single_use_scheduling_link",
-    {
-      create_scheduling_link_request: {
+  try {
+    const res = await calendlyFetch("/scheduling_links", {
+      method: "POST",
+      body: JSON.stringify({
         max_event_count: 1,
         owner: eventTypeUri,
         owner_type: "EventType",
-      },
+      }),
+    });
+
+    if (!res.ok) {
+      console.error(`[Calendly] Scheduling link API returned ${res.status}`);
+      captureServerError(new Error(`Calendly API ${res.status}`), {
+        route: "calendly",
+        phase: "create-scheduling-link",
+      });
+      return null;
     }
-  );
 
-  if (!result || typeof result !== "object") return null;
+    const data = (await res.json()) as {
+      resource?: { booking_url?: string };
+      booking_url?: string;
+    };
 
-  const data = result as {
-    resource?: { booking_url?: string };
-    booking_url?: string;
-  };
-
-  return data.resource?.booking_url ?? data.booking_url ?? null;
+    return data.resource?.booking_url ?? data.booking_url ?? null;
+  } catch (err) {
+    captureServerError(err, { route: "calendly", phase: "create-scheduling-link" });
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -386,4 +205,81 @@ export function groupSlotsByDay(
       ),
     };
   });
+}
+
+// ---------------------------------------------------------------------------
+// MCP tool call helper (UNUSED — preserved for future dedicated service)
+// ---------------------------------------------------------------------------
+// The Calendly MCP server (mcp.calendly.com) uses StreamableHTTP transport.
+// This works locally but hangs on Vercel serverless due to:
+//   1. The SDK's StreamableHTTPClientTransport overwrites AbortSignal
+//   2. SSE streams don't flush reliably through Vercel's network layer
+//   3. MCP OAuth tokens (mcp:scheduling:*) are siloed from REST API scopes
+//
+// When Guillermo moves to a long-running service (Railway/Fly.io), swap
+// fetchAvailableSlots/createSchedulingLink back to callCalendlyMCP().
+// The OAuth tokens in Redis (via `npm run calendly-auth`) are still valid.
+// ---------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function callCalendlyMCP(
+  toolName: string,
+  args: Record<string, unknown>,
+  accessToken: string
+): Promise<unknown | null> {
+  const transport = new StreamableHTTPClientTransport(
+    new URL(CALENDLY_MCP_URL),
+    {
+      requestInit: {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    }
+  );
+
+  const client = new Client(
+    { name: "dimeglio-dev-guillermo", version: "1.0.0" },
+    { capabilities: {} }
+  );
+
+  try {
+    const result = await Promise.race([
+      (async () => {
+        await client.connect(transport);
+        return client.callTool({ name: toolName, arguments: args });
+      })(),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`Calendly MCP timeout after ${MCP_TIMEOUT_MS}ms`)),
+          MCP_TIMEOUT_MS
+        )
+      ),
+    ]);
+
+    if (result.isError) {
+      console.error(`[Calendly MCP] Tool ${toolName} returned error:`, result.content);
+      return null;
+    }
+
+    const content = result.content as Array<{ type: string; text?: string }>;
+    const textParts = content
+      .filter((c): c is { type: "text"; text: string } => c.type === "text" && typeof c.text === "string")
+      .map((c) => c.text);
+
+    if (textParts.length === 0) return null;
+
+    try {
+      return JSON.parse(textParts.join(""));
+    } catch {
+      return textParts.join("");
+    }
+  } catch (err) {
+    captureServerError(err, { route: "calendly-mcp", phase: "tool-call", toolName });
+    return null;
+  } finally {
+    try {
+      await client.close();
+    } catch {
+      // Transport may already be closed
+    }
+  }
 }
