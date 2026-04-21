@@ -1,8 +1,8 @@
 ---
 title: "MCP in Production: Giving My AI Agent Real Scheduling Powers"
-description: "How I connected my portfolio's AI chat agent to Calendly's remote MCP server for real-time availability and booking, and where the standard MCP flow broke down."
+description: "How I built a scheduling agent on Calendly's remote MCP server, watched it 504 on Vercel, and shipped a REST API instead."
 date: "2026-04-20"
-tags: ["mcp", "ai", "calendly", "nextjs", "oauth", "architecture"]
+tags: ["mcp", "ai", "calendly", "nextjs", "oauth", "architecture", "vercel"]
 coverImage: "/blog/mcp-in-production-scheduling/cover.jpg"
 coverAlt: "Diagram showing an AI chat agent connected to Calendly via the MCP protocol, with arrows indicating the flow from user message to calendar availability"
 published: false
@@ -12,7 +12,7 @@ Guillermo had a contact card with three buttons. Two of them worked. "Email Pabl
 
 The obvious fix was Calendly's REST API or their embed widget. But then I noticed something: Calendly has a remote MCP server at `mcp.calendly.com`. Not a local server you run in your terminal. A real, hosted remote server using Streamable HTTP transport.
 
-I'd been using MCP in dev tools (Claude Desktop, Cursor) but never in a production web app. This felt like a chance to try something different and actually build with the protocol, not just consume it through an IDE.
+I'd been using MCP in dev tools (Claude Desktop, Cursor) but never in a production web app. This felt like a chance to try something different and actually build with the protocol, not just consume it through an IDE. It worked. Then I deployed it.
 
 ## MCP in 30 seconds
 
@@ -29,6 +29,8 @@ The standard MCP flow looks like this: connect to the server, call `listTools()`
 That's the textbook version. Here's what I actually built.
 
 ## The architecture
+
+Here's what I built, and what ran fine on my laptop.
 
 The flow has two distinct layers that are easy to conflate. Making them explicit is the single most important thing for understanding what's happening:
 
@@ -173,7 +175,7 @@ async function handleSlotClick(startTime: string) {
     body: JSON.stringify({ startTime, timezone }),
   });
   const data = await res.json();
-  // data.url = single-use Calendly scheduling link (from MCP)
+  // data.url = single-use Calendly scheduling link
   setBookingUrl(buildCalendlyUrl(data.url, startTime, timezone));
 }
 ```
@@ -222,12 +224,43 @@ Small models treat negative constraints as templates. Tell them "don't list time
 
 This pairs with the `listTools` deviation above. Even if we'd passed raw slot data through MCP to the LLM, we'd still have needed to solve the prompt problem. The widget approach sidesteps both issues at once.
 
+## Then Vercel happened
+
+Locally: everything worked. The MCP connection established, tokens refreshed, slots came back, booking links generated. Fast enough that I thought I was done.
+
+First production request: 504.
+
+Every time Guillermo checked availability on Vercel, the function timed out. The `StreamableHTTPClientTransport` connects to `mcp.calendly.com`, negotiates the HTTP session, authenticates, and then actually calls the tool. On a local server with no time pressure, that chain completes fine. On a Vercel serverless function with a hard execution deadline, it doesn't. The function gets killed mid-handshake.
+
+I tried reducing internal timeouts, calling the Calendly connection earlier in the request lifecycle, different connection patterns. None of it helped. The underlying issue is structural: Streamable HTTP transport assumes a long-lived process. Serverless functions are the opposite of that.
+
+So the MCP layer came out.
+
+## What actually shipped
+
+Calendly has a REST API. It accepts a Personal Access Token in an Authorization header. No OAuth dance, no Redis, no token refresh, no optimistic locking. Just an env var:
+
+```typescript
+fetch(`https://api.calendly.com/event_type_available_times?${params}`, {
+  headers: { Authorization: `Bearer ${process.env.CALENDLY_API_TOKEN}` },
+  signal: AbortSignal.timeout(8_000),
+});
+```
+
+Two endpoints cover everything: `GET /event_type_available_times` for availability, `POST /scheduling_links` for booking. Both respond well within Vercel's function timeout.
+
+From the LLM's perspective, nothing changed. The AI SDK tool signatures are identical. The widget, the booking flow, the prompt work -- none of that moved. What changed was the ~200 lines of MCP infrastructure (OAuth 2.1, PKCE, Dynamic Client Registration, Redis token storage, the auth script) becoming about 30 lines of fetch calls.
+
+The MCP code is still there, commented out, with a note: "Until Guillermo moves to a dedicated long-running service where MCP transport works reliably, the REST API + PAT is the production path."
+
 ## What I'd tell someone building with MCP in production
 
-MCP worked for this. The OAuth + transport + tool calling layer is solid. The `@modelcontextprotocol/sdk` made the connection to `mcp.calendly.com` straightforward. Token refresh, PKCE, Streamable HTTP transport: it all works as documented.
+Remote MCP servers are real and the protocol works. OAuth 2.1 with Dynamic Client Registration is well-specced. The `@modelcontextprotocol/sdk` is solid. The `callTool` API is clean. None of that is the problem.
 
-But "MCP in production" means making architectural trade-offs the protocol spec doesn't cover. Where does the LLM boundary sit? Do you pass tools through dynamically or hardcode them? How do you handle visual rendering when the protocol is designed for text? Those are the questions I spent most of my time on. Not the MCP parts.
+The problem is serverless. Streamable HTTP transport needs a process that can hold a connection open long enough to do the full auth and call sequence. Vercel functions don't guarantee that. If you're evaluating MCP for a serverless deployment, test the transport under real production conditions -- not just locally -- before you commit to the architecture.
 
-The "Schedule a Call" button works now. It took about a day, and most of that was fighting Calendly's URL parameters, not MCP.
+The bridge pattern (AI SDK tool wrapping an MCP call) still makes sense in principle. And the widget-over-raw-data approach is worth doing regardless of what's underneath. Those hold up.
 
-If you want to see the whole thing in action — or just want to talk shop about MCP, AI agents, or anything else — head to the [homepage](/) and ask Guillermo to schedule a call. He knows how to block my calendar now.
+What actually shipped: two REST calls, one env var, one abort timeout. The "Schedule a Call" button works now. It didn't need MCP. But now I know what breaks when you try.
+
+If you want to see it -- or just talk about MCP, serverless constraints, or AI agents -- head to the [homepage](/) and ask Guillermo to schedule a call.
