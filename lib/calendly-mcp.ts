@@ -31,6 +31,9 @@ const REDIS_KEY_LOCK = "calendly:tokens:lock";
 /** Buffer before expiry to trigger a proactive refresh (60 s). */
 const EXPIRY_BUFFER_MS = 60_000;
 
+/** Hard timeout for a single MCP tool call (ms). */
+const MCP_TIMEOUT_MS = 8_000;
+
 // ---------------------------------------------------------------------------
 // Stored token shape (extends OAuthTokens with a timestamp)
 // ---------------------------------------------------------------------------
@@ -190,6 +193,8 @@ async function getValidAccessToken(): Promise<string | null> {
 /**
  * Opens a fresh MCP connection, calls a single tool, and disconnects.
  * Each invocation is independent — suitable for Vercel serverless.
+ * An AbortController enforces a hard timeout so a hung MCP server
+ * never blocks the chat response stream.
  */
 async function callCalendlyMCP(
   toolName: string,
@@ -198,11 +203,16 @@ async function callCalendlyMCP(
   const accessToken = await getValidAccessToken();
   if (!accessToken) return null;
 
+  // Abort any in-flight HTTP requests if the MCP server hangs.
+  const abort = new AbortController();
+  const timeoutId = setTimeout(() => abort.abort(new Error(`Calendly MCP timeout after ${MCP_TIMEOUT_MS}ms`)), MCP_TIMEOUT_MS);
+
   const transport = new StreamableHTTPClientTransport(
     new URL(CALENDLY_MCP_URL),
     {
       requestInit: {
         headers: { Authorization: `Bearer ${accessToken}` },
+        signal: abort.signal,
       },
     }
   );
@@ -239,6 +249,7 @@ async function callCalendlyMCP(
     captureServerError(err, { route: "calendly-mcp", phase: "tool-call", toolName });
     return null;
   } finally {
+    clearTimeout(timeoutId);
     try {
       await client.close();
     } catch {
