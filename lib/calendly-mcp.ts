@@ -193,8 +193,12 @@ async function getValidAccessToken(): Promise<string | null> {
 /**
  * Opens a fresh MCP connection, calls a single tool, and disconnects.
  * Each invocation is independent — suitable for Vercel serverless.
- * An AbortController enforces a hard timeout so a hung MCP server
- * never blocks the chat response stream.
+ *
+ * The SDK's StreamableHTTPClientTransport overwrites any `signal` we pass
+ * in `requestInit` with its own internal AbortController, so we can't
+ * rely on AbortSignal for timeouts. Instead we use Promise.race() to
+ * enforce a hard deadline and call client.close() to tear down the
+ * transport if it's still hanging.
  */
 async function callCalendlyMCP(
   toolName: string,
@@ -203,16 +207,11 @@ async function callCalendlyMCP(
   const accessToken = await getValidAccessToken();
   if (!accessToken) return null;
 
-  // Abort any in-flight HTTP requests if the MCP server hangs.
-  const abort = new AbortController();
-  const timeoutId = setTimeout(() => abort.abort(new Error(`Calendly MCP timeout after ${MCP_TIMEOUT_MS}ms`)), MCP_TIMEOUT_MS);
-
   const transport = new StreamableHTTPClientTransport(
     new URL(CALENDLY_MCP_URL),
     {
       requestInit: {
         headers: { Authorization: `Bearer ${accessToken}` },
-        signal: abort.signal,
       },
     }
   );
@@ -223,8 +222,18 @@ async function callCalendlyMCP(
   );
 
   try {
-    await client.connect(transport);
-    const result = await client.callTool({ name: toolName, arguments: args });
+    const result = await Promise.race([
+      (async () => {
+        await client.connect(transport);
+        return client.callTool({ name: toolName, arguments: args });
+      })(),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`Calendly MCP timeout after ${MCP_TIMEOUT_MS}ms`)),
+          MCP_TIMEOUT_MS
+        )
+      ),
+    ]);
 
     if (result.isError) {
       console.error(`[Calendly MCP] Tool ${toolName} returned error:`, result.content);
@@ -249,7 +258,6 @@ async function callCalendlyMCP(
     captureServerError(err, { route: "calendly-mcp", phase: "tool-call", toolName });
     return null;
   } finally {
-    clearTimeout(timeoutId);
     try {
       await client.close();
     } catch {
