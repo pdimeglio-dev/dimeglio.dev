@@ -4,111 +4,65 @@
 
 ---
 
-## ✅ Completed — Calendly MCP Integration
+## ✅ Completed — Calendly Scheduling Integration
 
 ### What was built
-"Schedule a Call" inside Guillermo's chat. Fetches Pablo's real availability from Calendly via MCP, renders an interactive slot picker inside the chat, and generates a single-use scheduling link when the user picks a time.
+"Schedule a Call" inside Guillermo's chat. Fetches Pablo's real availability from Calendly, renders an interactive slot picker inside the chat, and generates a single-use scheduling link when the user picks a time.
 
 ```
 ContactCard "Schedule a Call" button
   → onAction injects message into chat
   → Guillermo calls checkAvailability tool
-  → lib/calendly-mcp.ts connects to mcp.calendly.com (StreamableHTTP + OAuth 2.1)
-  → Calls event_types-list_event_type_available_times (7-day window)
+  → lib/calendly-mcp.ts calls Calendly REST API (api.calendly.com)
   → AvailabilityPicker widget renders in chat (day pills + time grid)
   → User selects a slot → POST /api/schedule
-  → calls scheduling_links-create_single_use_scheduling_link via MCP
+  → calls POST /scheduling_links via REST API
   → Opens Calendly with ?date= param on the single-use link
 ```
 
 ### Key files
-- `scripts/calendly-auth.mjs` — One-time OAuth 2.1 setup (DCR + PKCE, stores tokens in Redis)
-- `lib/calendly-mcp.ts` — MCP client, token management (with Redis lock), slot fetching, link creation
+- `scripts/calendly-auth.mjs` — OAuth 2.1 setup for MCP tokens (preserved for future dedicated agent service)
+- `lib/calendly-mcp.ts` — REST API calls for availability + scheduling links; MCP client code preserved but unused
 - `app/api/schedule/route.ts` — Rate-limited booking endpoint
 - `components/chat/availability-picker.tsx` — State machine: selecting → booking → booked | fallback
 - `lib/chat-widgets.ts` — `DayGroup`, `AvailabilityPickerProps`
 
 ### Env vars
 ```
+CALENDLY_API_TOKEN=your_personal_access_token
 CALENDLY_EVENT_TYPE_URI=https://api.calendly.com/event_types/XXXX
 CALENDLY_FALLBACK_URL=https://calendly.com/dimeglio-pablo/30min
 ```
-Tokens stored in Redis: `calendly:tokens`, `calendly:client_info`
+MCP OAuth tokens still in Redis (`calendly:tokens`, `calendly:client_info`) for future use.
+
+### Why REST instead of MCP
+The original implementation used Calendly's remote MCP server (`mcp.calendly.com`) via
+StreamableHTTP transport. This worked locally but 504'd on Vercel serverless because:
+1. The SDK's `StreamableHTTPClientTransport` overwrites `AbortSignal` with its own internal controller — no way to enforce a timeout
+2. SSE streams (used by Streamable HTTP) don't flush reliably through Vercel's network layer
+3. MCP OAuth scopes (`mcp:scheduling:*`) are siloed from REST API scopes — can't reuse tokens
+
+MCP code is preserved in `lib/calendly-mcp.ts` for when Guillermo moves to a dedicated
+long-running service (Railway/Fly.io) where MCP transport works reliably.
 
 ---
 
-### Blog material — what actually happened
+### Blog material — parked (MCP post unpublished)
 
-#### Post structure idea
-1. **Brief MCP intro** — what it is, local vs remote servers, Streamable HTTP transport, why it matters beyond dev tooling
-2. **The implementation** — walk through the actual flow with code snippets (see below)
-3. **Where the standard MCP flow broke down** — honest section on workarounds (see deviations below)
+The MCP blog post (`content/blog/mcp-in-production-scheduling.mdx`) is `published: false`.
+We didn't ship MCP in production — the Calendly MCP server hangs on Vercel serverless
+(StreamableHTTP + SSE transport issues). Production uses REST API + Personal Access Token.
 
----
+The MCP approach is the right one for a dedicated agent service. When Guillermo moves off
+Vercel serverless, revisit the blog post and update it with the full story (including why
+MCP failed on serverless and what the migration looked like).
 
-#### The actual flow (for the code walkthrough section)
+#### Calendly gotchas worth keeping (apply to REST too)
 
-The flow has two layers that are easy to conflate — make this explicit in the post:
-
-**Layer 1 — AI SDK (tool dispatch)**
-The LLM calls `checkAvailability`. This is an AI SDK tool with an `execute()` function. The LLM doesn't know about MCP at all. `execute()` is just a TypeScript function as far as the AI SDK is concerned.
-
-**Layer 2 — MCP (transport + auth)**
-Inside `execute()`, `fetchAvailableSlots()` opens a `StreamableHTTPClientTransport` connection to `mcp.calendly.com` and calls an MCP tool. This is the actual MCP interaction.
-
-They look like two steps but they're nested — step 3 in the flow IS step 4:
-```
-LLM calls checkAvailability          ← AI SDK layer
-  └── execute() runs
-        └── fetchAvailableSlots()    ← MCP layer starts here
-              └── callCalendlyMCP("event_types-list_event_type_available_times")
-                    └── StreamableHTTPClientTransport → mcp.calendly.com
-```
-
-Same nesting on the booking side:
-```
-User clicks slot in widget           ← no LLM involved at all
-  └── POST /api/schedule
-        └── createSchedulingLink()   ← MCP layer
-              └── callCalendlyMCP("scheduling_links-create_single_use_scheduling_link")
-```
-
-**Key point for the post:** the LLM is only involved in deciding to call `checkAvailability` and writing one sentence of text. Everything else — auth, slot fetching, link creation, widget rendering — happens outside the LLM.
-
----
-
-#### Where the standard MCP flow broke down (workarounds section)
-
-**1. We're not using `listTools` — intentional deviation.**
-Standard MCP: call `client.listTools()` → get the server's full tool catalog → pass tools to the LLM → LLM calls them directly. We skip all of that. We hardcode the two tool names and call them manually from AI SDK `execute()` functions.
-
-*Why:* If we passed MCP tools through to the LLM, Calendly's raw JSON slot data would reach the model. The model would describe every time slot as text. We needed the slots to render as a visual widget, not prose. So MCP handles transport + auth; the AI SDK handles dispatch.
-
-*The bridge pattern:* `AI SDK tool execute()` → `callCalendlyMCP()` → `StreamableHTTPClientTransport`
-
-**2. No time pre-selection on single-use links.**
-Standard expectation: generate a link that opens on the exact slot the user picked. Reality: Calendly's single-use links (`/d/xxxx`) ignore all time-related URL parameters. `?time=HH:MM` — ignored. Path-based ISO timestamps (`/d/xxxx/2026-04-21T09:00:00-07:00`) — ignored. `?date=YYYY-MM-DD` works for date. The workaround: pre-navigate to the date and show the selected time in the UI ("Select 9:30 AM on Calendly to confirm"). One extra click for the user. This is a Calendly limitation, not MCP.
-
-**3. No direct booking on the free plan.**
-Standard expectation: book the slot on behalf of the user (like a real scheduling agent would). Reality: `create_invitee` is not available on the free plan. The workaround: generate a single-use scheduling link and hand the user off to Calendly. The slot is not held — another person could book the same time between clicks.
-
-**4. OAuth scopes are siloed — MCP token can't touch REST.**
-The MCP token (`mcp:scheduling:*`) and Calendly's REST API scopes (`event_types:read`, etc.) are completely separate. You can't use the MCP token to hit `api.calendly.com` directly. Everything must go through MCP tools. This forced us to use `event_types-list_event_types` (MCP) instead of a direct REST call to get the event type URI during setup.
-
----
-
-#### Technical gotchas (for footnotes / sidebar)
-
-- **Availability window: 7 days max, start_time must be in the future.** `event_types-list_event_type_available_times` returns 400 for > 7-day windows. Also: `new Date().toISOString()` is already "in the past" by the time the request arrives — add a 5-minute buffer.
-- **Nested wrapper argument.** `scheduling_links-create_single_use_scheduling_link` expects `{ create_scheduling_link_request: { ... } }`, not flat fields. The error is a Pydantic validation error, easy to misread as an MCP error.
-- **`@upstash/redis` double-encoding.** Auth script used raw REST API with `JSON.stringify(JSON.stringify(value))`. Fixed in `readTokens()` by checking `typeof raw === "string"` and parsing again.
-- **`discoverOAuthMetadata` deprecated.** Renamed to `discoverAuthorizationServerMetadata` in the MCP SDK. Old examples in docs still use the old name.
-- **DCR public client — no secret.** Calendly issues a `client_id` but no `client_secret`. Store the full DCR response — you need `client_id` for token refresh.
-
----
-
-#### The 4o-mini prompt quirk (good sidebar)
-System prompt said `"do NOT describe time slots as text"` → model listed every time slot as text. Negative constraints are read as templates. Fix: positive prescription — "Your text response must be exactly one short sentence." The model can't echo a constraint it was never told to avoid.
+- **Availability window: 7 days max, start_time must be in the future.** API returns 400 for > 7-day windows. `new Date().toISOString()` is "in the past" by the time the request arrives — add a 5-minute buffer.
+- **No time pre-selection on single-use links.** `/d/xxxx` ignores `?time=HH:MM` and path-based ISO timestamps. `?date=YYYY-MM-DD` works for date only. One extra click for the user.
+- **No direct booking on the free plan.** `create_invitee` is not available. Workaround: single-use scheduling link, slot is not held between clicks.
+- **OAuth scopes are siloed.** MCP tokens (`mcp:scheduling:*`) can't call REST API. REST needs a separate PAT. This is why we switched.
 
 ---
 
@@ -143,51 +97,22 @@ const recentMessages = Array.isArray(messages) ? messages.slice(-20) : messages;
 ```
 Pass `recentMessages` to `streamText` instead of `messages`.
 
-### Calendly MCP integration — full conversational scheduling
-**Goal:** "Schedule a call" opens a full in-chat scheduling flow powered by Calendly's remote MCP server.
+### Calendly scheduling — ✅ COMPLETED (REST API)
+**Goal:** "Schedule a call" opens a full in-chat scheduling flow.
 
-**User flow:**
-1. User clicks "Schedule a call" in ContactCard
-2. Guillermo: "Let me check Pablo's availability…" → calls `checkAvailability` tool
-3. Chat shows **AvailabilityPicker** widget — time slots grouped by day
-4. User clicks a slot → Guillermo calls `scheduleCall` (or generates a pre-filled Calendly link)
-5. Chat shows **MeetingConfirmation** widget with booking link/details
+**Implementation:** Calendly REST API + Personal Access Token. Originally built with MCP
+(StreamableHTTP transport to `mcp.calendly.com`), but MCP hangs on Vercel serverless.
+MCP code preserved in `lib/calendly-mcp.ts` for future dedicated agent service.
 
-**Architecture:**
-- Calendly hosts their MCP server at `https://mcp.calendly.com` (Streamable HTTP transport)
-- Chat API route uses `@modelcontextprotocol/sdk` as an MCP client to relay tool calls
-- No need to rewrite Calendly's API — proxy through the MCP protocol
-- Same server also added to Cline's MCP config for dev-time exploration
-
-**Setup (manual — before coding):**
-1. Calendly account with API access (free tier has limited API, Standard plan recommended)
-2. Personal Access Token → Calendly Settings → Integrations → API & Webhooks → Personal Access Tokens
-3. At least one event type created (e.g., "30-Minute Intro Call")
-4. Add to `.env.local` + Vercel env vars:
+**Setup:**
+1. Calendly account → Settings → Integrations → API & Webhooks → Personal Access Tokens
+2. At least one event type created (e.g., "30-Minute Intro Call")
+3. Add to `.env.local` + Vercel env vars:
    ```
-   CALENDLY_API_KEY=your_personal_access_token
+   CALENDLY_API_TOKEN=your_personal_access_token
+   CALENDLY_EVENT_TYPE_URI=https://api.calendly.com/event_types/XXXX
+   CALENDLY_FALLBACK_URL=https://calendly.com/dimeglio-pablo/30min
    ```
-
-**Code plan:**
-1. Add Calendly MCP to Cline config (remote server, Streamable HTTP)
-2. Explore available MCP tools via Cline
-3. `npm install @modelcontextprotocol/sdk`
-4. Create MCP client utility (`lib/calendly-mcp.ts`) that connects to `https://mcp.calendly.com`
-5. Add to `/api/chat/route.ts`:
-   - `checkAvailability` tool — fetches available slots via MCP
-   - `scheduleCall` tool — creates booking or scheduling link via MCP
-6. Add to `lib/chat-widgets.ts`: `AvailabilityPickerProps`, `MeetingConfirmationProps`
-7. Build `components/chat/availability-picker.tsx` — date/time slot grid
-8. Build `components/chat/meeting-confirmation.tsx` — booking confirmed card
-9. Re-enable "Schedule a call" button in `components/chat/contact-card.tsx`
-10. Add Calendly tools to system prompt (new tool usage rules)
-
-**Blog entry idea: "How I gave my AI agent real scheduling powers with MCP"**
-- The story: portfolio AI agent needed to book calls, Calendly had a remote MCP server, connected the two
-- Show the architecture: chat agent → MCP client → mcp.calendly.com → Calendly API
-- Talk about MCP as a protocol: local vs. remote servers, Streamable HTTP transport
-- The "aha moment": production MCP use, not just dev tooling
-- Blog voice: "I expected this to take a day. It took 3 hours and most of that was reading the MCP spec."
 
 ### Agent eval suite — LLM-as-Judge + regression tests
 **Goal:** Reliable, repeatable testing of Guillermo's responses. Mirrors the rPotential testing suite work.

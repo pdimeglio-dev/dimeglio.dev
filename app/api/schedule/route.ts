@@ -27,7 +27,7 @@ const FALLBACK_URL =
   process.env.CALENDLY_FALLBACK_URL || "https://calendly.com/dimeglio-pablo";
 
 // ---------------------------------------------------------------------------
-// POST /api/schedule — create a single-use Calendly scheduling link via MCP
+// POST /api/schedule — create a single-use Calendly scheduling link
 // ---------------------------------------------------------------------------
 
 export async function POST(req: Request) {
