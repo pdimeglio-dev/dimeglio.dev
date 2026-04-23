@@ -14,7 +14,7 @@ The obvious fix was Calendly's REST API or their embed widget. But then I notice
 
 I'd been using MCP in dev tools (Claude Desktop, Cursor) but never in a production web app. This felt like a chance to actually build with the protocol, not just consume it through an IDE.
 
-Spoiler: MCP didn't make it to production. REST API did. Here's the full story, including why.
+Spoiler: MCP didn't make it to production. REST API did.
 
 ## MCP in 30 seconds
 
@@ -26,11 +26,11 @@ Most people encounter MCP through local servers. You configure one in Claude Des
 
 Remote MCP servers are different. They live on the internet, use HTTP-based transport, and require real authentication. That's what Calendly offers at `mcp.calendly.com`. The standard flow: connect to the server, call `listTools()` to discover what's available, pass those tools to the LLM, let the LLM call them as needed.
 
-That's the textbook version. Here's what I actually tried to build — and where it fell apart.
+So that's the theory. Here's what I built.
 
 ## The architecture I built
 
-The flow has two distinct layers. Making them explicit is the most important thing for understanding what's happening:
+The flow has two distinct layers that are easy to conflate:
 
 ```
 LLM calls checkAvailability          <-- AI SDK layer (the LLM's world)
@@ -40,7 +40,7 @@ LLM calls checkAvailability          <-- AI SDK layer (the LLM's world)
                     └── StreamableHTTPClientTransport → mcp.calendly.com
 ```
 
-The LLM doesn't know MCP exists. It calls an AI SDK tool. That tool's `execute()` function happens to use MCP internally. Two layers, one operation.
+The LLM doesn't know MCP exists. It calls an AI SDK tool, and that tool's `execute()` function happens to use MCP internally.
 
 ### OAuth setup: Dynamic Client Registration
 
@@ -67,7 +67,7 @@ const res = await fetch(metadata.registration_endpoint, {
 const clientInfo = await res.json();
 ```
 
-The script opens a browser for authorization, catches the callback on a local server, exchanges the code for tokens (with PKCE), and stores everything in Upstash Redis. Tokens live in Redis, not on disk — so both local dev and Vercel production read from the same place. Run it once and both environments can authenticate.
+The script opens a browser for authorization, catches the callback on a local server, exchanges the code for tokens (with PKCE), and stores everything in Upstash Redis. Tokens live in Redis, not on disk. Both local dev and Vercel production read from the same place. Run it once and you're done.
 
 ### Token management: Redis + optimistic locking
 
@@ -96,7 +96,7 @@ await writeTokens({ ...newTokens, obtained_at: Date.now() });
 
 ### The MCP call: connect, call, disconnect
 
-Each MCP call is a fresh connection. The pattern:
+Each MCP call is a fresh connection:
 
 ```typescript
 // lib/calendly-mcp.ts — callCalendlyMCP() (trimmed)
@@ -116,7 +116,7 @@ const result = await client.callTool({ name: toolName, arguments: args });
 await client.close();
 ```
 
-This worked great locally. Fast, clean, did exactly what it should.
+Worked great locally.
 
 ## Where it fell apart on Vercel
 
@@ -130,10 +130,10 @@ Three things were working against me:
 The SDK's transport layer overwrites whatever `AbortSignal` you pass with its own internal controller. There's no way to set a timeout on the connection from the outside. If `mcp.calendly.com` takes 11 seconds to respond, your Vercel function sits and waits until Vercel kills it.
 
 **2. SSE streams don't flush reliably through Vercel's network layer.**
-Streamable HTTP uses Server-Sent Events for the response. SSE expects a persistent, flushing connection. Vercel's serverless infrastructure buffers responses and isn't designed for that pattern. The connection would open and then just... hang. No data, no error, no timeout — until Vercel gave up.
+Streamable HTTP uses Server-Sent Events for the response. SSE expects a persistent, flushing connection. Vercel's serverless infrastructure buffers responses and isn't designed for that pattern. The connection would open and then just... hang. No data, no error, no timeout. Vercel eventually gave up.
 
 **3. This isn't a bug I could fix.**
-Both of these are fundamental to how Streamable HTTP transport works. It's designed for long-running services with persistent connections, not for serverless functions that spin up, do one thing, and die. I could have worked around it with a proxy service or a custom transport implementation, but at that point I was solving an infrastructure problem to enable a protocol that wasn't adding value over a direct API call.
+Both of these are fundamental to how Streamable HTTP transport works. It's designed for long-running services with persistent connections, not for serverless functions that spin up, do one thing, and die. I could have worked around it with a proxy or a custom transport, but at that point I was solving an infrastructure problem just to avoid a direct API call.
 
 Anyway, I switched to the REST API.
 
@@ -160,34 +160,34 @@ async function fetchAvailableSlots(): Promise<string[] | null> {
 }
 ```
 
-No OAuth dance. No Redis token storage. No connection lifecycle to manage. `AbortSignal.timeout(5000)` works because I control the fetch, not a transport layer. It just works.
+No OAuth dance, no Redis, no connection lifecycle. `AbortSignal.timeout(5000)` works because I control the fetch, not a transport layer.
 
-The MCP auth code (`scripts/calendly-auth.mjs`) and the MCP client code (`lib/calendly-mcp.ts`) are both still in the repo, preserved for when Guillermo moves to a dedicated long-running service where MCP transport actually makes sense.
+Both the auth script and MCP client are still in the repo for when Guillermo moves off serverless.
 
 ## The parts I'd have hit either way
 
-Switching to REST didn't change everything. A few Calendly-specific gotchas that apply regardless of how you talk to their API:
+Switching to REST didn't change everything. A few Calendly gotchas that apply either way:
 
 **No time pre-selection on single-use links.** I expected to generate a scheduling link that opens Calendly on the exact time slot the user picked. What actually happens: Calendly's single-use links (`/d/xxxx`) ignore all time-related URL parameters. I tried `?time=09:30` (silently ignored), path-based ISO timestamps (also ignored). Only `?date=YYYY-MM-DD` works. One extra click for the user: "Select 9:30 AM on Calendly to confirm."
 
-**No direct booking on the free plan.** The `create_invitee` endpoint would let Guillermo book the slot on behalf of the user. Not available on the free plan. Workaround: single-use scheduling links. The slot isn't held between when the user clicks and when they complete booking — someone else could theoretically grab it. The "single-use" property is about the link, not the slot.
+**No direct booking on the free plan.** The `create_invitee` endpoint would let Guillermo book the slot on behalf of the user. Not available on the free plan. Workaround: single-use scheduling links. The slot isn't held between when the user clicks and when they complete booking. Someone else could theoretically grab it. The "single-use" property is about the link, not the slot.
 
-**Availability window: 7 days max, start time must be in the future.** The API returns 400 for windows longer than 7 days. `new Date().toISOString()` is "in the past" by the time the request arrives — add a 5-minute buffer.
+**Availability window: 7 days max, start time must be in the future.** The API returns 400 for windows longer than 7 days. `new Date().toISOString()` is "in the past" by the time the request arrives. Add a 5-minute buffer.
 
 ## The small model prompt problem
 
-One last thing worth mentioning. After switching to REST and getting the widget rendering correctly, there was still a prompt issue. The system prompt originally said: "do NOT describe time slots as text." And GPT-4o-mini, the model powering Guillermo, dutifully listed every time slot as text in its response.
+After switching to REST and getting the widget rendering, there was still a prompt issue. The system prompt said "do NOT describe time slots as text." GPT-4o-mini, the model powering Guillermo, dutifully listed every time slot as text.
 
-Small models treat negative constraints as templates. Tell them "don't list times" and they read "list times." The fix was positive prescription: "Your text response must be exactly one short sentence like 'Here are Pablo's available slots.'" Worked immediately.
+Negative constraints don't work well with small models. The fix was telling it exactly what to say instead: "Your text response must be exactly one short sentence like 'Here are Pablo's available slots.'" That worked.
 
 ## What I'd actually tell someone evaluating MCP for production
 
-MCP works in production. The `@modelcontextprotocol/sdk` is well-built. OAuth 2.1 with Dynamic Client Registration, Streamable HTTP transport, tool discovery — it all works as documented, and the ecosystem is moving fast. MCP is where this space is heading.
+MCP works in production. The `@modelcontextprotocol/sdk` is well-built. OAuth 2.1 with Dynamic Client Registration, Streamable HTTP transport, tool discovery. It all works as documented.
 
-What didn't work was my specific combination: Streamable HTTP transport inside Vercel serverless functions. SSE-based persistent connections and functions that spin up per request and die are a bad pair. That's not a MCP problem — it's an environment problem I created for myself.
+What didn't work was my specific combination: Streamable HTTP transport inside Vercel serverless functions. SSE-based persistent connections and functions that spin up per request and die are a bad pair. That's not a MCP problem. It's an environment problem I created for myself.
 
-The MCP code is still in the repo — I'll revisit when Guillermo moves off serverless.
+The MCP code is still in the repo. I'll revisit when Guillermo moves off serverless.
 
-The "Schedule a Call" button works. Most of the day was me learning the hard way that I'd put the right tool in the wrong place.
+The "Schedule a Call" button works. Most of that day was me and a bad environment combination.
 
-If you want to see it in action — or just want to talk shop about MCP, AI agents, or serverless architecture — head to the [homepage](/) and ask Guillermo to schedule a call.
+If you want to see it, head to the [homepage](/) and ask Guillermo to schedule a call.
