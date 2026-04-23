@@ -3,6 +3,7 @@
 
 export const BLOG_SLUGS = [
   "building-dimeglio-dev-with-ai",
+  "mcp-in-production-scheduling",
   "observability-stack",
   "welcome-guillermo-the-ai-agent"
 ] as const;
