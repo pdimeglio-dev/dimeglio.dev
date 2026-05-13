@@ -48,6 +48,14 @@ function extractText(node: React.ReactNode): string {
  */
 const components: MDXComponents = {
   Mermaid,
+  img: (props) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      {...props}
+      alt={props.alt ?? ""}
+      className="rounded-xl border border-slate-800 w-full"
+    />
+  ),
   table: (props) => (
     <div className="table-wrapper">
       <table {...props} />

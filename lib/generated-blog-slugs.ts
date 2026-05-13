@@ -2,6 +2,7 @@
 // Re-run `npm run ingest` after publishing or unpublishing a blog post.
 
 export const BLOG_SLUGS = [
+  "2026-05-12-behind-the-paddle-games",
   "building-dimeglio-dev-with-ai",
   "mcp-in-production-scheduling",
   "observability-stack",
