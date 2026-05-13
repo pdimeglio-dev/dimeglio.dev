@@ -1,0 +1,21 @@
+{
+  "slug": "2026-05-12-behind-the-paddle-games",
+  "title": "Behind The Paddle Games",
+  "post_url": "https://dimeglio.dev/blog/2026-05-12-behind-the-paddle-games",
+  "generated_at": "2026-05-13",
+  "project_social": { "instagram": "@the.paddle.games" },
+  "linkedin": {
+    "body": "I paddle competitively on the Bay, mostly SUP out of Redwood City. Strava is the best activity tracker out there, but it wasn't built for paddlers. No concept of a paddling season, no leaderboard for your local water body, no badges for completing a route you actually care about. So I built one.\n\nThe Paddle Games connects to your Strava account and turns paddle activities into points, leaderboard rankings, and spatial challenges. The backend is six independently-deployed GCP Cloud Functions communicating through Pub/Sub. No synchronous service-to-service HTTP calls in the main pipeline. Activity ingestion, scoring, challenge evaluation, and leaderboard updates are logically separate failure domains, so a transient hiccup in one doesn't blow up the others.\n\nThe challenge layer is the most technically interesting part. Nine evaluator types cover everything from \"first activity\" to GPS-based landmark visits, route completions, scavenger hunts, and streaks. Adding a new region is a data operation through an admin tool, not a code change.\n\nThe hardest thing about building this isn't the code. It's content. Geo-spatial challenges are only as interesting as the landmarks and routes seeded for a region, and building a catalog that means something to actual paddlers takes local knowledge and time. The Bay Area content is running but sparse.\n\nIf you paddle (SUP, kayak, canoe, surf, row, anything), connect your Strava account and join at thepaddlegames.com.\n\nFull post → dimeglio.dev/blog/2026-05-12-behind-the-paddle-games | @the.paddle.games on Instagram\n\nCurious how others approach seeding location-specific challenge content in sports apps. Crowdsourced, local club partnerships, or just manual curation?",
+    "word_count": 253
+  },
+  "x": {
+    "type": "thread",
+    "tweets": [
+      "Strava is the best activity tracker out there. It just wasn't built for paddlers. So I built the thing that was missing.",
+      "The backend is six GCP Cloud Functions, event-driven via Pub/Sub. Activity ingestion, scoring, challenge evaluation, and leaderboard updates are all separate failure domains. Nothing talks to anything else synchronously.",
+      "The challenge system has 9 evaluator types. GPS-based ones (landmark visits, route completions, scavenger hunts) use Turf.js against Strava's polyline data. Adding a new region is seeding new assets in an admin tool, not writing code.",
+      "The hardest part isn't the code. It's content. Geo-spatial challenges only come alive when the landmarks are places paddlers actually care about.",
+      "If you SUP, kayak, canoe, surf, or row, connect your Strava account and join. Architecture overview → dimeglio.dev/blog/2026-05-12-behind-the-paddle-games | @the.paddle.games on Instagram"
+    ]
+  }
+}
