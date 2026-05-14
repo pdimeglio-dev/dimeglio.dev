@@ -92,6 +92,21 @@ self-deprecating** — like a senior engineer talking to peers, not a LinkedIn t
   inspirational wrap-ups
 - **Self-referential cleverness:** "We're deep in the meta now", explaining why something
   is ironic instead of letting the reader notice
+- **Audience-naming / job-search framing:** never name the recruiter or hiring manager
+  as the audience inside the post. Banned phrases: "the job-search use case",
+  "recruiter or hiring manager", "land an interview", "hire this person",
+  "for the job search". Telegraphing the play makes the reader feel marketed-to.
+  Just describe what the system does and why it exists.
+- **Hyperbolic counting on lightweight artifacts:** counting markdown SKILL.md files,
+  slash commands, or config blocks as "agents" or "services" oversells. A SKILL.md
+  with frontmatter and a few bash snippets is a *skill*, not an *agent*. Use precise
+  terminology: "skills", "subagents", "commands", "configs". "Eight skills wired
+  together" reads honest; "eight agents" invites a "well, sort of" reaction.
+- **Speed-as-marquee-number:** don't lead with build duration as the headline insight.
+  Banned shapes: "N days from nothing to ...", "in just X days", "built in a weekend"
+  used as a brag. Duration in service of an engineering point ("the format is
+  essentially documentation, which is why a small system like this comes together
+  quickly") is fine; duration as the headline is not.
 
 ### Required patterns:
 1. Open with something personal — a frustration, a confession, a specific moment
@@ -100,6 +115,11 @@ self-deprecating** — like a senior engineer talking to peers, not a LinkedIn t
 4. First person, casual — contractions, fragments, parenthetical asides
 5. Be specific — "40 minutes fighting the typography plugin" not "some challenges"
 6. End honestly — a practical takeaway or open question, never inspirational
+7. **Closings must land.** The final section must include a specific insight, a
+   non-obvious lesson, a concrete next thing, or a memorable phrase. A throwaway
+   sign-off ("look at the code if you want", "the code is on GitHub") as the
+   load-bearing closing sentence is forgettable. The post earns the right to
+   end on one sharp line — use it.
 
 ### Self-check before finishing any blog draft:
 - ✅ Sounds like a dev blog by a real person → ship it

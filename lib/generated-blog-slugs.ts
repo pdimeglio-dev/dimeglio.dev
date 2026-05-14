@@ -3,6 +3,7 @@
 
 export const BLOG_SLUGS = [
   "2026-05-12-behind-the-paddle-games",
+  "2026-05-14-pipeline-writes-my-blog-posts",
   "building-dimeglio-dev-with-ai",
   "mcp-in-production-scheduling",
   "observability-stack",

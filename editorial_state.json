@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-05-12T00:00:00.000Z",
+  "last_run": "2026-05-14T00:00:00.000Z",
   "projects": {
     "paddle-games": {
       "last_posted": "2026-05-12",
@@ -35,19 +35,19 @@
       ]
     },
     "blog-pipeline-plugin": {
-      "last_posted": "2026-05-12",
+      "last_posted": "2026-05-14",
       "posts_this_month": 1,
       "has_intro_post": true,
       "draft_queue": [
         {
-          "slug": "2026-05-12-the-blog-pipeline-plugin",
-          "title": "The Blog Pipeline Plugin",
-          "mdx_path": "/Users/pablo/Development/dimeglio.dev/content/blog/2026-05-12-the-blog-pipeline-plugin.mdx",
+          "slug": "2026-05-14-pipeline-writes-my-blog-posts",
+          "title": "A Pipeline That Writes My Blog Posts for Me",
+          "mdx_path": "/Users/pablo/Development/dimeglio.dev/content/blog/2026-05-14-pipeline-writes-my-blog-posts.mdx",
           "cover_ok": true,
-          "rater_composite": 8.4,
+          "rater_composite": 7.3,
           "rater_pass": true,
           "intro_mode": true,
-          "created_at": "2026-05-12",
+          "created_at": "2026-05-14",
           "status": "pending_review"
         }
       ],
