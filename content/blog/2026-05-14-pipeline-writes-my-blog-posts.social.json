@@ -1,0 +1,22 @@
+{
+  "slug": "2026-05-14-pipeline-writes-my-blog-posts",
+  "title": "A Pipeline That Writes My Blog Posts for Me",
+  "post_url": "https://dimeglio.dev/blog/2026-05-14-pipeline-writes-my-blog-posts",
+  "generated_at": "2026-05-14",
+  "linkedin": {
+    "paragraphs": [
+      "Writing discipline is not my strong suit. I'm better at shipping things than writing about them. So I built a pipeline that does the writing part for me.",
+      "It reads my git history, figures out what was interesting, and drafts an MDX blog post. I review it, fix what's off, and publish. About $0.06 per post in API costs.",
+      "The hardest part was making it not sound like an AI wrote it. It did, but made it way harder for readers to find out :)",
+      "Full post → dimeglio.dev/blog/2026-05-14-pipeline-writes-my-blog-posts",
+      "Anyone else automating the parts of their workflow they're actually bad at instead of trying to get better at them?"
+    ],
+    "word_count": 102
+  },
+  "x": {
+    "type": "single",
+    "tweets": [
+      "Did you think I became a Writer all of a sudden? Negative. Built a pipeline that reads my git history and drafts the posts for me. → dimeglio.dev/blog/2026-05-14-pipeline-writes-my-blog-posts"
+    ]
+  }
+}
