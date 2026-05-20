@@ -1,0 +1,24 @@
+{
+  "slug": "2026-05-20-paddle-games-got-a-notifications-inbox",
+  "title": "The Paddle Games Got a Notifications Inbox",
+  "post_url": "https://dimeglio.dev/blog/2026-05-20-paddle-games-got-a-notifications-inbox",
+  "generated_at": "2026-05-20",
+  "project_social": { "instagram": "@the.paddle.games" },
+  "linkedin": {
+    "paragraphs": [
+      "Built a new notifications service for The Paddle Games. Less work than I expected. The infrastructure was already there. Every badge award and rank improvement was publishing to Pub/Sub. I just needed something listening, writing into a Firestore subcollection per user.",
+      "Badges, rank improvements, announcements. The bell icon in the nav lights up when there's something new.",
+      "If you paddle (SUP, kayak, canoe, surf, row), connect your Strava account and join at thepaddlegames.com.",
+      "Full post → dimeglio.dev/blog/2026-05-20-paddle-games-got-a-notifications-inbox | @the.paddle.games on Instagram"
+    ],
+    "word_count": 73
+  },
+  "x": {
+    "type": "thread",
+    "tweets": [
+      "Built a new notifications service for The Paddle Games. Less work than I expected. The infrastructure was already there. Every badge award and rank improvement was publishing to Pub/Sub. Just needed something subscribed.",
+      "Paddle SUP, kayak, canoe, surf, or row? Connect your Strava account and join at thepaddlegames.com.",
+      "Full post → dimeglio.dev/blog/2026-05-20-paddle-games-got-a-notifications-inbox | @the.paddle.games on Instagram"
+    ]
+  }
+}
