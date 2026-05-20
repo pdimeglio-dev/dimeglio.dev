@@ -1,36 +1,64 @@
 {
-  "last_run": "2026-05-14T00:00:00.000Z",
+  "last_run": "2026-05-20T00:00:00.000Z",
   "projects": {
     "paddle-games": {
-      "last_posted": "2026-05-12",
-      "posts_this_month": 1,
+      "last_posted": "2026-05-20",
+      "posts_this_month": 2,
       "has_intro_post": true,
-      "draft_queue": [
-        {
-          "slug": "2026-05-12-behind-the-paddle-games",
-          "title": "Behind The Paddle Games",
-          "mdx_path": "/Users/pablo/Development/dimeglio.dev/content/blog/2026-05-12-behind-the-paddle-games.mdx",
-          "cover_ok": true,
-          "rater_composite": 8.1,
-          "rater_pass": true,
-          "intro_mode": true,
-          "created_at": "2026-05-12",
-          "status": "pending_review"
-        }
-      ],
-      "run_history": []
-    },
-    "dimeglio-dev": {
-      "last_posted": null,
-      "posts_this_month": 0,
-      "has_intro_post": false,
       "draft_queue": [],
       "run_history": [
+        {
+          "date": "2026-05-12",
+          "slug": "2026-05-12-behind-the-paddle-games",
+          "result": "published",
+          "rater_composite": 8.1
+        },
+        {
+          "date": "2026-05-20",
+          "slug": "2026-05-20-paddle-games-got-a-notifications-inbox",
+          "result": "published",
+          "rater_composite": 8.0,
+          "commit_sha": "8918355"
+        }
+      ]
+    },
+    "dimeglio-dev": {
+      "last_posted": "2026-04-23",
+      "posts_this_month": 0,
+      "has_intro_post": true,
+      "draft_queue": [],
+      "run_history": [
+        {
+          "date": "2026-04-12",
+          "slug": "building-dimeglio-dev-with-ai",
+          "result": "published"
+        },
+        {
+          "date": "2026-04-15",
+          "slug": "welcome-guillermo-the-ai-agent",
+          "result": "published"
+        },
+        {
+          "date": "2026-04-19",
+          "slug": "observability-stack",
+          "result": "published"
+        },
+        {
+          "date": "2026-04-23",
+          "slug": "mcp-in-production-scheduling",
+          "result": "published"
+        },
         {
           "date": "2026-05-12",
           "slug": null,
           "result": "skipped",
           "reason": "low_signal"
+        },
+        {
+          "date": "2026-05-20",
+          "slug": "2026-05-20-portfolio-site-with-too-many-moving-parts",
+          "result": "discarded",
+          "reason": "produced as intro post due to stale has_intro_post=false; project already had 4 intros"
         }
       ]
     },
@@ -38,27 +66,29 @@
       "last_posted": "2026-05-14",
       "posts_this_month": 1,
       "has_intro_post": true,
-      "draft_queue": [
+      "draft_queue": [],
+      "run_history": [
         {
+          "date": "2026-05-14",
           "slug": "2026-05-14-pipeline-writes-my-blog-posts",
-          "title": "A Pipeline That Writes My Blog Posts for Me",
-          "mdx_path": "/Users/pablo/Development/dimeglio.dev/content/blog/2026-05-14-pipeline-writes-my-blog-posts.mdx",
-          "cover_ok": true,
-          "rater_composite": 7.3,
-          "rater_pass": true,
-          "intro_mode": true,
-          "created_at": "2026-05-14",
-          "status": "pending_review"
+          "result": "published",
+          "rater_composite": 7.3
         }
-      ],
-      "run_history": []
+      ]
     },
     "project-batcave": {
       "last_posted": null,
       "posts_this_month": 0,
       "has_intro_post": false,
       "draft_queue": [],
-      "run_history": []
+      "run_history": [
+        {
+          "date": "2026-05-20",
+          "slug": null,
+          "result": "skipped",
+          "reason": "repo not found at path"
+        }
+      ]
     }
   }
 }
