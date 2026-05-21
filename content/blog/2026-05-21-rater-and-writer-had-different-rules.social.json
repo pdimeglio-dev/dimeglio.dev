@@ -1,0 +1,23 @@
+{
+  "slug": "2026-05-21-rater-and-writer-had-different-rules",
+  "title": "My Rater and Writer Had Different Rules for Two Weeks",
+  "post_url": "https://dimeglio.dev/blog/2026-05-21-rater-and-writer-had-different-rules",
+  "generated_at": "2026-05-21",
+  "linkedin": {
+    "paragraphs": [
+      "I built a pipeline that reads my git history and drafts blog posts for me. Part of it is a quality gate that auto-fails anything that sounds like AI wrote it. Necessary, given that AI is writing them.",
+      "For two weeks, the gate and the generator were working from different rule books. The generator read the rules from a canonical file on every run. The gate used a version I'd written from memory. They'd diverged before the first real pipeline ran.",
+      "Neither flagged anything. Caught it because one post sounded off when I read it out loud.",
+      "(Also: the pipeline required about 25 manual approval clicks per run before I sorted the permissions. Built automation, manually approved every step.)",
+      "Full post → dimeglio.dev/blog/2026-05-21-rater-and-writer-had-different-rules",
+      "Anyone else catch their quality gate scoring against different rules than the generator was using?"
+    ],
+    "word_count": 137
+  },
+  "x": {
+    "type": "single",
+    "tweets": [
+      "Built a pipeline that reads my git history and writes blog posts. Has a quality gate that auto-fails drafts sounding like AI. For two weeks, the gate and the generator had different rule books. Neither noticed. → dimeglio.dev/blog/2026-05-21-rater-and-writer-had-different-rules"
+    ]
+  }
+}
