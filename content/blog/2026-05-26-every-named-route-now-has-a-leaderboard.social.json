@@ -1,0 +1,24 @@
+{
+  "slug": "2026-05-26-every-named-route-now-has-a-leaderboard",
+  "post_url": "https://dimeglio.dev/blog/2026-05-26-every-named-route-now-has-a-leaderboard",
+  "generated_at": "2026-05-26",
+  "project_social": { "instagram": "@the.paddle.games" },
+  "linkedin": {
+    "paragraphs": [
+      "The route challenge system in The Paddle Games tracked whether you'd completed a route. Didn't tell you how fast, how many times, or where you ranked. Badge earned, nothing else.",
+      "I added gate-to-gate timing from Strava's streams API, completion history, personal records, and a leaderboard per route. Then immediately shipped a bug where loop routes were logging two-second lap records. The finish gate overlaps the start on a loop, so the algorithm found it a few GPS points after finding the start. Fix: a minimum-distance guard derived from the route's geometry.",
+      "If you paddle (SUP, kayak, canoe, surf, row, anything), connect your Strava account and join at thepaddlegames.com.",
+      "Full post -> dimeglio.dev/blog/2026-05-26-every-named-route-now-has-a-leaderboard | @the.paddle.games on Instagram",
+      "Anyone else hit the overlapping-gates problem when building gate-based timing?"
+    ],
+    "word_count": 107
+  },
+  "x": {
+    "type": "thread",
+    "tweets": [
+      "Added gate-to-gate route timing and per-route leaderboards to The Paddle Games. Start gate, finish gate, 85% route coverage required to count as a completion. Completion history, personal records, ranked leaderboard per route.",
+      "Then shipped a bug: loop routes were logging two-second lap records. Start and finish gates overlap on a loop, so the algorithm found the \"finish\" just after finding the start, before anyone had moved. Fix was a minimum-distance guard derived from the route geometry.",
+      "If you SUP, kayak, canoe, surf, or row, connect your Strava account at thepaddlegames.com. Architecture post -> dimeglio.dev/blog/2026-05-26-every-named-route-now-has-a-leaderboard | @the.paddle.games on Instagram"
+    ]
+  }
+}
