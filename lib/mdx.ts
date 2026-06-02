@@ -18,6 +18,8 @@ export interface BlogFrontmatter {
   coverAlt?: string;
   /** ISO date when the post was last modified (for Article schema dateModified) */
   lastModified?: string;
+  /** Marks the post as part of an ordered series. `name` is the shared series title; `order` is its 1-based position. */
+  series?: { name: string; order: number };
 }
 
 export interface ExperienceFrontmatter {
@@ -160,6 +162,31 @@ export function getBlogPosts() {
 
 export function getBlogPost(slug: string) {
   return getContentBySlug<BlogFrontmatter>(CONTENT_PATHS.blog, slug);
+}
+
+export interface SeriesPost {
+  slug: string;
+  title: string;
+  order: number;
+}
+
+/**
+ * Get all published posts in a series, sorted by `series.order` ascending.
+ * Returns [] unless at least two published parts share the name, so a series
+ * with only its first part live renders no navigation yet.
+ */
+export function getSeriesPosts(name: string): SeriesPost[] {
+  const posts = getBlogPosts().filter(
+    (post) => post.frontmatter.series?.name === name,
+  );
+  if (posts.length < 2) return [];
+  return posts
+    .map((post) => ({
+      slug: post.slug,
+      title: post.frontmatter.title,
+      order: post.frontmatter.series!.order,
+    }))
+    .sort((a, b) => a.order - b.order);
 }
 
 export function getExperiences() {

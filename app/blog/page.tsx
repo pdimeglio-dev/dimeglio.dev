@@ -68,6 +68,12 @@ export default function BlogPage() {
                   {post.frontmatter.title}
                 </h2>
 
+                {post.frontmatter.series && (
+                  <span className="mt-2 inline-block rounded-full border border-slate-800 px-3 py-1 text-xs text-muted-foreground">
+                    {post.frontmatter.series.name}
+                  </span>
+                )}
+
                 <p className="mt-2 text-sm text-muted-foreground">
                   {post.frontmatter.description}
                 </p>

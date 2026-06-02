@@ -18,6 +18,7 @@ import remarkGfm from "remark-gfm";
 import rehypePrettyCode from "rehype-pretty-code";
 import type { MDXComponents } from "mdx/types";
 import { Mermaid } from "@/components/ui/mermaid";
+import { YouTubeEmbed } from "@/components/ui/youtube-embed";
 
 const rehypePrettyCodeOptions = {
   theme: "github-dark",
@@ -48,6 +49,7 @@ function extractText(node: React.ReactNode): string {
  */
 const components: MDXComponents = {
   Mermaid,
+  YouTubeEmbed,
   img: (props) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img

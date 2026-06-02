@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { getBlogPost, getBlogPosts } from "@/lib/mdx";
+import Link from "next/link";
+import { getBlogPost, getBlogPosts, getSeriesPosts } from "@/lib/mdx";
 import { MDXContent } from "@/components/mdx-content";
 import { BlogPostTracker } from "@/components/blog-post-tracker";
 import { JsonLd, articleSchema } from "@/components/json-ld";
@@ -115,6 +116,38 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
       </header>
 
       <MDXContent source={post.content} />
+
+      {post.frontmatter.series &&
+        (() => {
+          const siblings = getSeriesPosts(post.frontmatter.series.name);
+          if (siblings.length < 2) return null;
+          return (
+            <aside className="mt-16 border-t border-slate-800 pt-8">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                More in this series
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {post.frontmatter.series.name}
+              </p>
+              <ol className="mt-4 space-y-2">
+                {siblings.map((sibling) => (
+                  <li key={sibling.slug}>
+                    {sibling.slug === slug ? (
+                      <span className="text-foreground">{sibling.title}</span>
+                    ) : (
+                      <Link
+                        href={`/blog/${sibling.slug}`}
+                        className="text-muted-foreground transition-colors hover:text-white"
+                      >
+                        {sibling.title}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </aside>
+          );
+        })()}
 
       {/* Analytics: tracks blog_post_viewed + scroll depth */}
       <BlogPostTracker

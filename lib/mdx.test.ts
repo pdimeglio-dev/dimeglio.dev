@@ -5,6 +5,7 @@ import {
   getAllContent,
   getBlogPosts,
   getBlogPost,
+  getSeriesPosts,
   getExperiences,
   getProjects,
   getProject,
@@ -147,6 +148,39 @@ describe("getBlogPost", () => {
     const post = getBlogPost("building-dimeglio-dev-with-ai");
     expect(post).not.toBeNull();
     expect(post!.frontmatter.title).toContain("dimeglio.dev");
+  });
+});
+
+describe("getSeriesPosts", () => {
+  it("returns [] for a series name that matches no posts", () => {
+    expect(getSeriesPosts("No Such Series Exists Anywhere")).toEqual([]);
+  });
+
+  it("never returns exactly one post (the < 2 guard)", () => {
+    // A series with a single published part renders no navigation, so the
+    // helper must collapse it to []. Holds regardless of current content.
+    const names = new Set(
+      getBlogPosts()
+        .map((post) => post.frontmatter.series?.name)
+        .filter((name): name is string => Boolean(name)),
+    );
+    names.forEach((name) => {
+      expect(getSeriesPosts(name).length).not.toBe(1);
+    });
+  });
+
+  it("returns matched posts sorted by order ascending", () => {
+    const names = new Set(
+      getBlogPosts()
+        .map((post) => post.frontmatter.series?.name)
+        .filter((name): name is string => Boolean(name)),
+    );
+    names.forEach((name) => {
+      const parts = getSeriesPosts(name);
+      for (let i = 0; i < parts.length - 1; i++) {
+        expect(parts[i].order <= parts[i + 1].order).toBe(true);
+      }
+    });
   });
 });
 
