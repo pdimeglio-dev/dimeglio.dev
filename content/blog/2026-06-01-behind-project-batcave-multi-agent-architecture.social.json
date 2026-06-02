@@ -1,0 +1,21 @@
+{
+  "slug": "2026-06-01-behind-project-batcave-multi-agent-architecture",
+  "title": "Behind Project Batcave: A Multi-Agent Architecture Inspired by the Batman Universe",
+  "post_url": "https://dimeglio.dev/blog/2026-06-01-behind-project-batcave-multi-agent-architecture",
+  "generated_at": "2026-06-02",
+  "linkedin": {
+    "paragraphs": [
+      "Everyone building a personal AI assistant defaults to Jarvis. I went with Batman. Alfred, Gordon, and Ra's run on the Claude Agent SDK, each with a cloned Dark Knight voice. Telegram is the bat signal.",
+      "This is the first post in a four-part series. Next up: Gordon.",
+      "Architecture, production deployment, memory model, and reliability design in the full post: dimeglio.dev/blog/2026-06-01-behind-project-batcave-multi-agent-architecture",
+      "Anyone else building multi-agent systems on Cloud Run? Curious how you're handling the stateless container problem."
+    ],
+    "word_count": 83
+  },
+  "x": {
+    "type": "single",
+    "tweets": [
+      "Everyone builds Jarvis. I built the Batcave. Alfred, Gordon, and Ra's run on the Claude Agent SDK, each with a cloned Dark Knight voice. Telegram is the bat signal. Part 1 of 4. → dimeglio.dev/blog/2026-06-01-behind-project-batcave-multi-agent-architecture"
+    ]
+  }
+}
