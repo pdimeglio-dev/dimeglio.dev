@@ -18,6 +18,7 @@ import type { MDXContent as MDXContentType, ProjectFrontmatter } from "@/lib/mdx
 import { assetUrl } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { trackEvent } from "@/lib/analytics";
+import { YouTubeEmbed } from "@/components/ui/youtube-embed";
 
 type Category = "All" | "Professional" | "Personal";
 
@@ -30,13 +31,6 @@ const linkIcons: Record<string, typeof GitFork> = {
   website: Globe,
 };
 
-/** Extract YouTube video ID from various URL formats */
-function getYouTubeId(url: string): string | null {
-  const match = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([^?&]+)/,
-  );
-  return match?.[1] ?? null;
-}
 
 interface ProjectsGridProps {
   projects: MDXContentType<ProjectFrontmatter>[];
@@ -298,28 +292,18 @@ export function ProjectsGrid({ projects, renderedContent }: ProjectsGridProps) {
               })()}
 
               {/* Video embed */}
-              {activeProject.frontmatter.video && (() => {
-                const videoId = getYouTubeId(activeProject.frontmatter.video!);
-                return videoId ? (
-                  <div className="mt-8 flex flex-col gap-5">
-                    <div className="flex items-center gap-3">
-                      <Video className="h-4 w-4 text-zinc-500" />
-                      <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-zinc-500">Demo</h3>
-                    </div>
-                    <div className="overflow-hidden rounded-xl border border-slate-800">
-                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                        <iframe
-                          className="absolute inset-0 h-full w-full"
-                          src={`https://www.youtube.com/embed/${videoId}`}
-                          title={`${activeProject.frontmatter.title} — Video`}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                    </div>
+              {activeProject.frontmatter.video && (
+                <div className="mt-8 flex flex-col gap-5">
+                  <div className="flex items-center gap-3">
+                    <Video className="h-4 w-4 text-zinc-500" />
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-zinc-500">Demo</h3>
                   </div>
-                ) : null;
-              })()}
+                  <YouTubeEmbed
+                    src={activeProject.frontmatter.video}
+                    title={`${activeProject.frontmatter.title} — Video`}
+                  />
+                </div>
+              )}
             </div>
           )}
         </SheetContent>
