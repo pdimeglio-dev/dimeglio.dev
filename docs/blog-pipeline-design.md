@@ -664,7 +664,7 @@ The Social Manager is the exception: it runs interactively, invoked manually by 
 | Project image themes | Per-project `image_theme` block in config. Optional `logo_path` for compositing. | ✓ Resolved |
 | Plugin structure | GitHub repo with `.claude-plugin/`, `skills/`. Install via CLI or `enabledPlugins` in settings.json. | ✓ Resolved |
 | Review UI | Claude Code artifact for the draft queue. | Pending — Phase 6 |
-| State storage | `editorial_state.json` committed to `dimeglio.dev` repo. Per-project draft queues, `has_intro_post` flag. | ✓ Resolved |
+| State storage | `editorial_state.json` lives in the plugin root alongside `projects.config.json` and `series.config.json`. Per-project draft queues, `has_intro_post` flag. | ✓ Resolved |
 | OpenAI key scope | `OPENAI_API_KEY` in `.env` at plugin root covers both embeddings (ingest) and DALL-E 3 images. | ✓ Resolved |
 | Session context | Reporter reads Claude Code `.jsonl` session transcripts for the *why* behind commits. | ✓ Resolved |
 
