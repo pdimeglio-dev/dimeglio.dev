@@ -1,0 +1,25 @@
+{
+  "slug": "2026-06-07-nigel-splashforth-is-now-a-cloud-run-job",
+  "title": "Nigel Splashforth Is Now a Cloud Run Job",
+  "post_url": "https://dimeglio.dev/blog/2026-06-07-nigel-splashforth-is-now-a-cloud-run-job",
+  "generated_at": "2026-06-08",
+  "project_social": { "instagram": "@the.paddle.games" },
+  "linkedin": {
+    "paragraphs": [
+      "I built a Claude Code plugin that handles all Instagram content for The Paddle Games. Three skills: feature-carousel generates multi-slide app launch carousels from source code. location-carousel announces new routes and badges for a paddle spot with live data and a Mapbox mockup. leaderboard-roast is the one I ended up automating.",
+      "The roast started as a bit. I was looking at the monthly standings and the founder (me) was sitting somewhere embarrassing on his own leaderboard. So I gave the commentary job to Nigel Splashforth, British sports correspondent, and wrote a skill that reads Firestore and renders a 1080x1080 PNG card.",
+      "Nigel ran manually for a while. Then I wired him to a Cloud Run Job: monthly recap on the 1st, plus an hourly live mode that handles \"Roast now\" taps from inside the app.",
+      "Full post: dimeglio.dev/blog/2026-06-07-nigel-splashforth-is-now-a-cloud-run-job",
+      "Anyone building recurring AI-generated content for a product — how do you handle the review step before it goes public?"
+    ],
+    "word_count": 147
+  },
+  "x": {
+    "type": "thread",
+    "tweets": [
+      "Built a Claude Code plugin for The Paddle Games Instagram: feature-carousel (app launches from source code), location-carousel (new routes + badges with live data), and leaderboard-roast — narrated by Nigel Splashforth, British sports correspondent.",
+      "Nigel started as a bit. I was looking at the monthly standings, noticed the founder was sitting somewhere embarrassing on his own leaderboard, and decided to give the commentary job to a fictional journalist with a specific voice. Ran the skill manually a few times. It was funny.",
+      "Then I automated it. Cloud Run Job: monthly recap on the 1st, plus hourly live mode for \"Roast now\" taps in the app. Full post → dimeglio.dev/blog/2026-06-07-nigel-splashforth-is-now-a-cloud-run-job | @the.paddle.games on Instagram"
+    ]
+  }
+}
