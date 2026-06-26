@@ -8,6 +8,8 @@ export const BLOG_SLUGS = [
   "2026-05-21-rater-and-writer-had-different-rules",
   "2026-05-26-every-named-route-now-has-a-leaderboard",
   "2026-06-01-behind-project-batcave-multi-agent-architecture",
+  "2026-06-07-nigel-splashforth-is-now-a-cloud-run-job",
+  "2026-06-26-where-paddlers-cluster-routes-belong",
   "building-dimeglio-dev-with-ai",
   "mcp-in-production-scheduling",
   "observability-stack",

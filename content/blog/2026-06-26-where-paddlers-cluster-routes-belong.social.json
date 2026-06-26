@@ -1,0 +1,25 @@
+{
+  "slug": "2026-06-26-where-paddlers-cluster-routes-belong",
+  "title": "Where Paddlers Cluster, Routes Belong",
+  "post_url": "https://dimeglio.dev/blog/2026-06-26-where-paddlers-cluster-routes-belong",
+  "generated_at": "2026-06-26",
+  "project_social": { "instagram": "@the.paddle.games" },
+  "linkedin": {
+    "paragraphs": [
+      "Route creation for The Paddle Games used to be me guessing at a map. I built a Claude Code skill that reads the GPS activity stream instead. Thousands of tracks from connected paddlers were sitting in Firestore. They knew where people launched.",
+      "It clusters tracks into launches, destinations, and corridors, ranks regions by distinct paddlers vs existing coverage, and auto-creates disabled draft routes via the admin API. One human review step before anything commits.",
+      "The part I didn't anticipate: spatial centroids land in the water. The fix is shore snapping via OSM Overpass, querying boat ramps, beaches, and piers. Getting those Overpass QL queries right took longer than the clustering.",
+      "If you paddle (SUP, kayak, canoe, surf, row, or anything), connect your Strava account and join at thepaddlegames.com.",
+      "Full post → dimeglio.dev/blog/2026-06-26-where-paddlers-cluster-routes-belong | @the.paddle.games on Instagram"
+    ],
+    "word_count": 134
+  },
+  "x": {
+    "type": "thread",
+    "tweets": [
+      "Route creation for The Paddle Games used to be me guessing at a map. Built a Claude Code skill that mines Strava GPS history from Firestore, clusters it into launches and route corridors, and auto-creates disabled draft challenges.",
+      "The centroids landed in the water. Not near it. In it. Shore snapping via OSM Overpass puts them on actual boat ramps, beaches, and piers. (Getting the Overpass QL queries right took longer than the clustering.)",
+      "If you SUP, kayak, canoe, surf, or row, connect your Strava account and join. Full post → dimeglio.dev/blog/2026-06-26-where-paddlers-cluster-routes-belong | @the.paddle.games on Instagram"
+    ]
+  }
+}
