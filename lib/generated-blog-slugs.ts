@@ -10,6 +10,7 @@ export const BLOG_SLUGS = [
   "2026-06-01-behind-project-batcave-multi-agent-architecture",
   "2026-06-07-nigel-splashforth-is-now-a-cloud-run-job",
   "2026-06-26-where-paddlers-cluster-routes-belong",
+  "2026-10-22-replacing-myfitnesspal-before-punta-cana",
   "building-dimeglio-dev-with-ai",
   "mcp-in-production-scheduling",
   "observability-stack",
