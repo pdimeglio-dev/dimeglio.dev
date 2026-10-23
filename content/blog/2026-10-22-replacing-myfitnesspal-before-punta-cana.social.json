@@ -1,0 +1,24 @@
+{
+  "slug": "2026-10-22-replacing-myfitnesspal-before-punta-cana",
+  "title": "Replacing MyFitnessPal Before Punta Cana",
+  "post_url": "https://dimeglio.dev/blog/2026-10-22-replacing-myfitnesspal-before-punta-cana",
+  "generated_at": "2026-10-23",
+  "project_social": {},
+  "linkedin": {
+    "paragraphs": [
+      "I replaced MyFitnessPal with my own AI agent.",
+      "Gordon is a nutrition agent I built on the Claude Agent SDK, and he's the first app in something bigger: the Batcave, a set of apps where each one is run by its own AI agent in production. Two weeks before a family vacation I started logging only with him, and it stuck.",
+      "What I like most is that he isn't just a chat box. He's wired into the phone. \"Hey Siri, log food in Gordon\" from the lock screen. A calorie ring and macros on my Apple Watch. Hold the mic and talk. Snap a plate or scan a barcode. A push notification when he's done.",
+      "All of it in a React Native app, and the same agent behind every one of those, plus Telegram and the web. Next up is Ra's, the training agent, so what I eat and how I train finally talk to each other.",
+      "Part 2 of Building the Batcave: dimeglio.dev/blog/2026-10-22-replacing-myfitnesspal-before-punta-cana",
+      "If you had your own agent, which native feature would you wire it into first?"
+    ],
+    "word_count": 179
+  },
+  "x": {
+    "type": "single",
+    "tweets": [
+      "Gordon is app #1 in the Batcave: a suite of apps, each run by its own AI agent in production. He replaced MyFitnessPal for me. Siri, Apple Watch, voice, camera and push, all talking to the same Claude agent. Part 2 → https://dimeglio.dev/blog/2026-10-22-replacing-myfitnesspal-before-punta-cana"
+    ]
+  }
+}
