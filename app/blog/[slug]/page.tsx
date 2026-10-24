@@ -7,6 +7,14 @@ import { BlogPostTracker } from "@/components/blog-post-tracker";
 import { JsonLd, articleSchema } from "@/components/json-ld";
 
 /**
+ * Drafts (`published: false`) render only under `next dev`, so the blog
+ * pipeline can preview a post before publishing it. Production builds never
+ * see them: generateStaticParams lists published posts only, and the page
+ * 404s a draft outside development.
+ */
+const SHOW_DRAFTS = process.env.NODE_ENV === "development";
+
+/**
  * Generate static params for all published blog posts at build time.
  */
 export function generateStaticParams() {
@@ -56,9 +64,10 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
   const { slug } = await props.params;
   const post = getBlogPost(slug);
 
-  if (!post || !post.frontmatter.published) {
+  if (!post || (!post.frontmatter.published && !SHOW_DRAFTS)) {
     notFound();
   }
+  const isDraft = !post.frontmatter.published;
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-24 overflow-x-hidden">
@@ -73,6 +82,12 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
           coverImage: post.frontmatter.coverImage,
         })}
       />
+      {isDraft && (
+        <p className="mb-8 rounded-lg border border-amber-700 bg-amber-950/40 px-4 py-2 text-sm text-amber-300">
+          Draft preview. This post is not published, and only shows under
+          <code className="mx-1">next dev</code>.
+        </p>
+      )}
       <header className="mb-12">
         <time
           dateTime={post.frontmatter.date}
@@ -150,11 +165,13 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
         })()}
 
       {/* Analytics: tracks blog_post_viewed + scroll depth */}
-      <BlogPostTracker
-        slug={slug}
-        title={post.frontmatter.title}
-        tags={post.frontmatter.tags}
-      />
+      {!isDraft && (
+        <BlogPostTracker
+          slug={slug}
+          title={post.frontmatter.title}
+          tags={post.frontmatter.tags}
+        />
+      )}
     </article>
   );
 }
