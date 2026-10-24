@@ -1,0 +1,25 @@
+{
+  "slug": "2026-10-22-replacing-myfitnesspal-before-punta-cana",
+  "title": "Replacing MyFitnessPal Before Punta Cana",
+  "post_url": "https://dimeglio.dev/blog/2026-10-22-replacing-myfitnesspal-before-punta-cana",
+  "generated_at": "2026-10-24",
+  "project_social": {},
+  "linkedin": {
+    "paragraphs": [
+      "Replaced MyFitnessPal with my own AI agent (and his own apps).",
+      "Meet Gordon, the first agent in the Batcave to get his own apps. The Batcave is a set of AI agents I've been building, and now they're getting apps of their own. Two weeks before a family vacation I started logging all my food with him, and it stuck. Given how active I was going to be before the trip, we set calories and macros that worked with the little time we had. We also cleaned up the pantry so he could suggest meals only from what's there.",
+      "He isn't just a chat box. I'd already solved that part with Telegram: everyone in the Batcave talks through it, and a small router picks the right agent to put on the line. Now Gordon has more ways to talk: a website on Vercel, a React Native iOS app with Siri (App Intents) and notifications so he can talk back, and even his own little Apple Watch app for a quick macros check or logging from my wrist.",
+      "\"Hey Siri, log food in Gordon\" from the lock screen. Calorie ring and macros on my Apple Watch. Hold the mic and talk, snap a plate, scan a barcode, and he logs it. Things I always wanted from other tracking apps, but never quite got the way I wanted them.",
+      "Next up: Ra's, the training agent, so food and training finally talk to each other.",
+      "Full write-up on the blog, link in comments!"
+    ],
+    "word_count": 250,
+    "first_comment": "https://dimeglio.dev/blog/2026-10-22-replacing-myfitnesspal-before-punta-cana"
+  },
+  "x": {
+    "type": "single",
+    "tweets": [
+      "Gordon is the first agent in the Batcave, my set of AI agents, to get his own apps. He replaced MyFitnessPal for me. Siri, Apple Watch, voice, camera and push, all talking to the same Claude agent. Part 2 → https://dimeglio.dev/blog/2026-10-22-replacing-myfitnesspal-before-punta-cana"
+    ]
+  }
+}
