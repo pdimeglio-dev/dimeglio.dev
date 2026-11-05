@@ -11,6 +11,7 @@ export const BLOG_SLUGS = [
   "2026-06-07-nigel-splashforth-is-now-a-cloud-run-job",
   "2026-06-26-where-paddlers-cluster-routes-belong",
   "2026-10-22-replacing-myfitnesspal-before-punta-cana",
+  "2026-11-04-the-telegram-bot-needed-a-second-front-door",
   "building-dimeglio-dev-with-ai",
   "mcp-in-production-scheduling",
   "observability-stack",
