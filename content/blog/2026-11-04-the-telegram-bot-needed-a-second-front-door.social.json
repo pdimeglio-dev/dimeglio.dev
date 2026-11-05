@@ -1,0 +1,19 @@
+{
+  "slug": "2026-11-04-the-telegram-bot-needed-a-second-front-door",
+  "title": "The Telegram Bot Needed a Second Front Door",
+  "post_url": "https://dimeglio.dev/blog/2026-11-04-the-telegram-bot-needed-a-second-front-door",
+  "generated_at": "2026-11-04",
+  "linkedin": {
+    "paragraphs": [
+      "My AI nutrition agent started as a Telegram bot with exactly one user: me. My user id was a constant in the code.",
+      "Then I wanted to open Gordon from my phone without going through a chat app. So a web app and an iPhone app had to talk to the same agent and the same diary, without breaking the bot.",
+      "The cool part is that it's still one Gordon. Telegram and the apps only differ at the front door. Behind it, it's the same queue, the same worker and the same agent. I can send him a message, lock my phone, and his reply shows up on the lock screen when he's done.",
+      "Being honest, most of the guardrails in there exist because I tripped over something first, like the eval run that wrote 13 rows into my real diary.",
+      "It's still just me using it, but the code doesn't assume that anymore.",
+      "Part 3 of Building the Batcave. Next up: memory, where I thought Gordon had four tiers and then read the code.",
+      "Full write-up on the blog, link in comments!"
+    ],
+    "word_count": 183,
+    "first_comment": "https://dimeglio.dev/blog/2026-11-04-the-telegram-bot-needed-a-second-front-door"
+  }
+}
