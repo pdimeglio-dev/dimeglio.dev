@@ -46,6 +46,15 @@ For status meetings, a slides skill drives Playwright through the dashboard, tak
 
 I designed the shared version for Azure: one App Service web app behind Microsoft Entra sign-in, reading from private Blob Storage through a managed identity. Publishing is restricted to a role, checks hashes and the expected revision, and rejects conflicting writes. Readers always see a complete snapshot, falling back to the last valid one, marked stale, if the newest is damaged.
 
+### Working Across the Organization
+
+A system like this only works if everyone it touches trusts what it produces, so a big part of the job was communication at every level:
+
+* **Developers** get pull requests that explain the change, the proof and what was left out, so reviewing one takes minutes instead of an investigation.
+* **My own team** works the campaigns with the same skills and the same rules, instead of everyone fixing things their own way.
+* **The cloud and DevOps teams** own the findings that live in infrastructure. I worked with them directly on the Ansible playbooks and the handoff.
+* **Leadership** gets status straight from me, backed by the dashboard and the generated slides, so the numbers in the meeting are the same ones the agents are working from.
+
 ### Key Achievements
 
 * **Designed and built a Codex plugin on my own** that turns 5,000+ security findings into campaigns that agents work in waves.
@@ -53,4 +62,5 @@ I designed the shared version for Azure: one App Service web app behind Microsof
 * **Proof on every fix:** each claimed vulnerable path verified in the final packaged artifact, with the commit and proof recorded.
 * **About twenty specialized agent skills** for discovery, per-family fixes, delivery and reporting.
 * **100+ agent-written pull requests covering thousands of findings**, each explaining what changed, why, and what was excluded.
+* **Communication at every level:** developers, my own team, the cloud and DevOps teams, and direct status reporting to leadership.
 * **Status for leadership:** a reporting dashboard, an Azure design with Entra sign-in and conflict-safe publishing, and slide decks generated from dashboard screenshots with Playwright.
