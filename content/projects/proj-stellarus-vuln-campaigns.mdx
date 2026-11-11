@@ -1,0 +1,46 @@
+---
+title: "Agent-Driven Vulnerability Remediation"
+description: "A campaign system where coding agents work through thousands of Wiz security findings in bulk: find the issue, apply the fix in an isolated worktree, prove the build still passes, and hand developers a ready-to-merge pull request."
+category: "Professional"
+company: "Stellarus"
+associatedExperience: "exp-stellarus"
+startDate: "2026-07"
+endDate: "Present"
+techStack: ["OpenAI Codex", "Agent Skills", "Wiz", "Jira", "Git Worktrees", "React", "TypeScript", "shadcn/ui", "Azure Blob Storage", "Confluence", "Ansible"]
+order: 1
+---
+
+A Wiz security scan created more than 5,000 vulnerability tickets and assigned them all to one team. Nobody was working them. Fixing them one at a time by hand wasn't going to happen, so I designed and built, on my own, a way to fix them in bulk.
+
+### From 5,000 Tickets to a Handful of Campaigns
+
+I exported the full list and worked through it with Codex to find the main families of issues: the same vulnerable dependency or the same pattern showing up across many repos. Each family became a campaign, so one well-understood fix could be applied everywhere it was needed.
+
+### How a Campaign Runs
+
+Specialized agent skills handle each step:
+
+* **Find the issue** in the affected repo and read the fix Wiz recommends.
+* **Run a baseline** first, so we know the state of the build before anything changes.
+* **Apply the fix in a separate git worktree**, away from anyone's working branch.
+* **Run the baseline again.** If the build still passes, the agent opens a pull request for the developers, with the details of what changed and why.
+* **Watch the build after the fix.** If the build fails or the scan finds new vulnerabilities, the agent keeps working until the build is green.
+
+Developers only review, merge and deploy. Across the campaigns, the agents opened more than 100 pull requests covering thousands of tickets.
+
+### Findings That Code Can't Fix
+
+Some findings weren't in application code at all: they lived in cloud configuration. For those, I worked with the cloud and DevOps teams to write Ansible playbooks the engineers could run, and the system marks those tickets as handed off to cloud so they don't sit in the code backlog looking abandoned.
+
+### Status Everyone Can Trust
+
+At this volume, nobody can keep track of where each ticket stands by looking at Jira alone. The system keeps its own status for every ticket (fix in progress, pull request open, deferred to cloud) and syncs it with Jira whenever an agent works a campaign or someone runs a refresh. The status lives in Azure Blob Storage, and a dashboard I built in React, TypeScript and shadcn/ui shows every ticket and its status in one place. It's published to Confluence through the same publisher plugin I built for the AI Task Force.
+
+### Key Achievements
+
+* **Turned an untouched backlog of 5,000+ vulnerabilities into campaigns** grouped by the type of issue.
+* **100+ pull requests covering thousands of tickets**, opened by agents and ready to merge.
+* **Cloud findings routed to the right owners:** Ansible playbooks written with the cloud and DevOps teams, tracked separately from code fixes.
+* **Agent-driven fixes with proof:** baselines before and after every change, each fix isolated in its own worktree.
+* **Ready-to-merge pull requests** that explain the change, so developers spend their time reviewing instead of researching.
+* **One place to see status:** the system's own tracking kept in sync with Jira, shown in a React dashboard.
