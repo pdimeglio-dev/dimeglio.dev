@@ -6,7 +6,7 @@ company: "Stellarus"
 associatedExperience: "exp-stellarus"
 startDate: "2026-07"
 endDate: "Present"
-techStack: ["OpenAI Codex", "Codex Plugins", "Agent Skills", "Java", "Maven", "Spring Boot", "Node.js", "React", "TypeScript", "shadcn/ui", "Azure App Service", "Azure Blob Storage", "Microsoft Entra ID", "Jira", "Bitbucket", "Wiz", "Confluence", "Ansible"]
+techStack: ["OpenAI Codex", "Codex Plugins", "Agent Skills", "Git Worktrees", "Java", "Maven", "Spring Boot", "Node.js", "React", "TypeScript", "shadcn/ui", "Azure App Service", "Azure Blob Storage", "Microsoft Entra ID", "Jira", "Bitbucket", "Wiz", "Confluence", "Ansible"]
 order: 1
 ---
 
@@ -30,7 +30,7 @@ Most tracking treats a ticket marked Done or a merged pull request as the finish
 
 1. **Find the real source.** A matching repo name is only a lead. The agent traces the production resource back through its deployment pipeline to the deployed commit, the packaged artifact, the repo, the branch and the owner.
 2. **Choose the route.** Is the finding already covered by an open pull request? Does it need a new bundle? Or does it live in cloud configuration rather than code? Cloud findings leave the code path: I worked with the cloud and DevOps teams on Ansible playbooks for those, and the system tracks them as handed off.
-3. **Build a proven fix.** A skill for that dependency family finds what really controls the version (a Maven parent, a BOM, a property or a direct dependency) and gets the authoritative fixed version. It reproduces the build, applies the change, and checks the dependency graph, tests, packaging and runtime compatibility. Then it proves every vulnerable path it claims is gone from the final packaged artifact. A parent ticket doesn't count as covered while any of its findings is still unproven.
+3. **Build a proven fix.** A skill for that dependency family finds what really controls the version (a Maven parent, a BOM, a property or a direct dependency) and gets the authoritative fixed version. It works in its own git worktree, reproduces the build, applies the change, and checks the dependency graph, tests, packaging and runtime compatibility. Then it proves every vulnerable path it claims is gone from the final packaged artifact. A parent ticket doesn't count as covered while any of its findings is still unproven. Pinned Maven caches and versions are shared across worktrees, so hundreds of builds don't each download the world or fill the disk.
 4. **Deliver.** Before opening anything, the agent re-reads Jira, the branch heads and the open pull requests. The pull request records the exact commit, the findings it covers, the proof, the reviewers and anything excluded. Jira moves according to the campaign's own policy.
 5. **Follow through.** Review, merge, deployment and the later scan are recorded as separate events until the finding is verified.
 
