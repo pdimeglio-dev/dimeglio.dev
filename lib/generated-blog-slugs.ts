@@ -12,6 +12,7 @@ export const BLOG_SLUGS = [
   "2026-06-26-where-paddlers-cluster-routes-belong",
   "2026-10-22-replacing-myfitnesspal-before-punta-cana",
   "2026-11-04-the-telegram-bot-needed-a-second-front-door",
+  "2026-11-10-where-ras-golden-sets-came-from",
   "building-dimeglio-dev-with-ai",
   "mcp-in-production-scheduling",
   "observability-stack",
