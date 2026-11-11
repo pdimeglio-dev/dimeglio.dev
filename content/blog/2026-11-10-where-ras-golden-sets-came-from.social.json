@@ -6,14 +6,15 @@
   "linkedin": {
     "paragraphs": [
       "Before my AI training agent could read a single workout, we had to build the answer keys.",
-      "Ra's is the training agent in the Batcave, the set of AI agents I've been building. Until recently he could save a set and read it back, not much more. I wanted him to actually understand my CrossFit workouts, so every piece got a golden set first: real inputs with the right answer next to each one, checked by me.",
+      "Ra's is the training agent in the Batcave, the set of AI agents I've been building. I wanted him to actually understand my CrossFit workouts, so every piece got a golden set first: real inputs with the right answer next to each one, checked by me.",
       "The inputs were real. My own SugarWOD history, a free exercise library, and the CrossFit Open workouts. I went through it on a review page with OK and Wrong buttons.",
+      "Those sets are what the evals run on. An eval sends every case through Ra's and compares what comes out with the answer I wrote down. Each one has a minimum score, and if a prompt change drops below it, the change doesn't ship. So a tweak that fixes one workout can't quietly break three others.",
       "The cool part is that the sets ended up deciding the models. Matching movements uses no model at all, plain rules won. Opus reads the workouts. And Sonnet runs Ra's, because Haiku kept misreading how I describe a result.",
-      "Being honest, choosing the models was the quick part. The review page took a week.",
+      "Being honest, only the movement eval runs on every change by itself, since it costs nothing. The other two I run by hand before anything ships.",
       "Part 4 of Building the Batcave. Next up: memory, where I thought Gordon had four tiers and then read the code.",
       "Full write-up on the blog, link in comments!"
     ],
-    "word_count": 190,
+    "word_count": 243,
     "first_comment": "https://dimeglio.dev/blog/2026-11-10-where-ras-golden-sets-came-from"
   },
   "instagram": {
