@@ -1,0 +1,34 @@
+{
+  "slug": "2026-11-10-where-ras-golden-sets-came-from",
+  "title": "Where Ra's Golden Sets Came From",
+  "post_url": "https://dimeglio.dev/blog/2026-11-10-where-ras-golden-sets-came-from",
+  "generated_at": "2026-11-10",
+  "linkedin": {
+    "paragraphs": [
+      "Before my AI training agent could read a single workout, we had to build the answer keys.",
+      "Ra's is the training agent in the Batcave, the set of AI agents I've been building. Until recently he could save a set and read it back, not much more. I wanted him to actually understand my CrossFit workouts, so every piece got a golden set first: real inputs with the right answer next to each one, checked by me.",
+      "The inputs were real. My own SugarWOD history, a free exercise library, and the CrossFit Open workouts. I went through it on a review page with OK and Wrong buttons.",
+      "The cool part is that the sets ended up deciding the models. Matching movements uses no model at all, plain rules won. Opus reads the workouts. And Sonnet runs Ra's, because Haiku kept misreading how I describe a result.",
+      "Being honest, choosing the models was the quick part. The review page took a week.",
+      "Part 4 of Building the Batcave. Next up: memory, where I thought Gordon had four tiers and then read the code.",
+      "Full write-up on the blog, link in comments!"
+    ],
+    "word_count": 190,
+    "first_comment": "https://dimeglio.dev/blog/2026-11-10-where-ras-golden-sets-came-from"
+  },
+  "instagram": {
+    "caption": "Before my AI training agent could read a single workout, I checked hundreds of rows of my own training history by hand.\n\nRa's is the training agent in the Batcave, the AI agents I've been building. He has to know exactly which movement I did. A pause clean and a halt clean are different lifts, and every count and PR depends on telling them apart.\n\nSo the real data came first: my CrossFit history, a free exercise library, and the CrossFit Open workouts. I went through it on a review page with OK and Wrong buttons, and every answer became a test case.\n\nThose tests decided which model does what. Plain rules match the movements, Opus reads the workouts, Sonnet runs Ra's.\n\nFull write-up at dimeglio.dev (link in bio).",
+    "hashtags": [
+      "#aiagents",
+      "#evals",
+      "#crossfit",
+      "#claude"
+    ]
+  },
+  "x": {
+    "type": "single",
+    "tweets": [
+      "Before my AI training agent Ra's could read a CrossFit workout, we built golden sets from my own workout history and the CrossFit Opens. The evals on those sets picked the models, and plain rules beat a model at matching movements. Part 4 → https://dimeglio.dev/blog/2026-11-10-where-ras-golden-sets-came-from"
+    ]
+  }
+}
