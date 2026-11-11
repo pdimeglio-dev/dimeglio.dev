@@ -1,15 +1,17 @@
 ---
-title: "Lead Full Stack Engineer"
+title: "Lead Full Stack Engineer / AI Engineer"
 company: "Stellarus"
 startDate: "2026-07"
 endDate: "Present"
 relatedProjects: ["proj-stellarus-vuln-campaigns", "proj-stellarus-ai-task-force"]
-summary: "AI engineer on the team taking over Blue Shield of California's applications. Led AI adoption across the team and built an agent-driven system that works through thousands of security vulnerabilities in bulk."
+summary: "AI engineer on a Blue Shield of California platform team. Designed and built an agent system that fixes security vulnerabilities at scale, and lead the technical side of a team-wide AI program."
 order: 1
 ---
 
 Stellarus is a healthcare solutions company that builds products and services for health plans, helping them automate operations, reduce costs and improve the experience for their members. Its solutions launched first with Blue Shield of California, as part of the Ascendiun family of companies.
 
-I joined as the AI engineer on the team that took over Blue Shield of California's applications from an outsourced vendor. My first job was AI adoption. I designed the team's AI Task Force and lead it on the technical side. I ran a discovery of every AI tool already in use, and documented it in Confluence through a Codex plugin I built to publish straight from the codebase. I also laid out the structure of the team's Confluence space, and built proofs of concept for shared Codex and Copilot plugins so agent skills live in one place instead of being copied into random branches across scattered repos. The Task Force has since grown into a program where every engineer spends 30% of their time on AI work, and I help them design the use cases they bring.
+I'm the team's AI engineer: I design and build the agent tooling the team runs on, and lead the technical side of its AI program.
 
-When new leadership ran a Wiz security scan, more than 5,000 vulnerability tickets landed on the team with no plan to work through them. I exported the full list, grouped it into the main families of issues, and built, on my own, a campaign system where coding agents fix vulnerabilities in bulk: each fix gets a baseline build before and after, runs in its own git worktree, and arrives as a pull request explaining what changed and why. The agents opened more than 100 pull requests covering thousands of tickets. Findings that lived in cloud configuration instead of code went to the cloud and DevOps teams as Ansible playbooks I worked out with them. The system tracks every ticket's status, keeps it in sync with Jira, and shows it in a React dashboard.
+The biggest piece is an agent system for security remediation. A Wiz scan found more than 5,000 vulnerabilities across the team's repos. I designed and built, on my own, a system where coding agents work them as campaigns. They group findings by root cause, locate each one, apply the fix in an isolated git worktree, prove the build with baselines before and after, and open a pull request that explains the change. Then they keep watching the build until it's green. The agents have opened more than 100 pull requests covering thousands of findings. The system keeps its own status for every finding, synced with Jira, and shows it in a React and TypeScript dashboard.
+
+I also designed the team's AI Task Force. I started with a discovery of every AI tool in use, built a Codex plugin that publishes documentation straight to Confluence, and built proofs of concept for shared Codex and Copilot plugins so agent skills live in one place instead of scattered across repos. It's now a program where every engineer spends 30% of their time on AI work, and I help design the use cases they bring.
