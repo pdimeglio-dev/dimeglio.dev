@@ -121,6 +121,28 @@ self-deprecating** — like a senior engineer talking to peers, not a LinkedIn t
    load-bearing closing sentence is forgettable. The post earns the right to
    end on one sharp line — use it.
 
+### Written for a reader who hasn't seen the repo:
+Learned rewriting the Ra's golden sets post (2026-11-10). The Rater scored the jargon-heavy
+version 8.8 too, so these are checked by hand, not left to the score.
+
+1. **Introduce the system and the agent first.** Even in a series, say what the Batcave is
+   (a multi-agent system: router, Alfred, Gordon, Ra's, isolated Claude agents), what this
+   agent was before, and what it should become, before any detail.
+2. **Explain the core idea before the story.** If the post is about evals, say what a golden
+   set, an eval, a gate, held-out and negative cases are, and why they're needed, in plain words.
+3. **State the key design split and why.** E.g. code finds the movement (closed list, must be
+   exact and explainable), a model finds the structure (open-ended language), and the model
+   never gets the last word.
+4. **No repo vocabulary.** Say what a thing is, not what the repo calls it. No ADR numbers,
+   suite or eval names, case ids, file paths, tool or function names, "golds", or shorthand like
+   top-1, p50, trigram, schema, `GROUP BY`. "The doc where I wrote down the decision" beats "ADR-002".
+5. **Keep only numbers that carry the point,** and round the rest ("about 85%", "hundreds of
+   times"). Thresholds, before/after and head-to-head results stay exact.
+6. **Gloss domain terms once, on first use, inside the sentence** (the Open, Rx, EMOM, the Girls,
+   embeddings). Never in the opening sentence; it delays the hook.
+7. **Length follows the content.** Rater cuts that would remove an explainer Pablo asked for
+   don't apply. Cut repetition and repo detail instead.
+
 ### Self-check before finishing any blog draft:
 - ✅ Sounds like a dev blog by a real person → ship it
 - ❌ Sounds like a Medium article or marketing case study → rewrite it
