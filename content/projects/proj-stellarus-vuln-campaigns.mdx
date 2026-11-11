@@ -40,9 +40,9 @@ About twenty specialized skills cover each step: one for running a campaign, one
 
 Every refresh produces a structured report for each ticket, with Markdown, charts and a publication manifest, and its counts have to reconcile back to the frozen baseline. Reports publish to Confluence through the same publisher plugin I built for the AI Task Force.
 
-The dashboard is a read-only view of the campaigns, built in React, TypeScript and shadcn/ui on a Node reporting API. It shows baseline size, lifecycle breakdown, pull request coverage and scanner-verified progress, with drill-downs by severity, Jira status, family, wave and blocker. It never edits tickets or declares anything fixed. A synthetic demo mode with invented data makes it safe to show without exposing real findings.
+The dashboard is a read-only view of the campaigns, built in React, TypeScript and shadcn/ui on a Node reporting API. It shows baseline size, lifecycle breakdown, pull request coverage and scanner-verified progress, with drill-downs by severity, Jira status, family, wave and blocker. It never edits tickets or declares anything fixed.
 
-I designed the shared version for Azure: one App Service web app behind Microsoft Entra sign-in, reading from private Blob Storage through a managed identity. Publishing is restricted to a role, checks hashes and the expected revision, and rejects conflicting writes. Readers always see a complete snapshot, falling back to the last valid one, marked stale, if the newest is damaged. It's been tested in a dev environment, with the cutover to live data still ahead.
+I designed the shared version for Azure: one App Service web app behind Microsoft Entra sign-in, reading from private Blob Storage through a managed identity. Publishing is restricted to a role, checks hashes and the expected revision, and rejects conflicting writes. Readers always see a complete snapshot, falling back to the last valid one, marked stale, if the newest is damaged.
 
 ### Key Achievements
 
