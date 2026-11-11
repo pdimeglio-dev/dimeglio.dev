@@ -6,7 +6,7 @@ company: "Stellarus"
 associatedExperience: "exp-stellarus"
 startDate: "2026-07"
 endDate: "Present"
-techStack: ["OpenAI Codex", "Codex Plugins", "Agent Skills", "Git Worktrees", "Java", "Maven", "Spring Boot", "Node.js", "React", "TypeScript", "shadcn/ui", "Azure App Service", "Azure Blob Storage", "Microsoft Entra ID", "Jira", "Bitbucket", "Wiz", "Confluence", "Ansible"]
+techStack: ["OpenAI Codex", "Codex Plugins", "Agent Skills", "Git Worktrees", "Java", "Maven", "Spring Boot", "Node.js", "React", "TypeScript", "shadcn/ui", "Playwright", "Azure App Service", "Azure Blob Storage", "Microsoft Entra ID", "Jira", "Bitbucket", "Wiz", "Confluence", "Ansible"]
 order: 1
 ---
 
@@ -40,7 +40,9 @@ About twenty specialized skills cover each step: one for running a campaign, one
 
 Every refresh produces a structured report for each ticket, with Markdown, charts and a publication manifest, and its counts have to reconcile back to the frozen baseline. Reports publish to Confluence through the same publisher plugin I built for the AI Task Force.
 
-The dashboard is a read-only view of the campaigns, built in React, TypeScript and shadcn/ui on a Node reporting API. It shows baseline size, lifecycle breakdown, pull request coverage and scanner-verified progress, with drill-downs by severity, Jira status, family, wave and blocker. It never edits tickets or declares anything fixed.
+The dashboard is how leadership sees where the campaigns stand: a read-only view built in React, TypeScript and shadcn/ui on a Node reporting API. It shows baseline size, lifecycle breakdown, pull request coverage and scanner-verified progress, with drill-downs by severity, Jira status, family, wave and blocker. It never edits tickets or declares anything fixed.
+
+For status meetings, a slides skill drives Playwright through the dashboard, takes screenshots of the views that matter, and builds the deck from them, so the slides always match the live numbers instead of being rebuilt by hand.
 
 I designed the shared version for Azure: one App Service web app behind Microsoft Entra sign-in, reading from private Blob Storage through a managed identity. Publishing is restricted to a role, checks hashes and the expected revision, and rejects conflicting writes. Readers always see a complete snapshot, falling back to the last valid one, marked stale, if the newest is damaged.
 
@@ -51,4 +53,4 @@ I designed the shared version for Azure: one App Service web app behind Microsof
 * **Proof on every fix:** each claimed vulnerable path verified in the final packaged artifact, with the commit and proof recorded.
 * **About twenty specialized agent skills** for discovery, per-family fixes, delivery and reporting.
 * **100+ agent-written pull requests covering thousands of findings**, each explaining what changed, why, and what was excluded.
-* **A reporting dashboard and Azure design** with Entra sign-in, managed identity, and versioned, conflict-safe publishing.
+* **Status for leadership:** a reporting dashboard, an Azure design with Entra sign-in and conflict-safe publishing, and slide decks generated from dashboard screenshots with Playwright.
