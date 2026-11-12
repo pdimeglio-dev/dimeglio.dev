@@ -9,7 +9,7 @@ import { JsonLd, personSchema } from "@/components/json-ld";
 
 export const metadata: Metadata = {
   description:
-    "Pablo Di Meglio is a Senior Full Stack Engineer and AI Native with 17 years of experience at Google, Disney, Wells Fargo, and more. Building software that thinks.",
+    "Pablo Di Meglio is a Lead Full Stack Engineer and AI Native with 17 years of experience at Google, Disney, Wells Fargo, and more. Building software that thinks.",
   alternates: {
     canonical: "https://dimeglio.dev",
   },
