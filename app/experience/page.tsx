@@ -29,7 +29,14 @@ export default function ExperiencePage() {
   const jobs = experiences
     .filter((e) => e.slug.startsWith("exp-"))
     .sort((a, b) => {
-      // Sort by startDate descending (newest first)
+      // Current roles first, in their `order` (so Independent can lead);
+      // everything else by startDate descending (newest first)
+      const aCurrent = a.frontmatter.endDate === "Present";
+      const bCurrent = b.frontmatter.endDate === "Present";
+      if (aCurrent !== bCurrent) return aCurrent ? -1 : 1;
+      if (aCurrent && bCurrent) {
+        return (a.frontmatter.order ?? 99) - (b.frontmatter.order ?? 99);
+      }
       const aDate = a.frontmatter.startDate || "";
       const bDate = b.frontmatter.startDate || "";
       return bDate.localeCompare(aDate);

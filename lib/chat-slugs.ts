@@ -40,6 +40,7 @@ export const VALID_EXPERIENCE_SLUGS = new Set([
   "exp-google-agile-modeling",
   "exp-google-cloud-studio",
   "exp-google-shopping",
+  "exp-independent",
   "exp-mission-lane",
   "exp-pccw-global",
   "exp-rpotential",
