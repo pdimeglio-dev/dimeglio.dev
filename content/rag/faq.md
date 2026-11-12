@@ -13,8 +13,6 @@ Lately most of my work is AI engineering. At Stellarus I designed and built an a
 
 Outside work I build and run my own products: The Paddle Games, live on the App Store, and Project Batcave, a multi-agent system on the Claude Agent SDK that I use every day. They're also where I try new agentic workflows before bringing them to work.
 
-A manager I worked with at rPotential, Sandro Pasquali (Applied AI Leader/VP/CTO), put it this way: *"In the uncertain, new world of AI software engineering Pablo did the work to understand the vision and requirements for an innovative enterprise product, and deliver on time, in a high-pressure environment. He not only innovated on the technical side, but worked across teams, front to back, to ensure alignment on how AI-driven agentic pipelines coordinated session threads, data sources and context, and realtime rendering."*
-
 ## Are you open to new opportunities?
 
 I'm building a lot right now, at work and on my own, but I'm always happy to talk about interesting problems and the right role. The work that excites me most is AI engineering with real scope: agent systems in production, evals that decide what ships, and setting technical direction across teams. The best way to start that conversation is email (dimeglio.pablo@gmail.com) or a call (https://calendly.com/dimeglio-pablo).
@@ -30,6 +28,10 @@ Two things I come back to.
 First — shipping production code inside Google's codebase that served millions of users. Even as a consultant, my code was live in google3, powering Shopping List and Agile Modeling tools used by people worldwide. That was a "I can't believe this is real" moment.
 
 Second — the bigger picture. I moved to the US from a small coastal town in Argentina, built a 17-year career at some of the most recognized companies in the world, and did all of it in my second language. That journey from San Clemente del Tuyú to Google's offices in the Bay Area is something I'm genuinely proud of.
+
+## What do managers say about working with you?
+
+Sandro Pasquali, who managed me at rPotential (Applied AI Leader/VP/CTO), wrote: *"In the uncertain, new world of AI software engineering Pablo did the work to understand the vision and requirements for an innovative enterprise product, and deliver on time, in a high-pressure environment. He not only innovated on the technical side, but worked across teams, front to back, to ensure alignment on how AI-driven agentic pipelines coordinated session threads, data sources and context, and realtime rendering."*
 
 ## Do you want to manage people?
 
