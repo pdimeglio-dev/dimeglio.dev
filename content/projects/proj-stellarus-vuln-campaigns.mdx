@@ -1,0 +1,56 @@
+---
+title: "Agent System for Security Remediation"
+description: "A Codex plugin I designed and built on my own: coding agents trace thousands of security findings back to the code that ships them, fix them in waves, prove every fix in the packaged artifact, and only count a finding as fixed when a later scan says so."
+category: "Professional"
+company: "Stellarus"
+associatedExperience: "exp-stellarus"
+startDate: "2026-07"
+endDate: "Present"
+techStack: ["OpenAI Codex", "Codex Plugins", "Agent Skills", "Git Worktrees", "Java", "Maven", "Spring Boot", "Node.js", "React", "TypeScript", "shadcn/ui", "Playwright", "Azure App Service", "Azure Blob Storage", "Microsoft Entra ID", "Jira", "Bitbucket", "Wiz", "Confluence", "Ansible"]
+order: 1
+---
+
+I designed and built, on my own, an agent system that fixes security vulnerabilities at scale. A Wiz scan found more than 5,000 vulnerabilities across the team's repos, far more than anyone could fix one at a time. Instead of working them by hand, I built a Codex plugin where coding agents do the investigation and the fixing, and developers review and merge.
+
+The hard part wasn't writing fixes. It was knowing, with evidence, whether a finding was actually fixed.
+
+### Fixed Means Proven by a Later Scan
+
+Most tracking treats a ticket marked Done or a merged pull request as the finish line. This system doesn't. Every finding moves through the same lifecycle: backlog, source qualification, local validation, pull request opened, merged, deployed, and verified by a later scan. Jira status and merged pull requests are recorded as observations along the way, but only a new scanner result for the exact resource and artifact counts as fixed.
+
+### Campaigns, Waves and Bundles
+
+* **Campaigns** cover one business area each. A campaign has its own ticket selector, evidence store, Jira policy, report and dashboard route, so work in one never borrows another's tickets or permissions.
+* **The baseline is frozen at first intake.** Progress is measured against a stable denominator. Tickets that show up later are tracked separately instead of quietly moving the goalposts.
+* **Families** group findings by technology (Spring, Jackson, Netty, Tomcat and others) and decide how to fix them.
+* **Waves** are the units of execution: qualified groups of findings from the same codebase, which can span several families.
+* **Bundles** are one change and one pull request per repo, covering every finding that repo's packaged artifact proves fixed.
+
+### How the Agents Work a Finding
+
+1. **Find the real source.** A matching repo name is only a lead. The agent traces the production resource back through its deployment pipeline to the deployed commit, the packaged artifact, the repo, the branch and the owner.
+2. **Choose the route.** Is the finding already covered by an open pull request? Does it need a new bundle? Or does it live in cloud configuration rather than code? Cloud findings leave the code path: I worked with the cloud and DevOps teams on Ansible playbooks for those, and the system tracks them as handed off.
+3. **Build a proven fix.** A skill for that dependency family finds what really controls the version (a Maven parent, a BOM, a property or a direct dependency) and gets the authoritative fixed version. It works in its own git worktree, reproduces the build, applies the change, and checks the dependency graph, tests, packaging and runtime compatibility. Then it proves every vulnerable path it claims is gone from the final packaged artifact. A parent ticket doesn't count as covered while any of its findings is still unproven. Pinned Maven caches and versions are shared across worktrees, so hundreds of builds don't each download the world or fill the disk.
+4. **Deliver.** Before opening anything, the agent re-reads Jira, the branch heads and the open pull requests. The pull request records the exact commit, the findings it covers, the proof, the reviewers and anything excluded. Jira moves according to the campaign's own policy.
+5. **Follow through.** Review, merge, deployment and the later scan are recorded as separate events until the finding is verified.
+
+About twenty specialized skills cover each step: one for running a campaign, one for discovery, assessment skills for each dependency family, a skill for planning a Spring Boot 4 migration, checks for findings that are already fixed or already covered by an open pull request, and skills for delivery, reporting and slides. Across the campaigns, the agents have opened more than 100 pull requests covering thousands of findings.
+
+### Reporting and the Dashboard
+
+Every refresh produces a structured report for each ticket, with Markdown, charts and a publication manifest, and its counts have to reconcile back to the frozen baseline. Reports publish to Confluence through the same publisher plugin I built for the AI Task Force.
+
+I direct the campaigns and report their status directly to leadership. The dashboard is how they see where things stand: a read-only view built in React, TypeScript and shadcn/ui on a Node reporting API. It shows baseline size, lifecycle breakdown, pull request coverage and scanner-verified progress, with drill-downs by severity, Jira status, family, wave and blocker. It never edits tickets or declares anything fixed.
+
+For status meetings, a slides skill drives Playwright through the dashboard, takes screenshots of the views that matter, and builds the deck from them, so the slides always match the live numbers instead of being rebuilt by hand.
+
+I designed the shared version for Azure: one App Service web app behind Microsoft Entra sign-in, reading from private Blob Storage through a managed identity. Publishing is restricted to a role, checks hashes and the expected revision, and rejects conflicting writes. Readers always see a complete snapshot, falling back to the last valid one, marked stale, if the newest is damaged.
+
+### Key Achievements
+
+* **Designed and built a Codex plugin on my own** that turns 5,000+ security findings into campaigns that agents work in waves.
+* **Evidence-based closure:** a finding only counts as fixed when a later scan of the deployed artifact confirms it, not when Jira or a merged pull request says so.
+* **Proof on every fix:** each claimed vulnerable path verified in the final packaged artifact, with the commit and proof recorded.
+* **About twenty specialized agent skills** for discovery, per-family fixes, delivery and reporting.
+* **100+ agent-written pull requests covering thousands of findings**, each explaining what changed, why, and what was excluded.
+* **Status for leadership:** a reporting dashboard, an Azure design with Entra sign-in and conflict-safe publishing, and slide decks generated from dashboard screenshots with Playwright.

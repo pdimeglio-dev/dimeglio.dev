@@ -1,11 +1,11 @@
 ---
 title: "The Paddle Games"
-description: "Full-stack leaderboard platform for Bay Area paddle sports — kayaking, SUP, canoeing, and surfing — with Strava integration, a data-driven gamification engine, and geo-spatial challenges. Currently serving 100+ active paddlers."
+description: "A leaderboard platform for Bay Area paddle sports (kayaking, SUP, canoeing and surfing), live on the web and the App Store. Strava integration, a data-driven gamification engine, route challenges with personal records, and push notifications. Used by close to 100 paddlers."
 category: "Personal"
 logoFile: "paddle-games"
 associatedExperience: ""
 endDate: "Present"
-techStack: ["React", "TypeScript", "TanStack Router", "TanStack Query", "shadcn/ui", "Tailwind CSS", "Framer Motion", "Node.js", "Express", "Firestore", "GCP Cloud Functions", "GCP Pub/Sub", "Strava API", "Vite", "Vercel"]
+techStack: ["React", "React Native", "Expo", "EAS Build & Update", "NativeWind", "TypeScript", "TanStack Router", "TanStack Query", "shadcn/ui", "Tailwind CSS", "Framer Motion", "Node.js", "Express", "Firestore", "GCP Cloud Functions", "GCP Pub/Sub", "Strava API", "Vite", "Vercel"]
 video: "https://youtu.be/ZfxECzbmnAs"
 images: ["landing-page.png", "dashboard.png", "leaderboard.png", "leaderboards-list.png", "player-vs-player-comparisson.png", "activity-points.png", "challenges.png", "badges.png", "badges-expanded.png"]
 mobileImages: ["mobile-landing-page.jpg", "mobile-dashboard.jpg", "mobile-leaderboard.jpg", "mobile-leaderboards.jpg", "mobile-full-ranking.jpg", "mobile-p-vs-player-comparisson.jpg", "mobile-activity-points.jpg", "mobile-activities.jpg", "mobile-challenges.jpg", "mobile-challenges-2.jpg"]
@@ -13,23 +13,29 @@ links:
   github: "https://github.com/pdimeglio-dev/paddle-games"
   instagram: "https://instagram.com/the.paddle.games"
   website: "https://www.thepaddlegames.com"
+  "app store": "https://apps.apple.com/us/app/the-paddle-games/id6787727156"
 order: 1
 ---
 
 The Paddle Games is a community-driven leaderboard platform for Bay Area paddle sports enthusiasts. It connects with Strava to automatically track kayaking, stand-up paddleboarding, canoeing, and surfing activities — ranking paddlers on weekly, monthly, and all-time leaderboards powered by a fully data-driven gamification engine.
 
-Designed, developed, and launched as a solo full-stack build — from product vision to production deployment — currently serving 100+ active users with a growing community on Instagram.
+Designed, built and launched solo, from product idea to production, on the web and as a native iPhone app on the App Store. It has close to 100 paddlers, with a growing community on Instagram.
+
+### Native iPhone App
+
+The mobile app is built with Expo and React Native, and shares its API clients, data models and TanStack Query hooks with the web app through a shared core package, so a feature built once works on both. It signs in with Strava, sends push notifications for new personal records, new route leaders and rank changes, and ships most changes as over-the-air updates instead of new store builds. Getting through App Store review meant building a demo account the reviewers could use, kept out of the real leaderboards and blocked from writing to Strava.
 
 ### Event-Driven Microservices Architecture
 
-The backend is a serverless, event-driven system on Google Cloud Platform with 6 independent microservices communicating asynchronously via Pub/Sub:
+The backend is a serverless, event-driven system on Google Cloud Platform with 7 independent microservices communicating asynchronously via Pub/Sub:
 
 * **Auth Service** — Strava OAuth flow, JWT issuance, and token lifecycle management
 * **Strava Integration Service** — Webhook ingestion, activity enrichment, and geographic filtering
 * **Points Calculator Service** — Data-driven scoring rules engine
 * **Challenges Service** — Badge evaluation with a pluggable evaluator pattern
 * **Leaderboard Service** — Read-optimized materialized views for rankings
-* **Profile Service** — Stateless API aggregator for the frontend
+* **Profile Service** — Stateless API aggregator for the web and mobile apps
+* **Notifications Service** — Push notifications to the mobile app for personal records, new route leaders and rank changes
 
 Each service subscribes only to the events it cares about, enabling independent scaling, deployment, and evolution.
 
@@ -43,16 +49,18 @@ The entire points and challenges system is defined as data — no code changes a
 
 ### Geo-Spatial Challenge System
 
-The platform is evolving into a location-based challenge engine powered by GPS data from Strava activities:
+Location-based challenges are powered by GPS data from Strava activities:
 
 * **Polyline Decoding & Analysis:** Strava activity polylines are decoded and analyzed against a library of spatial assets — points, lines, and polygons representing local landmarks and waterway waypoints.
 * **Landmark & Route Detection:** The system detects when a paddler passes within a configurable radius of defined locations, enabling discovery challenges and guided waterfront tours.
-* **Progressive Roadmap:** The spatial system is designed in phases — from landmark discovery, to route completion and sector coverage, to habit-building streaks, and eventually timed racing with start/finish gates.
+* **Route Challenges and Personal Records:** Paddlers complete defined routes, get their own history and best times on each one, and get notified when they set a record or someone takes the lead.
+* **Map Editor:** An admin map editor for drawing landmarks and routes, with draggable pins and editable route points.
 
 ### Key Achievements
 
-* **Solo Full-Stack Product:** End-to-end ownership — product design, 6-service microservices backend, React 19 frontend, GCP infrastructure, Strava integration, and community building.
+* **Solo Full-Stack Product:** End-to-end ownership of product design, a 7-service backend, the React 19 web app, a native iPhone app on the App Store, GCP infrastructure, Strava integration and community building.
+* **Shipped to the App Store:** Expo and React Native app sharing a core package with the web, push notifications, over-the-air updates, and a review-safe demo account.
 * **Data-Driven Architecture:** Scoring rules, challenge definitions, badge configurations, and spatial assets are all stored as data — making the entire gamification layer extensible without code changes.
 * **Real-Time Event Pipeline:** Strava webhooks trigger an asynchronous pipeline through activity processing, points calculation, challenge evaluation, and leaderboard updates.
-* **Geo-Spatial Intelligence:** GPS polyline analysis, landmark proximity detection, sequenced waypoint validation, and a multi-phase roadmap toward route tracking and competitive timing.
-* **Production Community:** 100+ active users, automated activity ingestion, Instagram community, and a freemium business model with local sponsorship strategy.
+* **Geo-Spatial Challenges:** GPS polyline analysis, landmark proximity detection, sequenced waypoint validation, and route challenges with personal records.
+* **Production Community:** close to 100 paddlers, automated activity ingestion, Instagram community, and a freemium business model with local sponsorship strategy.

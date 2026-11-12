@@ -27,6 +27,8 @@ export const VALID_PROJECT_SLUGS = new Set([
   "proj-rpotential-genui",
   "proj-rpotential-sdui-library",
   "proj-rpotential-testing",
+  "proj-stellarus-vuln-campaigns",
+  "proj-stellarus-ai-task-force",
   "proj-wells-fargo-modernization",
 ]);
 
@@ -41,6 +43,7 @@ export const VALID_EXPERIENCE_SLUGS = new Set([
   "exp-mission-lane",
   "exp-pccw-global",
   "exp-rpotential",
+  "exp-stellarus",
   "exp-vmn-plus",
   "exp-wells-fargo",
   // certifications & education (anchor targets on /experience)
@@ -68,6 +71,7 @@ export const KNOWN_LOGOS: Record<string, "svg" | "png"> = {
   "paddle-games": "png",
   "pccw-global": "svg",
   rpotential: "svg",
+  stellarus: "png",
   "wells-fargo": "svg",
 };
 

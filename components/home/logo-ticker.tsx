@@ -16,11 +16,13 @@ const logos = [
   { src: "/logos/disney.svg", alt: "Disney", href: "/experience#exp-disney-studios" },
   { src: "/logos/globant.svg", alt: "Globant", href: "/experience" },
   { src: "/logos/rpotential.svg", alt: "rPotential", href: "/experience#exp-rpotential" },
+  // The spark above the "S" makes the image top-heavy; lift it so the wordmark lines up with the row.
+  { src: "/logos/stellarus.png", alt: "Stellarus", href: "/experience#exp-stellarus", className: "-translate-y-[12%]" },
   { src: "/logos/mission-lane.svg", alt: "Mission Lane", href: "/experience#exp-mission-lane" },
   { src: "/logos/wells-fargo.svg", alt: "Wells Fargo", href: "/experience#exp-wells-fargo" },
   { src: "/logos/pccw-global.svg", alt: "PCCW Global", href: "/experience#exp-pccw-global" },
   { src: "/logos/argentina-gob-ar.svg", alt: "Argentina Gobierno", href: "/experience#exp-globant-educar" },
-] as const;
+] as const satisfies readonly { src: string; alt: string; href: string; className?: string }[];
 
 /**
  * "Where I've built" logo strip — displays company logos in a centered flex row.
@@ -53,7 +55,7 @@ export function LogoTicker() {
               alt={logo.alt}
               width={200}
               height={60}
-              className="h-7 md:h-9 w-auto max-w-28 md:max-w-40 object-contain grayscale opacity-50 transition-all duration-300 hover:grayscale-0 hover:opacity-100"
+              className={`h-7 md:h-9 w-auto max-w-28 md:max-w-40 object-contain grayscale opacity-50 transition-all duration-300 hover:grayscale-0 hover:opacity-100 ${"className" in logo ? logo.className : ""}`}
             />
           </Link>
         ))}
