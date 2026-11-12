@@ -58,7 +58,7 @@ He got competitive about it fast. While chasing a personal record descending Haw
 
 ## The Paddle Games — Where Sport Meets Engineering
 
-The Paddle Games is Pablo's personal project that sits at the intersection of his two worlds — engineering and water sports. It's a full-stack leaderboard platform for Bay Area paddle sports (kayaking, SUP, canoeing, surfing) with Strava integration, a data-driven gamification engine, and geo-spatial challenges. Currently serving 100+ active paddlers with a growing Instagram community (@the.paddle.games).
+The Paddle Games is Pablo's personal project that sits at the intersection of his two worlds — engineering and water sports. It's a full-stack leaderboard platform for Bay Area paddle sports (kayaking, SUP, canoeing, surfing) with Strava integration, a data-driven gamification engine, and geo-spatial challenges. It has close to 100 paddlers, a native iPhone app on the App Store, and a growing Instagram community (@the.paddle.games).
 
 This isn't a side project in the "I built a todo app" sense. It's 6 microservices on GCP, event-driven architecture with Pub/Sub, a React 19 frontend, and a gamification engine where all scoring rules and challenges are defined as data. He designed, built, and launched it solo.
 
