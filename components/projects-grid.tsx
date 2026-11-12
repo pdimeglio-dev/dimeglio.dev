@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, ExternalLink, GitFork, Camera, Globe, Video } from "lucide-react";
+import { ArrowUpRight, ExternalLink, GitFork, Camera, Globe, Smartphone, Video } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -29,6 +29,7 @@ const linkIcons: Record<string, typeof GitFork> = {
   github: GitFork,
   instagram: Camera,
   website: Globe,
+  "app store": Smartphone,
 };
 
 
