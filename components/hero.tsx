@@ -28,7 +28,7 @@ export function Hero() {
           Pablo Di Meglio
         </h1>
         <p className="mt-4 text-lg text-zinc-300 sm:text-xl md:text-2xl">
-          Full Stack Engineer · AI Native
+          Full Stack Engineer · AI Native · 17 years
         </p>
         <p className="mt-6 max-w-xl mx-auto text-base text-zinc-400 leading-relaxed sm:text-lg">
           Building software that thinks.
