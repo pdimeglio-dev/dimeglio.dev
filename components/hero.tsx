@@ -50,7 +50,7 @@ export function Hero() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:animate-none" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          Now building Batcave and The Paddle Games
+          Now building The Batcave Project and The Paddle Games
           <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
         </motion.a>
       </motion.div>

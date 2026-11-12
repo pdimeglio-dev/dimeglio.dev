@@ -6,7 +6,6 @@ import {
   motion,
   useMotionTemplate,
   useMotionValue,
-  useReducedMotion,
 } from "framer-motion";
 import { ArrowUpRight, GitFork, Globe, Smartphone } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
@@ -17,26 +16,20 @@ export interface FeaturedBuild {
   status: string;
   pitch: string;
   stats: string[];
-  screenshot: string;
-  screenshotAlt: string;
-  /** Tailwind aspect class for the phone frame, e.g. "aspect-[9/19]" */
-  screenshotAspect: string;
   links: { appStore?: string; website?: string; github?: string };
 }
 
 type Target = "details" | "website" | "app_store" | "github";
 
 /**
- * One "What I'm building" card: status pill, pitch, stats, links, and a
- * phone-framed screenshot that floats and lifts on hover. A soft spotlight
- * follows the cursor across the card.
+ * One "What I'm building" card: status pill, pitch, stats and links.
+ * A soft spotlight follows the cursor across the card.
  *
  * Analytics: fires `featured_build_clicked` with the slug and which target
  * (details page, website, App Store, GitHub) was clicked.
  */
 export function FeaturedBuildCard({ build, index }: { build: FeaturedBuild; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
   const mouseX = useMotionValue(-400);
   const mouseY = useMotionValue(-400);
   const spotlight = useMotionTemplate`radial-gradient(420px circle at ${mouseX}px ${mouseY}px, rgba(139, 92, 246, 0.14), transparent 70%)`;
@@ -134,24 +127,6 @@ export function FeaturedBuildCard({ build, index }: { build: FeaturedBuild; inde
         </div>
       </div>
 
-      {/* Phone-framed screenshot, hidden on small phones to keep the text readable */}
-      <div className="pointer-events-none relative hidden w-36 shrink-0 items-center justify-center pr-6 sm:flex md:w-32 lg:w-40">
-        <motion.div
-          animate={reduceMotion ? undefined : { y: [0, -6, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: index * 1.5 }}
-          className="w-full"
-        >
-          <div className="rotate-3 overflow-hidden rounded-[1.4rem] border-4 border-slate-800 bg-black shadow-2xl shadow-purple-500/10 transition-transform duration-500 group-hover:-translate-y-2 group-hover:rotate-0">
-            {/* eslint-disable-next-line @next/next/no-img-element -- CDN-hosted, same pattern as the projects slider */}
-            <img
-              src={build.screenshot}
-              alt={build.screenshotAlt}
-              loading="lazy"
-              className={`${build.screenshotAspect} w-full object-cover object-top`}
-            />
-          </div>
-        </motion.div>
-      </div>
     </motion.div>
   );
 }

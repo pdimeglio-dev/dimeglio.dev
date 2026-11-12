@@ -1,5 +1,4 @@
 import { getProject } from "@/lib/mdx";
-import { assetUrl } from "@/lib/utils";
 import { FeaturedBuildCard, type FeaturedBuild } from "@/components/home/featured-build-card";
 
 /**
@@ -14,9 +13,6 @@ const builds = [
     pitch:
       "A leaderboard and challenge platform for Bay Area paddlers. Strava sync, route challenges with personal records, and a native iPhone app. Built and run solo.",
     stats: ["iPhone + web", "7 GCP services", "~100 paddlers"],
-    screenshot: "mobile-nigel-commentary.png",
-    screenshotAlt: "Nigel, the AI commentator, roasting the monthly leaderboard in the iPhone app",
-    screenshotAspect: "aspect-[9/19]",
   },
   {
     slug: "proj-batcave",
@@ -24,9 +20,6 @@ const builds = [
     pitch:
       "My own multi-agent system on the Claude Agent SDK. Alfred, Gordon and Ra's handle memory, nutrition and training, on Telegram voice, an iPhone and Watch app, and the web.",
     stats: ["3 agents", "13 eval suites", "280+ PRs"],
-    screenshot: "gordon-lock-screen.png",
-    screenshotAlt: "A push notification from Gordon on the iPhone lock screen, confirming a logged snack",
-    screenshotAspect: "aspect-[2/3]",
   },
 ] as const;
 
@@ -46,9 +39,6 @@ export function FeaturedBuilds() {
         status: build.status,
         pitch: build.pitch,
         stats: [...build.stats],
-        screenshot: assetUrl(`/projects/${build.slug}/${build.screenshot}`),
-        screenshotAlt: build.screenshotAlt,
-        screenshotAspect: build.screenshotAspect,
         links: {
           appStore: links["app store"],
           website: links.website,
