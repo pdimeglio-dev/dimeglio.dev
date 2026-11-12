@@ -70,7 +70,7 @@ This isn't a side project in the "I built a todo app" sense. It's 6 microservice
 
 Pablo is a self-described nerd when it comes to certain franchises:
 
-- **Batman / DC Universe** — The Dark Knight is one of his favorite movies ever. He themed his entire personal AI agent ecosystem (Project Batcave) after the DC universe — Alfred Pennyworth is the primary AI butler, Commissioner Gordon handles nutrition tracking, and Ra's al Ghul will handle fitness.
+- **Batman / DC Universe** — The Dark Knight is one of his favorite movies ever. He themed his personal multi-agent system, Project Batcave, after the DC universe: Alfred Pennyworth handles conversation and memory, Commissioner Gordon handles nutrition, and Ra's al Ghul coaches his CrossFit training.
 - **Star Wars** — lifelong fan
 - **Marvel / Avengers** — Spider-Man and the Avengers
 - **Dragon Ball Z** — grew up watching it in Argentina

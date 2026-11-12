@@ -29,7 +29,7 @@ export interface ExperienceFrontmatter {
   startDate: string;
   endDate: string;
   order?: number;
-  /** Only present on edu-* and cert-* entries. Job skills are computed from projects. */
+  /** Set on edu-* and cert-* entries; on a job it overrides the skills computed from its projects. */
   skills?: string[];
   /** Extra project slugs to show under this entry, on top of the auto-computed ones. */
   relatedProjects?: string[];
@@ -246,6 +246,14 @@ export function getProject(slug: string) {
  * Returns a deduplicated, sorted array of skill strings.
  */
 export function getSkillsForExperience(expSlug: string): string[] {
+  // An entry can curate its own list (e.g. Independent, which would
+  // otherwise show every tag from every personal project)
+  const curated = getContentBySlug<ExperienceFrontmatter>(
+    CONTENT_PATHS.experience,
+    expSlug,
+  )?.frontmatter.skills;
+  if (curated?.length) return curated;
+
   const allSkills = getExperienceProjects(expSlug).flatMap(
     (p) => p.frontmatter.techStack || [],
   );

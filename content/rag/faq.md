@@ -7,23 +7,21 @@
 
 ## Tell me about yourself.
 
-I'm a full stack engineer with 14+ years of experience across pretty different environments — Google, Disney, Wells Fargo, startups like Mission Lane and rPotential. I've worked in entertainment, fintech, retail, telecom, and now AI-first product development. I'm comfortable in both the structured processes of big tech and the "figure it out and ship it" pace of startups.
+I'm a full stack engineer with 17 years of experience across pretty different environments: Google, Disney, Wells Fargo, startups like Mission Lane and rPotential, and now Stellarus, a healthcare technology company where I'm Lead Full Stack Engineer and the team's AI engineer. I've worked in entertainment, fintech, retail, telecom, healthcare and AI-first product development, and I'm comfortable in both the structured processes of big tech and the "figure it out and ship it" pace of startups.
 
-Lately I've been deep in AI-native engineering — building systems where LLMs compose the UI in real-time, not just assist the developer. At rPotential I led the team building a Generative UI engine, an SDUI component library, and an LLM-as-Judge testing framework. Shipped full platforms in 4-week cycles.
+Lately most of my work is AI engineering. At Stellarus I designed and built an agent system that works through thousands of security vulnerabilities and only counts a fix when a later scan confirms it, and I lead the technical side of the team's AI program. Before that, at rPotential, I led the team building a Generative UI engine, an SDUI component library and an LLM-as-Judge testing framework.
 
-I use AI tools heavily in my own workflow — not as a novelty but as a multiplier. It lets me move 2-3x faster on things I already know how to do well. I take ownership of what I work on, and I care about the architectural decisions, not just the output.
+Outside work I build and run my own products: The Paddle Games, live on the App Store, and Project Batcave, a multi-agent system on the Claude Agent SDK that I use every day. They're also where I try new agentic workflows before bringing them to work.
 
-My last manager, Sandro Pasquali (Applied AI Leader/VP/CTO), said it better than I can: *"In the uncertain, new world of AI software engineering Pablo did the work to understand the vision and requirements for an innovative enterprise product, and deliver on time, in a high-pressure environment. He not only innovated on the technical side, but worked across teams, front to back, to ensure alignment on how AI-driven agentic pipelines coordinated session threads, data sources and context, and realtime rendering."*
+A manager I worked with at rPotential, Sandro Pasquali (Applied AI Leader/VP/CTO), put it this way: *"In the uncertain, new world of AI software engineering Pablo did the work to understand the vision and requirements for an innovative enterprise product, and deliver on time, in a high-pressure environment. He not only innovated on the technical side, but worked across teams, front to back, to ensure alignment on how AI-driven agentic pipelines coordinated session threads, data sources and context, and realtime rendering."*
 
-## Why are you looking for a new role?
+## Are you open to new opportunities?
 
-My most recent project wrapped up successfully — the client was happy with what we delivered on the engineering side. After 14+ years at Globant, where I built my career from Argentina to the Bay Area working with Disney, Google, and others, I'm ready to explore opportunities on my own. Now that I have my U.S. citizenship, I want to find a role where I have real long-term ownership of what I'm building — not wondering when the engagement ends regardless of the work quality.
+I'm building a lot right now, at work and on my own, but I'm always happy to talk about interesting problems and the right role. The work that excites me most is AI engineering with real scope: agent systems in production, evals that decide what ships, and setting technical direction across teams. The best way to start that conversation is email (dimeglio.pablo@gmail.com) or a call (https://calendly.com/dimeglio-pablo).
 
-## What's your ideal team or company?
+## What kind of problems excite you?
 
-I'd love to be at a company where engineering intersects with health, fitness, or the outdoors — think Apple Watch, Whoop, Strava, or something in that space. That said, I'm excited about both big tech and AI startups building genuinely interesting products.
-
-What matters most is ownership. I want to build something I can invest in long-term, contribute to architectural decisions, and see the impact of my work over time — not just deliver a feature and hand it off.
+Problems where engineering meets something people care about day to day. Health, fitness and the outdoors are close to my heart, which is why I built The Paddle Games and Gordon, my nutrition agent. More broadly, I like owning a system long term: making the architectural calls, living with them, and seeing the impact over time, not delivering a feature and handing it off.
 
 ## What's your biggest professional achievement?
 
@@ -31,13 +29,11 @@ Two things I come back to.
 
 First — shipping production code inside Google's codebase that served millions of users. Even as a consultant, my code was live in google3, powering Shopping List and Agile Modeling tools used by people worldwide. That was a "I can't believe this is real" moment.
 
-Second — the bigger picture. I moved to the US from a small coastal town in Argentina, built a 14+ year career at some of the most recognized companies in the world, and did all of it in my second language. That journey from San Clemente del Tuyú to Google's offices in the Bay Area is something I'm genuinely proud of.
+Second — the bigger picture. I moved to the US from a small coastal town in Argentina, built a 17-year career at some of the most recognized companies in the world, and did all of it in my second language. That journey from San Clemente del Tuyú to Google's offices in the Bay Area is something I'm genuinely proud of.
 
 ## Do you want to manage people?
 
-Yes, but I'm not interested in being a manager who sits in meetings all day and never touches code. I'm at my best as a player-coach — leading the team, making architectural decisions, mentoring engineers, while still getting my hands dirty with implementation. Tech Lead or Engineering Manager roles where I can do both are the sweet spot.
-
-I've led distributed teams of 5+ engineers across time zones (US, Argentina, Colombia), established sprint cadences, code review standards, and architectural decision records. I lead by example — my last manager specifically called out that I "worked across teams, front to back" rather than just delegating.
+I'm at my best as a hands-on technical leader: setting direction, making the architectural decisions, mentoring engineers, and still writing a lot of the code. I've led distributed teams of 5+ engineers across time zones (US, Argentina, Colombia), established code review standards and architectural decision records, and at Stellarus I lead the technical side of an AI program where every engineer spends 30% of their time on AI work. I lead by example: a previous manager specifically called out that I "worked across teams, front to back" rather than just delegating.
 
 ## Do you need visa sponsorship?
 
@@ -49,7 +45,7 @@ Pablo is based in Redwood City, California. He prefers remote work but is open t
 
 ## What's your availability?
 
-Available immediately. Can start as soon as tomorrow.
+Pablo is currently employed full time. For timing on a specific role, reach out to him directly via email (dimeglio.pablo@gmail.com) or schedule a call (https://calendly.com/dimeglio-pablo).
 
 ## What are your salary expectations?
 

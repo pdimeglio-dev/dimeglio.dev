@@ -12,6 +12,7 @@ import { BLOG_SLUGS } from "@/lib/generated-blog-slugs";
 export const VALID_PROJECT_SLUGS = new Set([
   "proj-assursoft-insurance",
   "proj-batcave",
+  "proj-dimeglio-dev",
   "proj-disney-o2i-support",
   "proj-disney-o2i",
   "proj-disney-parks-api",

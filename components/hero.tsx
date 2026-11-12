@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/analytics";
  */
 export function Hero() {
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-6 text-center">
+    <section className="relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden px-6 pt-16 text-center md:min-h-[72vh] md:pt-0">
       {/* Subtle blurred radial gradient background */}
       <div
         className="pointer-events-none absolute inset-0 -z-10"
@@ -50,7 +50,7 @@ export function Hero() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:animate-none" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          Now building The Batcave Project and The Paddle Games
+          Now building Project Batcave and The Paddle Games
           <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
         </motion.a>
       </motion.div>
