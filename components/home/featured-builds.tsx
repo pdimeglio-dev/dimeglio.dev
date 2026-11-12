@@ -61,7 +61,7 @@ export function FeaturedBuilds() {
   return (
     <section id="building" className="mx-auto w-full max-w-6xl scroll-mt-24 px-6">
       <p className="text-center text-sm uppercase tracking-widest text-muted-foreground">
-        What I&apos;m building
+        What I&apos;m building outside work
       </p>
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
         {items.map((item, i) => (

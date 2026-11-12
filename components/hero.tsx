@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
@@ -29,6 +30,21 @@ export function Hero() {
         </h1>
         <p className="mt-4 text-lg text-zinc-300 sm:text-xl md:text-2xl">
           Senior Full Stack Engineer · AI Native
+        </p>
+        <p className="mt-2 text-sm text-zinc-400 sm:text-base">
+          Lead Full Stack Engineer / AI Engineer at{" "}
+          <Link
+            href="/experience#exp-stellarus"
+            onClick={() =>
+              trackEvent({
+                event: "nav_link_clicked",
+                properties: { href: "/experience#exp-stellarus", label: "Hero: current role", from_page: "/" },
+              })
+            }
+            className="font-medium text-zinc-200 underline decoration-zinc-600 underline-offset-4 transition-colors hover:text-white hover:decoration-zinc-300"
+          >
+            Stellarus
+          </Link>
         </p>
         <p className="mt-6 max-w-xl mx-auto text-base text-zinc-400 leading-relaxed sm:text-lg">
           Building software that thinks.
