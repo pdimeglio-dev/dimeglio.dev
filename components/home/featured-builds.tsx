@@ -16,7 +16,7 @@ const builds = [
   },
   {
     slug: "proj-batcave",
-    status: "Running every day",
+    status: "Agents on call in the cloud",
     pitch:
       "My own multi-agent system on the Claude Agent SDK. Alfred, Gordon and Ra's handle memory, nutrition and training, on Telegram voice, an iPhone and Watch app, and the web.",
     stats: ["3 agents", "13 eval suites", "280+ PRs"],
