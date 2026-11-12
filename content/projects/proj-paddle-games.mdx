@@ -7,8 +7,8 @@ associatedExperience: ""
 endDate: "Present"
 techStack: ["React", "React Native", "Expo", "EAS Build & Update", "NativeWind", "TypeScript", "TanStack Router", "TanStack Query", "shadcn/ui", "Tailwind CSS", "Framer Motion", "Node.js", "Express", "Firestore", "GCP Cloud Functions", "GCP Pub/Sub", "Strava API", "Vite", "Vercel"]
 video: "https://youtu.be/ZfxECzbmnAs"
-images: ["landing-page.png", "dashboard.png", "leaderboard.png", "leaderboards-list.png", "player-vs-player-comparisson.png", "activity-points.png", "challenges.png", "badges.png", "badges-expanded.png"]
-mobileImages: ["mobile-landing-page.jpg", "mobile-dashboard.jpg", "mobile-leaderboard.jpg", "mobile-leaderboards.jpg", "mobile-full-ranking.jpg", "mobile-p-vs-player-comparisson.jpg", "mobile-activity-points.jpg", "mobile-activities.jpg", "mobile-challenges.jpg", "mobile-challenges-2.jpg"]
+images: ["landing-page.png", "dashboard.png", "route-leaderboard.png", "leaderboard.png", "leaderboards-list.png", "player-vs-player-comparisson.png", "activity-points.png", "challenges.png", "badges.png", "badges-expanded.png"]
+mobileImages: ["mobile-landing-page.jpg", "mobile-nigel-commentary.png", "mobile-dashboard.jpg", "mobile-leaderboard.jpg", "mobile-leaderboards.jpg", "mobile-full-ranking.jpg", "mobile-p-vs-player-comparisson.jpg", "mobile-activity-points.jpg", "mobile-activities.jpg", "mobile-challenges.jpg", "mobile-challenges-2.jpg"]
 links:
   github: "https://github.com/pdimeglio-dev/paddle-games"
   instagram: "https://instagram.com/the.paddle.games"
@@ -26,6 +26,46 @@ Designed, built and launched solo, from product idea to production, on the web a
 The mobile app is built with Expo and React Native, and shares its API clients, data models and TanStack Query hooks with the web app through a shared core package, so a feature built once works on both. It signs in with Strava, sends push notifications for new personal records, new route leaders and rank changes, and ships most changes as over-the-air updates instead of new store builds. Getting through App Store review meant building a demo account the reviewers could use, kept out of the real leaderboards and blocked from writing to Strava.
 
 ### Event-Driven Microservices Architecture
+
+```mermaid
+flowchart TB
+    ST[Strava<br/>a paddler uploads an activity]:::external
+    SYNC[Strava sync<br/>webhook, outbox, retries]:::input
+    BUS@{ icon: "logos:google-cloud", form: "rounded", label: "Pub/Sub events", pos: "b", h: 40 }
+    subgraph PIPE[Event pipeline]
+        direction LR
+        CH[Challenges<br/>badges, landmarks,<br/>route gates]
+        PTS[Points<br/>data-driven<br/>scoring rules]
+        LB[Leaderboards<br/>monthly, all time,<br/>per route]
+    end
+    DB@{ icon: "logos:firebase", form: "rounded", label: "Firestore", pos: "b", h: 40 }
+    NOT[Notifications<br/>push and inbox]:::output
+    NIGEL[Nigel<br/>Claude writes the<br/>monthly roast]:::agent
+    BFF[Profile API<br/>one read API<br/>for both apps]:::input
+    subgraph APPS[Where paddlers play]
+        direction LR
+        IOS@{ icon: "logos:apple", form: "rounded", label: "iPhone app", pos: "b", h: 40 }
+        WEB@{ icon: "logos:vercel", form: "rounded", label: "Web app", pos: "b", h: 40 }
+    end
+    ST -->|webhook| SYNC
+    SYNC -->|activity recorded| BUS
+    BUS --> CH
+    BUS --> PTS
+    CH -->|badge earned| PTS
+    PTS -->|points updated| LB
+    PIPE -->|writes| DB
+    CH -->|new route record| NOT
+    LB -->|rank changed| NOT
+    DB <-->|reads, roast| NIGEL
+    DB --> BFF
+    BFF --> APPS
+    NOT -->|push| IOS
+    class BUS queue
+    class DB storage
+    class IOS,WEB input
+```
+
+*Seven services on Google Cloud, wired by events. Nothing in the activity pipeline calls another service directly.*
 
 The backend is a serverless, event-driven system on Google Cloud Platform with 7 independent microservices communicating asynchronously via Pub/Sub:
 

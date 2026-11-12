@@ -19,6 +19,8 @@ export interface FeaturedBuild {
   stats: string[];
   screenshot: string;
   screenshotAlt: string;
+  /** Tailwind aspect class for the phone frame, e.g. "aspect-[9/19]" */
+  screenshotAspect: string;
   links: { appStore?: string; website?: string; github?: string };
 }
 
@@ -145,7 +147,7 @@ export function FeaturedBuildCard({ build, index }: { build: FeaturedBuild; inde
               src={build.screenshot}
               alt={build.screenshotAlt}
               loading="lazy"
-              className="aspect-[9/19] w-full object-cover object-top"
+              className={`${build.screenshotAspect} w-full object-cover object-top`}
             />
           </div>
         </motion.div>

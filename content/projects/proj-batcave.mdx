@@ -6,7 +6,7 @@ logoFile: "batcave"
 associatedExperience: ""
 endDate: "Present"
 techStack: ["Claude Agent SDK", "MCP", "Node.js", "TypeScript", "Cloud Run", "Cloud Tasks", "Cloud Build", "Supabase (Postgres)", "Hono", "React Native / Expo", "SwiftUI", "React 19", "TanStack Query", "Tailwind CSS", "OpenAI Whisper", "ElevenLabs", "LangSmith", "GitHub Actions"]
-images: ["batcave-telegram.PNG", "batcave-logs.png"]
+images: ["gordon-app.png", "batcave-telegram.PNG", "batcave-logs.png"]
 video: "https://youtube.com/shorts/AtIqqAJ0Qs0"
 links:
   github: "https://github.com/pdimeglio-dev/project-batcave"
@@ -18,6 +18,49 @@ Batcave started in February 2026 as a Telegram bot on a free-tier GCP VM: one bu
 Most people are building Jarvis. I went with a different superhero universe.
 
 ### How It Runs
+
+```mermaid
+flowchart TB
+    subgraph YOU[Where I talk to them]
+        direction LR
+        T@{ icon: "logos:telegram", form: "rounded", label: "Telegram voice", pos: "b", h: 40 }
+        P@{ icon: "logos:apple", form: "rounded", label: "iPhone and Watch app", pos: "b", h: 40 }
+        W@{ icon: "logos:vitejs", form: "rounded", label: "Gordon and Ra's web", pos: "b", h: 40 }
+    end
+    ING[Ingest<br/>Telegram webhook]:::input
+    API[REST API<br/>Hono, Supabase sign-in]:::input
+    Q@{ icon: "logos:google-cloud", form: "rounded", label: "Cloud Tasks queue", pos: "b", h: 40 }
+    RT[Router<br/>Haiku picks one agent]:::agent
+    subgraph AGENTS[Each agent runs its own Claude Agent SDK loop]
+        direction LR
+        AL[Alfred<br/>conversation and memory]:::agent
+        GO[Gordon<br/>nutrition]:::agent
+        RA["Ra's al Ghul<br/>CrossFit training"]:::agent
+    end
+    VOICE[Whisper in<br/>ElevenLabs out]:::external
+    CORE[Shared core<br/>27 tools, one MCP server]:::storage
+    DB@{ icon: "logos:supabase-icon", form: "rounded", label: "Supabase Postgres", pos: "b", h: 40 }
+    OUT[Reply in Telegram,<br/>or pushed to the app]:::output
+    T -->|message| ING
+    P -->|signed request| API
+    W -->|signed request| API
+    ING -->|turn| Q
+    API -->|chat turn| Q
+    API -->|diary reads and writes| CORE
+    Q -->|task| RT
+    RT --> AL
+    RT --> GO
+    RT --> RA
+    AGENTS -->|tools| CORE
+    CORE -->|rows| DB
+    AGENTS -->|reply| OUT
+    OUT -.->|voice note| VOICE
+    class T,P,W input
+    class Q queue
+    class DB storage
+```
+
+*Three Cloud Run services that scale to zero. Telegram and the apps share one queue, one worker and one set of tools.*
 
 * **Three Cloud Run services that scale to zero.** A public webhook takes Telegram messages, checks the secret token, drops duplicates and queues the turn on Cloud Tasks. A private worker runs the turn. A REST API (Hono, Supabase auth, about 35 routes) serves the apps. Chat from the apps goes through the same queue and worker as Telegram, so an agent behaves the same wherever I talk to it.
 * **A router picks the agent.** A small, fast model (Haiku) reads each message and names one agent. A short reply like "yes" stays with the agent that just asked the question. It's checked against a 46-case routing eval on every pull request and again before every deploy.
