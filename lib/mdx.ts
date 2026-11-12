@@ -29,9 +29,9 @@ export interface ExperienceFrontmatter {
   startDate: string;
   endDate: string;
   order?: number;
-  /** Only present on edu-* and cert-* entries. Job skills are computed from projects. */
+  /** Set on edu-* and cert-* entries; on a job it overrides the skills computed from its projects. */
   skills?: string[];
-  /** Optional explicit list of related project slugs (overrides auto-computed). */
+  /** Extra project slugs to show under this entry, on top of the auto-computed ones. */
   relatedProjects?: string[];
 }
 
@@ -246,27 +246,47 @@ export function getProject(slug: string) {
  * Returns a deduplicated, sorted array of skill strings.
  */
 export function getSkillsForExperience(expSlug: string): string[] {
-  const projects = getProjects();
-  const associatedProjects = projects.filter(
-    (p) => p.frontmatter.associatedExperience === expSlug,
-  );
-  const allSkills = associatedProjects.flatMap(
+  // An entry can curate its own list (e.g. Independent, which would
+  // otherwise show every tag from every personal project)
+  const curated = getContentBySlug<ExperienceFrontmatter>(
+    CONTENT_PATHS.experience,
+    expSlug,
+  )?.frontmatter.skills;
+  if (curated?.length) return curated;
+
+  const allSkills = getExperienceProjects(expSlug).flatMap(
     (p) => p.frontmatter.techStack || [],
   );
   return [...new Set(allSkills)].sort();
 }
 
 /**
+ * Projects linked to an experience entry: every project whose
+ * `associatedExperience` points at it, plus any extra slugs listed in the
+ * entry's `relatedProjects` (e.g. personal projects shown under "Independent").
+ * Unknown slugs are ignored.
+ */
+function getExperienceProjects(expSlug: string) {
+  const projects = getProjects();
+  const experience = getContentBySlug<ExperienceFrontmatter>(
+    CONTENT_PATHS.experience,
+    expSlug,
+  );
+  const extra = new Set(experience?.frontmatter.relatedProjects ?? []);
+  return projects.filter(
+    (p) => p.frontmatter.associatedExperience === expSlug || extra.has(p.slug),
+  );
+}
+
+/**
  * Get project slugs, titles, and descriptions associated with an experience entry.
- * Uses the reverse relationship from projects' `associatedExperience` field.
+ * Uses projects' `associatedExperience` plus the entry's `relatedProjects`.
  * Description falls back to the MDX body content (trimmed).
  */
 export function getProjectsForExperience(
   expSlug: string,
 ): { slug: string; title: string; description: string }[] {
-  const projects = getProjects();
-  return projects
-    .filter((p) => p.frontmatter.associatedExperience === expSlug)
+  return getExperienceProjects(expSlug)
     .map((p) => ({
       slug: p.slug,
       title: p.frontmatter.title,

@@ -1,0 +1,45 @@
+---
+title: "dimeglio.dev and Guillermo"
+description: "This portfolio, built as a working AI product: a Next.js site with Guillermo, a RAG agent that answers questions about my work from everything published here and replies with interactive cards, plus an agentic pipeline that drafts, scores and publishes the blog."
+category: "Personal"
+associatedExperience: ""
+endDate: "Present"
+techStack: ["Next.js", "React 19", "TypeScript", "Tailwind CSS", "shadcn/ui", "Framer Motion", "MDX", "RAG", "Pinecone", "OpenAI Embeddings", "Vercel AI SDK", "NDJSON Streaming", "Upstash", "Resend", "Sentry", "PostHog", "Mermaid", "Claude Code Plugins", "Vercel"]
+links:
+  website: "https://dimeglio.dev"
+  github: "https://github.com/pdimeglio-dev/dimeglio.dev"
+order: 3
+---
+
+dimeglio.dev is where my work lives, and it's built to be a working AI product rather than a static page. Everything on it, from the experience timeline to the blog, is also the knowledge base for Guillermo, an AI agent you can ask about my work.
+
+### Guillermo, the RAG Agent
+
+Guillermo answers questions about my experience, projects and writing, and only from what's published here.
+
+* **Retrieval first, every time.** Before answering anything about my career, Guillermo searches the portfolio. If the answer isn't there, he says so and offers a way to ask me directly, instead of guessing.
+* **Answers as interface, not text dumps.** Projects, skills, blog posts and contact details come back as interactive cards streamed to the page as the answer is written, so a question like "what has he built with React?" returns a filterable list, not a paragraph.
+* **From question to conversation.** When a visitor wants to talk, Guillermo shows a contact card or opens a calendar picker with my real availability, and I get an email with the context of the conversation.
+* **Guardrails.** Rate limiting per visitor, strict rules on what he can claim, every deep link checked against the content that actually exists, and no salary numbers or opinions about past employers.
+
+### The Knowledge Base
+
+Every experience entry, project, blog post and a set of background notes is turned into embeddings and indexed in Pinecone. Short entries like jobs and projects are indexed whole; long ones like blog posts are split by section, and every piece keeps a header naming the document it came from, so a question about "work at Google" finds the right job and the right projects. Re-indexing is one command, run whenever the content changes.
+
+### The Site
+
+* **Next.js App Router with MDX content.** Experience, projects and posts are plain MDX files, so updating the portfolio is editing text, not code.
+* **Diagrams and design.** Architecture diagrams render from Mermaid in a shared visual style, on a dark design system built with Tailwind CSS, shadcn/ui and Framer Motion.
+* **Observability.** Sentry captures errors on the client and the server and forwards them to PostHog, where they sit next to product analytics, so I can see both what broke and what visitors actually use.
+
+### The Blog Pipeline
+
+The blog is written with a set of Claude Code plugins I built: a reporter reads a project's git history, a writer drafts the post in my voice with a cover image, and an independent rater scores it and can send it back. A social manager drafts the LinkedIn, X and Instagram posts, reviewed by a separate rater. Nothing publishes without my approval.
+
+### Key Achievements
+
+* **A RAG agent in production** that answers from the portfolio only, falls back honestly when it doesn't know, and turns interest into a booked call.
+* **Interactive, streamed answers:** cards for projects, skills, posts and contact instead of walls of text.
+* **Content as the source of truth:** one set of MDX files powers the site, the agent's knowledge and, next, the generated CV.
+* **Full observability** across client and server, with errors and analytics in one place.
+* **An agentic writing pipeline** with separate writer and reviewer agents and a human approval step.

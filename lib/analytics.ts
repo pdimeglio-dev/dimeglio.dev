@@ -135,6 +135,10 @@ export type AnalyticsEvent =
   | {
       event: "calendly_fallback_shown";
       properties: { reason: "mcp_unavailable" | "booking_failed"; conversation_id?: string };
+    }
+  | {
+      event: "featured_build_clicked";
+      properties: { slug: string; target: "details" | "website" | "app_store" | "github"; url: string };
     };
 
 /**

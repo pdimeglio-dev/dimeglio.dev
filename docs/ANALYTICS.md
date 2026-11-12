@@ -115,6 +115,21 @@ Fired when a user clicks a company logo on the homepage "Where I've built" secti
 
 ---
 
+#### `featured_build_clicked`
+Fired when a user clicks a card or link in the homepage "What I'm building" section.
+
+| Property | Type | Example |
+|---|---|---|
+| `slug` | string | `"proj-paddle-games"`, `"proj-batcave"` |
+| `target` | `"details"` \| `"website"` \| `"app_store"` \| `"github"` | `"app_store"` |
+| `url` | string | `"/projects?projectId=proj-batcave"` |
+
+**Component:** `components/home/featured-build-card.tsx`
+
+The hero's "Now building…" pill fires `nav_link_clicked` with `href: "#building"`.
+
+---
+
 #### `blog_post_viewed`
 Fired when a blog post page loads.
 

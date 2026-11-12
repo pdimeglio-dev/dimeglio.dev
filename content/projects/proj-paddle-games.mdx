@@ -27,6 +27,46 @@ The mobile app is built with Expo and React Native, and shares its API clients, 
 
 ### Event-Driven Microservices Architecture
 
+```mermaid
+flowchart TB
+    ST[Strava<br/>a paddler uploads an activity]:::external
+    SYNC[Strava sync<br/>webhook, outbox, retries]:::input
+    BUS@{ icon: "logos:google-cloud", form: "rounded", label: "Pub/Sub events", pos: "b", h: 40 }
+    subgraph PIPE[Event pipeline]
+        direction LR
+        CH[Challenges<br/>badges, landmarks,<br/>route gates]
+        PTS[Points<br/>data-driven<br/>scoring rules]
+        LB[Leaderboards<br/>monthly, all time,<br/>per route]
+    end
+    DB@{ icon: "logos:firebase", form: "rounded", label: "Firestore", pos: "b", h: 40 }
+    NOT[Notifications<br/>push and inbox]:::output
+    NIGEL[Nigel<br/>Claude writes the<br/>monthly roast]:::agent
+    BFF[Profile API<br/>one read API<br/>for both apps]:::input
+    subgraph APPS[Where paddlers play]
+        direction LR
+        IOS@{ icon: "logos:apple", form: "rounded", label: "iPhone app", pos: "b", h: 40 }
+        WEB@{ icon: "logos:vercel", form: "rounded", label: "Web app", pos: "b", h: 40 }
+    end
+    ST -->|webhook| SYNC
+    SYNC -->|activity recorded| BUS
+    BUS --> CH
+    BUS --> PTS
+    CH -->|badge earned| PTS
+    PTS -->|points updated| LB
+    PIPE -->|writes| DB
+    CH -->|new route record| NOT
+    LB -->|rank changed| NOT
+    DB <-->|reads, roast| NIGEL
+    DB --> BFF
+    BFF --> APPS
+    NOT -->|push| IOS
+    class BUS queue
+    class DB storage
+    class IOS,WEB input
+```
+
+*Seven services on Google Cloud, wired by events. Nothing in the activity pipeline calls another service directly.*
+
 The backend is a serverless, event-driven system on Google Cloud Platform with 7 independent microservices communicating asynchronously via Pub/Sub:
 
 * **Auth Service** — Strava OAuth flow, JWT issuance, and token lifecycle management

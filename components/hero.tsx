@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ArrowDown } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * Hero section with a massive headline, subtitle, and a blurred radial
@@ -8,7 +10,7 @@ import { motion } from "framer-motion";
  */
 export function Hero() {
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-6 text-center">
+    <section className="relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden px-6 pt-16 text-center md:min-h-[72vh] md:pt-0">
       {/* Subtle blurred radial gradient background */}
       <div
         className="pointer-events-none absolute inset-0 -z-10"
@@ -26,11 +28,31 @@ export function Hero() {
           Pablo Di Meglio
         </h1>
         <p className="mt-4 text-lg text-zinc-300 sm:text-xl md:text-2xl">
-          Senior Full Stack Engineer · AI Native
+          Full Stack Engineer · AI Native
         </p>
         <p className="mt-6 max-w-xl mx-auto text-base text-zinc-400 leading-relaxed sm:text-lg">
           Building software that thinks.
         </p>
+        <motion.a
+          href="#building"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+          onClick={() =>
+            trackEvent({
+              event: "nav_link_clicked",
+              properties: { href: "#building", label: "Hero: what I'm building", from_page: "/" },
+            })
+          }
+          className="group mt-10 inline-flex items-center gap-2 rounded-full border border-slate-800 bg-card/60 px-4 py-2 text-sm text-zinc-300 backdrop-blur transition-colors hover:border-slate-700 hover:text-white"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:animate-none" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          </span>
+          Now building Project Batcave and The Paddle Games
+          <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+        </motion.a>
       </motion.div>
     </section>
   );

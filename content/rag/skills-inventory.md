@@ -47,7 +47,7 @@
 
 | Skill | Level | Evidence |
 |-------|-------|---------|
-| Node.js | 🟡 Proficient | 5 projects: Batcave, Paddle Games (6 microservices), PCCW, rPotential CLI, rPotential GenUI |
+| Node.js | 🟡 Proficient | 5 projects: Project Batcave, Paddle Games (7 microservices), PCCW, rPotential CLI, rPotential GenUI |
 | Spring Boot | 🟡 Proficient | Disney O2I (×2), Disney Parks API. Solid experience but not recent. |
 | Spring / Spring MVC | 🟡 Proficient | EducAR, Disney Parks, earlier Java work |
 | Express | 🟡 Proficient | Paddle Games backend services |
@@ -84,15 +84,15 @@
 | Skill | Level | Evidence |
 |-------|-------|---------|
 | LLMs (general) | 🟠 Advanced | 5 projects + 2 certifications. Deep understanding of prompting, tool-calling, streaming, and evaluation. |
-| Claude (API) | 🟠 Advanced | Batcave (reasoning engine), rPotential GenUI, CLI, Testing |
+| Claude (API) | 🟠 Advanced | Project Batcave (a Claude Agent SDK loop per agent, a Haiku router, Opus for reading workouts), rPotential GenUI, CLI, Testing |
 | Gemini | 🟠 Advanced | rPotential GenUI (layout planning), Google Outfits (Vertex AI) |
 | Prompt Engineering | 🟠 Advanced | rPotential GenUI, CLI, Testing — production prompt design for tool-calling and layout generation |
 | GenUI / SDUI | 🟠 Advanced | rPotential: 3 interconnected projects (GenUI Engine, SDUI Library, Testing Suite) |
-| Multi-Agent Architecture | 🟡 Proficient | Project Batcave (multi-agent system with bidirectional handoffs) + AI Engineer Agentic Track cert |
-| MCP (Model Context Protocol) | 🟡 Proficient | AI Engineer Agentic Track certification |
+| Multi-Agent Architecture | 🟡 Proficient | Project Batcave (a router that picks one of three agents, each running its own Claude Agent SDK loop with its own tools and cost cap, gated by evals) + Stellarus (Codex agents that fix security vulnerabilities in campaigns) + AI Engineer Agentic Track cert |
+| MCP (Model Context Protocol) | 🟡 Proficient | Project Batcave (one in-process MCP server with 27 tools shared by the agents) + AI Engineer Agentic Track certification |
 | LLM-as-Judge | 🟡 Proficient | rPotential Testing Suite (quality evaluation of AI-generated layouts) |
-| OpenAI Whisper | 🟢 Familiar | Batcave (speech-to-text in voice pipeline) |
-| ElevenLabs TTS | 🟢 Familiar | Batcave (text-to-speech with character voices) |
+| OpenAI Whisper | 🟢 Familiar | Project Batcave (speech-to-text for Telegram voice notes) |
+| ElevenLabs TTS | 🟢 Familiar | Project Batcave (text-to-speech with character voices) |
 | Vertex AI | 🟢 Familiar | Google Outfits (vector search, embeddings) |
 
 ## Protocols & Serialization
@@ -136,7 +136,7 @@
 | Skill | Level | Evidence |
 |-------|-------|---------|
 | GitHub Actions / CI | 🟡 Proficient | rPotential SDUI Library |
-| Git | 🟡 Proficient | Every project — 14+ years of version control |
+| Git | 🟡 Proficient | Every project, 17 years of version control |
 | Jenkins | 🟢 Familiar | Mission Lane CI/CD pipeline |
 | Bazel | 🟢 Familiar | 3 Google projects (internal build system) |
 

@@ -7,7 +7,7 @@
 - **Work Authorization:** U.S. Citizen — no visa sponsorship required, now or ever again
 - **Languages:** Bilingual — English (professional fluency) and Spanish (native)
 - **Location:** Redwood City, California (San Francisco Bay Area)
-- **Availability:** Immediately available
+- **Current Role:** Lead Full Stack Engineer / AI Engineer at Stellarus (full time, since July 2026)
 
 ## Contact
 
@@ -34,26 +34,28 @@ From there the career progressed through some of the most recognized companies i
 - **Globant Cloud Studio Innovation** — Bay Area, 2024–2025 (Globant internal project using Google Cloud AI tools, not a Google placement)
 - **Mission Lane** — Remote (fintech), 2020–2022
 - **PCCW Global** — Remote (telecom), 2022–2023
-- **rPotential** — Remote (AI startup), 2025–Present
+- **rPotential** — Remote (AI startup), 2025–2026
+- **Stellarus**: Bay Area (healthcare technology, part of the Ascendiun family with Blue Shield of California), July 2026–Present, as a direct full-time employee
+- **Independent**: The Paddle Games, Project Batcave and this portfolio, built and run on his own since 2025
 
 He received his Green Card through Globant in 2019, and became a U.S. Citizen with a U.S. Passport in February 2026. As a U.S. citizen, he does not require any form of visa sponsorship — not now, not in the future.
 
 ## Globant Relationship
 
-Pablo has been employed by Globant since 2011 — over 14 years. Globant is a technology consulting company that places engineers at client companies. So while Pablo's résumé shows Disney, Google, Wells Fargo, etc., his employer throughout has been Globant. He was placed at these companies as a senior consultant, fully embedded in their teams, writing code in their codebases, and shipping their products.
+Pablo was employed by Globant from 2011 to May 2026, over 14 years. Globant is a technology consulting company that places engineers at client companies. So while Pablo's résumé shows Disney, Google, Wells Fargo, etc., his employer through all of those placements was Globant. Since July 2026 he has been a direct employee at Stellarus. He was placed at these companies as a senior consultant, fully embedded in their teams, writing code in their codebases, and shipping their products.
 
 This is not outsourcing or staff augmentation in the traditional sense — Pablo was a first-class member of these teams, attending standups, owning features, and in many cases leading engineering efforts.
 
 ## Current Status
 
-Pablo's most recent project at rPotential wrapped up successfully — the client was satisfied with the engineering delivery. After 14+ years at Globant, he's ready to explore opportunities independently. Now that he has U.S. citizenship, he wants to find a role where he has long-term ownership of what he's building — not wondering when the engagement ends regardless of work quality.
+Pablo is Lead Full Stack Engineer and the team's AI engineer at Stellarus, a healthcare technology company that builds products for health plans, starting with Blue Shield of California. He designed and built an agent system that fixes security vulnerabilities at scale, and he leads the technical side of the team's AI program. Outside work he builds and runs his own products: The Paddle Games (live on the App Store) and Project Batcave (a multi-agent system on the Claude Agent SDK), and he keeps this portfolio and Guillermo as a place to try new ideas in AI engineering.
 
-## What He's Looking For
+## Open to the Right Conversation
 
-- **Target Titles:** AI Lead · AI Native Senior Full Stack Engineer · Architect · Senior Full Stack Engineer
-- **Location:** Remote preferred, or hybrid in the Bay Area. Based in Redwood City — a short commute or even San Francisco a couple days a week works fine.
-- **Company Type:** Big tech or AI startups building interesting products. Dream companies would be at the intersection of engineering and health/fitness — Apple Watch, Whoop, Strava, or similar. Also interested in getting out of the consulting agency model and into a company where he can build something with long-term ownership.
-- **Compensation:** $200K+ base. For specific compensation discussions, reach out directly via email (dimeglio.pablo@gmail.com) or schedule a call (https://calendly.com/dimeglio-pablo).
+Pablo is happy where he's building, but always open to talking about interesting problems and the right role, especially AI engineering with real scope: agent systems in production, evals that decide what ships, and setting technical direction across teams.
+
+- **Location:** Based in Redwood City. Remote or hybrid in the Bay Area.
+- **Compensation and timing:** Discussed directly with Pablo, never by Guillermo. Reach out via email (dimeglio.pablo@gmail.com) or schedule a call (https://calendly.com/dimeglio-pablo).
 
 ## What Drives Him
 
@@ -61,6 +63,6 @@ Pablo is motivated by learning new things to solve challenging problems. AI has 
 
 ## Recommendation
 
-His most recent manager, **Sandro Pasquali** (Applied AI Leader/VP/CTO at rPotential), wrote:
+His manager at rPotential, **Sandro Pasquali** (Applied AI Leader/VP/CTO at rPotential), wrote:
 
 > "I managed Pablo on a team building cutting-edge agentic systems. In the uncertain, new world of AI software engineering Pablo did the work to understand the vision and requirements for an innovative enterprise product, and deliver on time, in a high-pressure environment. Demonstrating strong leadership, he not only innovated on the technical side, but worked across teams, front to back, to ensure alignment on how AI-driven agentic pipelines coordinated session threads, data sources and context, and realtime rendering. I have every confidence that Pablo will bring value to any team he is a part of."

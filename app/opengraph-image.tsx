@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 export const runtime = "edge";
 
 export const alt =
-  "Pablo Di Meglio — Senior Full Stack Engineer · AI Native";
+  "Pablo Di Meglio — Full Stack Engineer · AI Native";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -62,7 +62,7 @@ export default async function Image() {
               letterSpacing: "0.05em",
             }}
           >
-            Senior Full Stack Engineer · AI Native
+            Full Stack Engineer · AI Native
           </div>
           <div
             style={{
