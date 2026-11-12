@@ -71,6 +71,7 @@ export const KNOWN_LOGOS: Record<string, "svg" | "png"> = {
   "paddle-games": "png",
   "pccw-global": "svg",
   rpotential: "svg",
+  stellarus: "png",
   "wells-fargo": "svg",
 };
 

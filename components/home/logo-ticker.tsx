@@ -12,6 +12,7 @@ import { trackEvent } from "@/lib/analytics";
  * When adding a new company, add its SVG to /public/logos/ and add an entry here.
  */
 const logos = [
+  { src: "/logos/stellarus.png", alt: "Stellarus", href: "/experience#exp-stellarus" },
   { src: "/logos/google.svg", alt: "Google", href: "/experience#exp-google-agile-modeling" },
   { src: "/logos/disney.svg", alt: "Disney", href: "/experience#exp-disney-studios" },
   { src: "/logos/globant.svg", alt: "Globant", href: "/experience" },
