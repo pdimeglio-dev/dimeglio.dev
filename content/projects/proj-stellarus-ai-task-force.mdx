@@ -6,7 +6,7 @@ company: "Stellarus"
 associatedExperience: "exp-stellarus"
 startDate: "2026-07"
 endDate: "Present"
-techStack: ["OpenAI Codex", "Codex Plugins", "GitHub Copilot", "Agent Skills", "Confluence"]
+techStack: ["OpenAI Codex", "Codex Plugins", "GitHub Copilot", "Agent Skills", "Confluence", "Bitbucket Pipelines", "Azure"]
 order: 2
 ---
 
@@ -26,12 +26,15 @@ I built proofs of concept for shared Codex and Copilot plugins, so skills and ag
 
 ### From Initiative to Program
 
-The Task Force now has a manager and a Scrum Master, and every engineer on the team gets 30% of their time for AI work. Engineers bring their own AI use cases, and I help them shape the design and get them built.
+The Task Force now has a manager and a Scrum Master, and every engineer on the team gets 30% of their time for AI work. Engineers bring their own AI use cases, and I help them shape the design and get them built. Two of the current ones:
+
+* **AI Code Reviewer.** A developer on the team built a code review agent as a CLI. I'm helping him write it up in Confluence: which metrics to capture, how to grow adoption, and how to get leadership's buy-in. We're now designing how to turn it into something every team can use, with Bitbucket CI/CD pipelines calling the reviewer agent running in Azure.
+* **QA tools.** A set of agent tools that refine Jira tickets, generate test cases from them, and implement API tests.
 
 ### Key Achievements
 
 * **Designed the AI Task Force and lead it on the technical side**, now a program where every engineer spends 30% of their time on AI work.
-* **Technical design support** for the AI use cases engineers bring to the program.
+* **Technical design support** for the AI use cases engineers bring to the program, including taking an AI code reviewer from a CLI to a shared service wired into Bitbucket CI/CD on Azure, and QA tools that refine Jira tickets and generate test cases and API tests.
 * **Full discovery of the AI tools in use**, documented in Confluence.
 * **Built a Codex plugin that publishes to Confluence**, reused later for the vulnerability campaign dashboard.
 * **Proofs of concept for shared Codex and Copilot plugins** to replace skills scattered across repos.
