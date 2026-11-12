@@ -29,7 +29,7 @@ export function Hero() {
           Pablo Di Meglio
         </h1>
         <p className="mt-4 text-lg text-zinc-300 sm:text-xl md:text-2xl">
-          Senior Full Stack Engineer · AI Native
+          Full Stack Engineer · AI Native
         </p>
         <p className="mt-2 text-sm text-zinc-400 sm:text-base">
           Lead Full Stack Engineer / AI Engineer at{" "}
