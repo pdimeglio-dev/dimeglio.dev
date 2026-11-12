@@ -27,11 +27,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Pablo Di Meglio — Lead Full Stack Engineer · AI Native",
+    default: "Pablo Di Meglio — Full Stack Engineer · AI Native",
     template: "%s | Pablo Di Meglio",
   },
   description:
-    "Personal portfolio and blog of Pablo Di Meglio — Lead Full Stack Engineer and AI Native. Building software that thinks.",
+    "Personal portfolio and blog of Pablo Di Meglio — Full Stack Engineer and AI Native. Building software that thinks.",
   metadataBase: new URL("https://dimeglio.dev"),
   keywords: [
     "Pablo Di Meglio",
@@ -58,13 +58,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "dimeglio.dev",
-    title: "Pablo Di Meglio — Lead Full Stack Engineer · AI Native",
+    title: "Pablo Di Meglio — Full Stack Engineer · AI Native",
     description:
-      "Personal portfolio and blog of Pablo Di Meglio — Lead Full Stack Engineer and AI Native. Building software that thinks.",
+      "Personal portfolio and blog of Pablo Di Meglio — Full Stack Engineer and AI Native. Building software that thinks.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pablo Di Meglio — Lead Full Stack Engineer · AI Native",
+    title: "Pablo Di Meglio — Full Stack Engineer · AI Native",
     description:
       "Personal portfolio and blog. Building software that thinks.",
   },

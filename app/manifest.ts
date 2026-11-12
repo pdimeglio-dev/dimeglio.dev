@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "dimeglio.dev — Pablo Di Meglio",
     short_name: "dimeglio.dev",
     description:
-      "Personal portfolio and blog of Pablo Di Meglio — Lead Full Stack Engineer and AI Native.",
+      "Personal portfolio and blog of Pablo Di Meglio — Full Stack Engineer and AI Native.",
     start_url: "/",
     display: "standalone",
     background_color: "#000000",
