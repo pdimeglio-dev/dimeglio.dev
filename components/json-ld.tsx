@@ -34,7 +34,7 @@ export function websiteSchema() {
     name: "dimeglio.dev",
     url: BASE_URL,
     description:
-      "Personal portfolio and blog of Pablo Di Meglio — Senior Full Stack Engineer and AI Native. Building software that thinks.",
+      "Personal portfolio and blog of Pablo Di Meglio — Lead Full Stack Engineer and AI Native. Building software that thinks.",
     author: personSchema(),
   };
 }
@@ -46,7 +46,7 @@ export function personSchema() {
     "@type": "Person",
     name: "Pablo Di Meglio",
     url: BASE_URL,
-    jobTitle: "Senior Full Stack Engineer",
+    jobTitle: "Lead Full Stack Engineer",
     description:
       "Lead Full Stack Engineer and AI Native with 17 years of experience building scalable systems at Google, Disney, Wells Fargo, and more.",
     sameAs: [
