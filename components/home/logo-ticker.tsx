@@ -34,7 +34,7 @@ export function LogoTicker() {
   return (
     <section id="logos" className="mx-auto max-w-5xl px-6">
       <p className="text-center text-sm uppercase tracking-widest text-muted-foreground">
-        Where I&apos;ve built over 17 years
+        Where I&apos;ve built
       </p>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
